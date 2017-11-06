@@ -1,7 +1,7 @@
 {
   "name": "brains",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "making brains",
   "main": "index.js",
   "dependencies": {
     "csvtojson": "^1.1.9",
@@ -9,11 +9,11 @@
   },
   "devDependencies": {},
   "scripts": {
-   "start": "node main.js",
-   "postinstall": "browserify src/client/clientMain.js -i nodejs-physijs -o dist/bundle.js ",
-   "build": "browserify src/client/clientMain.js -i nodejs-physijs -o dist/bundle.js ",
-   "watchify": "watchify src/client/clientMain.js -i nodejs-physijs -o dist/bundle.js -v -d"
+   "start": "node index.js",
+   "postinstall": "browserify src/client/clientMain.js -i matter-js -o dist/bundle.js ",
+   "build": "browserify src/client/clientMain.js -i matter-js -o dist/bundle.js ",
+   "watchify": "watchify src/client/clientMain.js -i matter-js -o dist/bundle.js -v -d"
  },
-  "author": "",
+  "author": "brian leahy",
   "license": "ISC"
 }

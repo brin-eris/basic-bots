@@ -40,3 +40,5 @@ Thumbs.db
 #############
 bin/
 vendor/
+dist/
+node_modules/

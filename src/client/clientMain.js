@@ -1,13 +1,17 @@
-
+'use strict';
 // module aliases
 const    Engine = require('matter-js').Engine;
 const    Render = require('matter-js').Render;
 const    World = require('matter-js').World;
 const    Bodies = require('matter-js').Bodies;
+const    Cppn = require('../common/Cppn');
+const    Plotter = require('./Plotter');
+const    BrainVat = require('../common/BrainVat');
 
 document.addEventListener('DOMContentLoaded', function(e) {
 
-
+  let urmom = new Cppn();
+  urmom.dothing();
   // create an engine
   var engine = Engine.create();
 

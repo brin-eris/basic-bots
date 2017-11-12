@@ -1,6 +1,12 @@
 'use strict';
 const Brain = require('./Brain');
-const Matter = require('matter-js')
+
+const    Matter = require('matter-js');
+const    MatterWrap = require('matter-wrap');
+const    MatterAttractors = require('matter-attractors');
+
+
+
 const World = require('matter-js').World;
 const Bodies = require('matter-js').Bodies;
 const Body = require('matter-js').Body;
@@ -18,10 +24,10 @@ class Bot {
     let group = Body.nextGroup(true);
     let radius = 10;
     let eyeRadius = 5;
-    let offsetRadius = radius + eyeRadius + 8;
-    let eyeAOffset = Matter.Vector.create( offsetRadius * Math.cos(0.9), offsetRadius * Math.sin(0.9));
-    let eyeBOffset = Matter.Vector.create( offsetRadius * Math.cos(0.9), - offsetRadius * Math.sin(0.9));
-    let eyeCOffset = Matter.Vector.create( offsetRadius, 0 );
+    let offsetRadius = radius * 2 + eyeRadius;
+    let eyeAOffset = Matter.Vector.create( offsetRadius * Math.cos(0.9), offsetRadius * Math.sin(0.7));
+    let eyeBOffset = Matter.Vector.create( offsetRadius * Math.cos(0.9), - offsetRadius * Math.sin(0.7));
+    let eyeCOffset = Matter.Vector.create( offsetRadius * 1.5, 0 );
 
     let bot = Matter.Composite.create({
       label: Bot
@@ -33,7 +39,9 @@ class Bot {
       },
       density: 0.9,
       restitution: 0.1,
-      friction: 0.5,
+      friction: 0.9,
+      frictionAir: 0.1,
+      frictionStatic: 0.5,
       render: {
         fillStyle: '#C44D58',
         strokeStyle: '#C44D58',
@@ -47,6 +55,10 @@ class Bot {
       },
       isSensor: true
     });
+    eyeA.gameObject = this;
+    eyeA.onCollideActive = function(me, them){
+      me.gameObject.brain.eyeAInput = 0.0;
+    };
 
     let eyeB = Bodies.circle(position.x + eyeBOffset.x, position.y + eyeBOffset.y, eyeRadius, {
       collisionFilter: {
@@ -54,6 +66,10 @@ class Bot {
       },
       isSensor: true
     });
+    eyeB.gameObject = this;
+    eyeB.onCollideActive = function(me, them){
+      me.gameObject.brain.eyeBInput = 0.0;
+    };
 
     let eyeC = Bodies.circle(position.x + eyeCOffset.x, position.y + eyeCOffset.y, eyeRadius, {
       collisionFilter: {
@@ -61,6 +77,10 @@ class Bot {
       },
       isSensor: true
     });
+    eyeC.gameObject = this;
+    eyeC.onCollideActive = function(me, them){
+      me.gameObject.brain.eyeCInput = 0.0;
+    };
 
     let shitA = Matter.Constraint.create({
       bodyB: body,

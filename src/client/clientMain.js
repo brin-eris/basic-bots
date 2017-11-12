@@ -1,29 +1,24 @@
 'use strict';
 
-const Matter = require('matter-js');
+const    Matter = require('matter-js');
 const    MatterWrap = require('matter-wrap');
 const    MatterAttractors = require('matter-attractors');
 const    MatterCollisionEvents = require('matter-collision-events');
 
-Matter.use('matter-wrap', 'matter-attractors', 'matter-collision-events')
+Matter.use('matter-wrap', 'matter-attractors', 'matter-collision-events');
 
-
-// module aliases
-const    Engine = require('matter-js').Engine;
-const    Render = require('matter-js').Render;
-const    World = require('matter-js').World;
-const    Bodies = require('matter-js').Bodies;
 const    Cppn = require('../common/Cppn');
 const    Plotter = require('./Plotter');
 const    BrainVat = require('../common/BrainVat');
 const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
 
-const MAX_BOTS = 15;
-const MAX_PLANTS = 50;
+const MAX_BOTS = 50;
+const MAX_PLANTS = 150;
 
 
 document.addEventListener('DOMContentLoaded', function(e) {
+
 
 
   var engine = Matter.Engine.create();
@@ -33,8 +28,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
         element: document.body,
         engine: engine,
         options: {
-            width: 800,
-            height: 600,
+            width: 1800,
+            height: 1600,
             showForce: true,
             showAngleIndicator: true,
             showCollisions: true,
@@ -48,15 +43,15 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
     for (let i = 0; i < MAX_BOTS; i++ ){
       new  Bot().create(engine.world, {
-        x : Math.random() * 600,
-        y : Math.random() * 600
+        x : Math.random() * 1600,
+        y : Math.random() * 1600
       });
     }
 
     for (let i = 0; i < MAX_PLANTS; i++){
       new Plant().create(engine.world, {
-        x : Math.random() * 800,
-        y : Math.random() * 800
+        x : Math.random() * 1500,
+        y : Math.random() * 1500
         });
     }
 
@@ -71,7 +66,31 @@ document.addEventListener('DOMContentLoaded', function(e) {
     });
 
     Matter.Events.on(engine, "collisionStart", function(e){
+          for (var i = 0; i < e.pairs.length; i++) {
+            let pair = e.pairs[i];
+            let bodyA = pair.bodyA;
+            let bodyB = pair.bodyB;
+            if(bodyA.onCollide){
+              bodyA.onCollide(bodyA, bodyB);
+            }
+            if(bodyB.onCollide){
+              bodyB.onCollide(bodyB, bodyA);
+            }
+          }
+    });
 
+    Matter.Events.on(engine, "collisionActive", function(e){
+          for (var i = 0; i < e.pairs.length; i++) {
+            let pair = e.pairs[i];
+            let bodyA = pair.bodyA;
+            let bodyB = pair.bodyB;
+            if(bodyA.onCollideActive){
+              bodyA.onCollideActive(bodyA, bodyB);
+            }
+            if(bodyB.onCollideActive){
+              bodyB.onCollideActive(bodyB, bodyA);
+            }
+          }
     });
 
     var mouse = Matter.Mouse.create(render.canvas),
@@ -90,24 +109,32 @@ document.addEventListener('DOMContentLoaded', function(e) {
         // keep the mouse in sync with rendering
         render.mouse = mouse;
 
-        // fit the render viewport to the scene
-        Matter.Render.lookAt(render, {
-            min: { x: 0, y: 0 },
-            max: { x: 800, y: 600 }
-        });
+        // // fit the render viewport to the scene
+        // Matter.Render.lookAt(render, {
+        //     min: { x: 0, y: 0 },
+        //     max: { x: 800, y: 600 }
+        // });
 
+            engine.world.bounds.min.x = 0;
+            engine.world.bounds.min.y = 0;
+            engine.world.bounds.max.x = 1800;
+            engine.world.bounds.max.y = 1600;
 
   // wrapping using matter-wrap plugin
       var allBodies = Matter.Composite.allBodies(engine.world);
 
-      for (var i = 0; i < allBodies.length; i += 1) {
+      for (var i = 0; i < allBodies.length; i++) {
           allBodies[i].plugin.wrap = {
-              min: { x: render.bounds.min.x - 100, y: render.bounds.min.y },
-              max: { x: render.bounds.max.x + 100, y: render.bounds.max.y }
+              min: { x: engine.world.bounds.min.x, y: engine.world.bounds.min.y },
+              max: { x: engine.world.bounds.max.x, y: engine.world.bounds.max.y }
           };
       }
+
+
+
+
       // run the engine
-      Engine.run(engine);
+      Matter.Engine.run(engine);
 
   // run the renderer
     Matter.Render.run(render);

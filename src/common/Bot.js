@@ -171,8 +171,7 @@ class Bot {
   tick() {
     this.life -= 0.0005;
     this.brain.tick();
-      // no eating and runing
-    //if(!this.brain.eat){
+
       let thrust = this.brain.thrust;
       let facing = this.body.angle;
       let turn = this.brain.turn + facing;
@@ -181,13 +180,12 @@ class Bot {
         butt,
         Matter.Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
 
-
-    //}
-
       if(this.life <=0){
           Matter.Composite.remove(this.world, this.parentComposite);
           console.log('i dead');
       }
+
+      this.body.render.fillStyle = (0xFF0000 * this.brain.red) + (0x00FF00 * this.brain.green) + (0x0000FF * this.brain.blue);
 
   }
 

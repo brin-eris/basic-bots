@@ -12,16 +12,18 @@ class Plant {
   }
 
       create(world, position){
-        var particleOptions = {
-                friction: 0.05,
-                frictionStatic: 0.1,
-                render: { visible: true }
-            };
 
-          this.body =  Bodies.rectangle(position.x, position.y, 30, 30, {
+
+          this.body =  Bodies.rectangle(position.x, position.y, 40, 40, {
             friction: 0.5,
             frictionStatic: 0.1,
-            isStatic: true
+            isStatic: true,
+            isSensor: true,
+            render: {
+              fillStyle: '#00FF00',
+              strokeStyle: '#00FF00',
+              lineWidth: 3
+            }
           });
 
           this.body.onCollideActive = function(me, them){
@@ -33,9 +35,7 @@ class Plant {
           this.body.gameObject = this;
           this.world = world;
           World.add(world, this.body);
-
       }
-
 }
 
 

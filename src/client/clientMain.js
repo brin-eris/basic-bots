@@ -7,6 +7,7 @@ const    MatterCollisionEvents = require('matter-collision-events');
 
 Matter.use('matter-wrap', 'matter-attractors', 'matter-collision-events');
 
+const    Wall = require('../common/Wall');
 const    Cppn = require('../common/Cppn');
 const    Plotter = require('./Plotter');
 const    BrainVat = require('../common/BrainVat');
@@ -15,6 +16,7 @@ const    Plant = require('../common/Plant');
 
 const MAX_BOTS = 50;
 const MAX_PLANTS = 150;
+const WALLS = 200;
 
 
 document.addEventListener('DOMContentLoaded', function(e) {
@@ -52,6 +54,13 @@ document.addEventListener('DOMContentLoaded', function(e) {
       new Plant().create(engine.world, {
         x : Math.random() * 1500,
         y : Math.random() * 1500
+        });
+    }
+
+    for (let i = 0; i < WALLS; i++){
+      new Wall().create(engine.world, {
+        x : Math.random() * 15 + 1000,
+        y : Math.random() * 15 + 1000
         });
     }
 

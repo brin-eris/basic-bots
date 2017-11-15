@@ -81950,6 +81950,7 @@ const    MatterCollisionEvents = require('matter-collision-events');
 
 Matter.use('matter-wrap', 'matter-attractors', 'matter-collision-events');
 
+const    Wall = require('../common/Wall');
 const    Cppn = require('../common/Cppn');
 const    Plotter = require('./Plotter');
 const    BrainVat = require('../common/BrainVat');
@@ -81958,6 +81959,7 @@ const    Plant = require('../common/Plant');
 
 const MAX_BOTS = 50;
 const MAX_PLANTS = 150;
+const WALLS = 200;
 
 
 document.addEventListener('DOMContentLoaded', function(e) {
@@ -81995,6 +81997,13 @@ document.addEventListener('DOMContentLoaded', function(e) {
       new Plant().create(engine.world, {
         x : Math.random() * 1500,
         y : Math.random() * 1500
+        });
+    }
+
+    for (let i = 0; i < WALLS; i++){
+      new Wall().create(engine.world, {
+        x : Math.random() * 15 + 1000,
+        y : Math.random() * 15 + 1000
         });
     }
 
@@ -82087,7 +82096,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
 });
 
-},{"../common/Bot":562,"../common/BrainVat":564,"../common/Cppn":565,"../common/Plant":566,"./Plotter":560,"matter-attractors":546,"matter-collision-events":547,"matter-js":549,"matter-wrap":550}],562:[function(require,module,exports){
+},{"../common/Bot":562,"../common/BrainVat":564,"../common/Cppn":565,"../common/Plant":566,"../common/Wall":567,"./Plotter":560,"matter-attractors":546,"matter-collision-events":547,"matter-js":549,"matter-wrap":550}],562:[function(require,module,exports){
 'use strict';
 const    Brain = require('./Brain');
 const    Plant = require('./Plant');
@@ -82261,8 +82270,7 @@ class Bot {
   tick() {
     this.life -= 0.0005;
     this.brain.tick();
-      // no eating and runing
-    //if(!this.brain.eat){
+
       let thrust = this.brain.thrust;
       let facing = this.body.angle;
       let turn = this.brain.turn + facing;
@@ -82271,13 +82279,12 @@ class Bot {
         butt,
         Matter.Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
 
-
-    //}
-
       if(this.life <=0){
           Matter.Composite.remove(this.world, this.parentComposite);
           console.log('i dead');
       }
+
+      this.body.render.fillStyle = (0xFF0000 * this.brain.red) + (0x00FF00 * this.brain.green) + (0x0000FF * this.brain.blue);
 
   }
 
@@ -82312,7 +82319,7 @@ class Brain{
       this.blue = 0.0;
       this.sound = 0.0;
       this.smellInput = 1.0;
-      this.eat = 0.0;
+      //this.eat = 0.0;
       this.ouchie = 0.0;
 
       this.inputWeights = Mathjs.matrix([
@@ -82431,7 +82438,7 @@ class Brain{
       this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3)));
       this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4)));
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
-      this.eat = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) > 0.6;
+      //this.eat = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) > 0.6;
 
       this.eyeAInput = 1.0;
       this.eyeBInput = 1.0;
@@ -82518,16 +82525,18 @@ class Plant {
   }
 
       create(world, position){
-        var particleOptions = {
-                friction: 0.05,
-                frictionStatic: 0.1,
-                render: { visible: true }
-            };
 
-          this.body =  Bodies.rectangle(position.x, position.y, 30, 30, {
+
+          this.body =  Bodies.rectangle(position.x, position.y, 40, 40, {
             friction: 0.5,
             frictionStatic: 0.1,
-            isStatic: true
+            isStatic: true,
+            isSensor: true,
+            render: {
+              fillStyle: '#00FF00',
+              strokeStyle: '#00FF00',
+              lineWidth: 3
+            }
           });
 
           this.body.onCollideActive = function(me, them){
@@ -82539,12 +82548,53 @@ class Plant {
           this.body.gameObject = this;
           this.world = world;
           World.add(world, this.body);
-
       }
-
 }
 
 
 module.exports = Plant;
+
+},{"matter-js":549}],567:[function(require,module,exports){
+'use strict';
+
+const    Matter = require('matter-js');
+const    World = require('matter-js').World;
+const    Bodies = require('matter-js').Bodies;
+
+
+class Wall {
+  constructor() {
+    this.life = 1.0;
+    this.class = Wall;
+  }
+
+      create(world, position){
+
+
+          this.body =  Bodies.rectangle(position.x, position.y, 30, 30, {
+            friction: 0.5,
+            frictionStatic: 0.1,
+            isStatic: true,
+            render: {
+              fillStyle: '#0000FF',
+              strokeStyle: '#0000FF',
+              lineWidth: 3
+            }
+          });
+
+          this.body.onCollideActive = function(me, them){
+            if(me.gameObject.life <=0.0){
+              Matter.Body.remove(this.world, this.body);
+            }
+          }
+
+          this.body.gameObject = this;
+          this.world = world;
+          World.add(world, this.body);
+      }
+}
+
+
+module.exports = Wall;
 
 },{"matter-js":549}]},{},[561]);

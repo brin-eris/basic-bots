@@ -137,7 +137,7 @@ class Brain{
       this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3)));
       this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4)));
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
-      this.eat = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) > 0.5;
+      this.eat = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) > 0.6;
 
       this.eyeAInput = 1.0;
       this.eyeBInput = 1.0;

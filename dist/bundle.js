@@ -82143,9 +82143,9 @@ class Bot {
     body.gameObject = this;
     body.onCollideActive = function(me, them){
         if(them.gameObject && them.gameObject.class==Plant){
-          if(me.gameObject.brain.eat){
+          //if(me.gameObject.brain.eat){
             me.gameObject.eat(them);
-          }
+          //}
         }
     };
     body.onCollide = function(me, them){
@@ -82155,9 +82155,9 @@ class Bot {
             them.gameObject.life -= 0.001;
             me.gameObject.brain.ouchie = 1.0;
         } else if(them.gameObject && them.gameObject.class==Plant){
-            if(me.gameObject.brain.eat){
+            //if(me.gameObject.brain.eat){
               me.gameObject.eat(them);
-            }
+            //}
           }
     };
 
@@ -82262,7 +82262,7 @@ class Bot {
     this.life -= 0.0005;
     this.brain.tick();
       // no eating and runing
-    if(!this.brain.eat){
+    //if(!this.brain.eat){
       let thrust = this.brain.thrust;
       let facing = this.body.angle;
       let turn = this.brain.turn + facing;
@@ -82272,7 +82272,7 @@ class Bot {
         Matter.Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
 
 
-    }
+    //}
 
       if(this.life <=0){
           Matter.Composite.remove(this.world, this.parentComposite);
@@ -82431,7 +82431,7 @@ class Brain{
       this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3)));
       this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4)));
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
-      this.eat = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) > 0.5;
+      this.eat = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) > 0.6;
 
       this.eyeAInput = 1.0;
       this.eyeBInput = 1.0;

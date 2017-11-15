@@ -82089,8 +82089,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
 },{"../common/Bot":562,"../common/BrainVat":564,"../common/Cppn":565,"../common/Plant":566,"./Plotter":560,"matter-attractors":546,"matter-collision-events":547,"matter-js":549,"matter-wrap":550}],562:[function(require,module,exports){
 'use strict';
-const Brain = require('./Brain');
-
+const    Brain = require('./Brain');
+const    Plant = require('./Plant');
 const    Matter = require('matter-js');
 const    MatterWrap = require('matter-wrap');
 const    MatterAttractors = require('matter-attractors');
@@ -82102,7 +82102,7 @@ const Bodies = require('matter-js').Bodies;
 const Body = require('matter-js').Body;
 const Vertices = require('matter-js').Vertices;
 
-// soak the brains in here to get juicy
+
 class Bot {
   constructor() {
     this.class = Bot;
@@ -82118,7 +82118,7 @@ class Bot {
     let eyeAOffset = Matter.Vector.create( offsetRadius * Math.cos(0.9), offsetRadius * Math.sin(0.7));
     let eyeBOffset = Matter.Vector.create( offsetRadius * Math.cos(0.9), - offsetRadius * Math.sin(0.7));
     let eyeCOffset = Matter.Vector.create( offsetRadius * 1.5, 0 );
-
+    let smellRadius = radius * 5;
     let bot = Matter.Composite.create({
       label: Bot
     });
@@ -82138,6 +82138,34 @@ class Bot {
         lineWidth: 3
       }
     });
+
+    body.gameObject = this;
+    body.onCollideActive = function(me, them){
+        if(them.gameObject && them.gameObject.class==Plant){
+            me.gameObject.eat(them);
+            me.gameObject.brain.eating = 1.0;
+        }
+    };
+    body.onCollide = function(me, them){
+        if(them.gameObject && them.gameObject.class==Bot){
+            // todo force based spike damage
+            me.gameObject.life -= 0.001;
+            them.gameObject.life -= 0.001;
+            me.gameObject.brain.ouchie = 1.0;
+        }
+    };
+
+    let smellSensor = Bodies.circle(position.x, position.y, smellRadius, {
+      collisionFilter: {
+        group: group
+      },
+      isSensor: true
+    });
+    smellSensor.gameObject = this;
+    smellSensor.onCollideActive = function(me, them){
+        me.gameObject.brain.smellInput = 1.0;
+    };
+
 
     let eyeA = Bodies.circle(position.x + eyeAOffset.x, position.y + eyeAOffset.y, eyeRadius, {
       collisionFilter: {
@@ -82177,7 +82205,7 @@ class Bot {
       pointB: eyeAOffset,
       bodyA: eyeA,
       stiffness: 1,
-      length: 0
+      dampening:1
     });
 
     let shitB = Matter.Constraint.create({
@@ -82185,7 +82213,7 @@ class Bot {
       pointB: eyeBOffset,
       bodyA: eyeB,
       stiffness: 1,
-      length: 0
+      dampening:1
     });
 
     let shitC = Matter.Constraint.create({
@@ -82193,29 +82221,41 @@ class Bot {
       pointB: eyeCOffset,
       bodyA: eyeC,
       stiffness: 1,
-      length: 0
+      dampening:1
     });
 
+    let shitD = Matter.Constraint.create({
+      bodyB: body,
+      pointB: Matter.Vector.create(0,0),
+      bodyA: smellSensor,
+      stiffness: 1,
+      dampening:1
+    });
     //let spike = Body.create({});
 
     Matter.Composite.addBody(bot, body);
     Matter.Composite.addBody(bot, eyeA);
     Matter.Composite.addBody(bot, eyeB);
     Matter.Composite.addBody(bot, eyeC);
+    Matter.Composite.addBody(bot, smellSensor);
     Matter.Composite.addConstraint(bot, shitA);
     Matter.Composite.addConstraint(bot, shitB);
     Matter.Composite.addConstraint(bot, shitC);
+    Matter.Composite.addConstraint(bot, shitD);
 
     this.body = body;
 
     bot.gameObject = this;
-
+    this.parentComposite = bot;
+    this.smellSensor = smellSensor;
     this.world = world;
     World.add(world, bot);
   }
 
   tick() {
+    this.life -= 0.0005;
     this.brain.tick();
+
     let thrust = this.brain.thrust;
     let facing = this.body.angle;
     let turn = this.brain.turn + facing;
@@ -82223,6 +82263,18 @@ class Bot {
     Matter.Body.applyForce(this.body,
       butt,
       Matter.Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
+
+      if(this.life <=0){
+
+          Matter.Composite.remove(this.world, this.parentComposite);
+          console.log('i dead');
+      }
+
+  }
+
+  eat(food){
+    this.life+=0.001;
+    food.life-=0.001;
   }
 
 }
@@ -82230,7 +82282,7 @@ class Bot {
 
 module.exports = Bot
 
-},{"./Brain":563,"matter-attractors":546,"matter-js":549,"matter-wrap":550}],563:[function(require,module,exports){
+},{"./Brain":563,"./Plant":566,"matter-attractors":546,"matter-js":549,"matter-wrap":550}],563:[function(require,module,exports){
 'use strict';
 
 const Mathjs = require('mathjs');
@@ -82250,6 +82302,8 @@ class Brain{
       this.green = 0.0;
       this.blue = 0.0;
       this.sound = 0.0;
+      this.smellInput = 1.0;
+      this.eating = 0.0;
 
       this.inputWeights = Mathjs.matrix([
         [ (Math.random()-0.5)*4,
@@ -82351,8 +82405,8 @@ class Brain{
         this.ccClock,
         this.turn,
         this.thrust,
-        1,
-        1
+        this.smellInput,
+        this.eating
         ]);
         //,
         // this.lifeInput,
@@ -82370,7 +82424,8 @@ class Brain{
       this.eyeAInput = 1.0;
       this.eyeBInput = 1.0;
       this.eyeCInput = 1.0;
-
+      this.smellInput = 0.0;
+      this.eating = 0.0;
     }
 
     sigmoid(x){
@@ -82447,6 +82502,7 @@ const    Bodies = require('matter-js').Bodies;
 class Plant {
   constructor() {
     this.life = 1.0;
+    this.class = Plant;
   }
 
       create(world, position){
@@ -82459,7 +82515,8 @@ class Plant {
           this.body =  Bodies.rectangle(position.x, position.y, 30, 30, {
             friction: 0.5,
             frictionStatic: 0.1,
-            isStatic: true
+            isStatic: true,
+            isSensor: true
           });
           this.world = world;
           World.add(world, this.body);

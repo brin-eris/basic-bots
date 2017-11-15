@@ -17,6 +17,8 @@ class Brain{
       this.green = 0.0;
       this.blue = 0.0;
       this.sound = 0.0;
+      this.smellInput = 1.0;
+      this.eating = 0.0;
 
       this.inputWeights = Mathjs.matrix([
         [ (Math.random()-0.5)*4,
@@ -118,8 +120,8 @@ class Brain{
         this.ccClock,
         this.turn,
         this.thrust,
-        1,
-        1
+        this.smellInput,
+        this.eating
         ]);
         //,
         // this.lifeInput,
@@ -137,7 +139,8 @@ class Brain{
       this.eyeAInput = 1.0;
       this.eyeBInput = 1.0;
       this.eyeCInput = 1.0;
-
+      this.smellInput = 0.0;
+      this.eating = 0.0;
     }
 
     sigmoid(x){

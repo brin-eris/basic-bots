@@ -176,7 +176,6 @@ class Bot {
       Matter.Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
 
       if(this.life <=0){
-
           Matter.Composite.remove(this.world, this.parentComposite);
           console.log('i dead');
       }

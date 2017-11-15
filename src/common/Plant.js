@@ -24,6 +24,14 @@ class Plant {
             isStatic: true,
             isSensor: true
           });
+
+          this.body.onCollideActive = function(me, them){
+            if(me.gameObject.life <=0.0){
+              Matter.Body.remove(this.world, this.body);
+            }
+          }
+
+          this.body.gameObject = this;
           this.world = world;
           World.add(world, this.body);
 

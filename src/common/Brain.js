@@ -18,7 +18,8 @@ class Brain{
       this.blue = 0.0;
       this.sound = 0.0;
       this.smellInput = 1.0;
-      this.eating = 0.0;
+      this.eat = 0.0;
+      this.ouchie = 0.0;
 
       this.inputWeights = Mathjs.matrix([
         [ (Math.random()-0.5)*4,
@@ -121,7 +122,7 @@ class Brain{
         this.turn,
         this.thrust,
         this.smellInput,
-        this.eating
+        this.ouchie
         ]);
         //,
         // this.lifeInput,
@@ -136,11 +137,13 @@ class Brain{
       this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3)));
       this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4)));
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
+      this.eat = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) > 0.5;
+
       this.eyeAInput = 1.0;
       this.eyeBInput = 1.0;
       this.eyeCInput = 1.0;
       this.smellInput = 0.0;
-      this.eating = 0.0;
+      this.ouchie = 0.0;
     }
 
     sigmoid(x){

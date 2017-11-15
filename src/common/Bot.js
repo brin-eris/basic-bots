@@ -53,8 +53,9 @@ class Bot {
     body.gameObject = this;
     body.onCollideActive = function(me, them){
         if(them.gameObject && them.gameObject.class==Plant){
+          if(me.gameObject.brain.eat){
             me.gameObject.eat(them);
-            me.gameObject.brain.eating = 1.0;
+          }
         }
     };
     body.onCollide = function(me, them){
@@ -63,7 +64,11 @@ class Bot {
             me.gameObject.life -= 0.001;
             them.gameObject.life -= 0.001;
             me.gameObject.brain.ouchie = 1.0;
-        }
+        } else if(them.gameObject && them.gameObject.class==Plant){
+            if(me.gameObject.brain.eat){
+              me.gameObject.eat(them);
+            }
+          }
     };
 
     let smellSensor = Bodies.circle(position.x, position.y, smellRadius, {
@@ -166,14 +171,18 @@ class Bot {
   tick() {
     this.life -= 0.0005;
     this.brain.tick();
+      // no eating and runing
+    if(!this.brain.eat){
+      let thrust = this.brain.thrust;
+      let facing = this.body.angle;
+      let turn = this.brain.turn + facing;
+      let butt = Matter.Vector.create(-5 * Math.cos(facing) + this.body.position.x, -5 * Math.sin(facing) + this.body.position.y);
+      Matter.Body.applyForce(this.body,
+        butt,
+        Matter.Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
 
-    let thrust = this.brain.thrust;
-    let facing = this.body.angle;
-    let turn = this.brain.turn + facing;
-    let butt = Matter.Vector.create(-5 * Math.cos(facing) + this.body.position.x, -5 * Math.sin(facing) + this.body.position.y);
-    Matter.Body.applyForce(this.body,
-      butt,
-      Matter.Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
+
+    }
 
       if(this.life <=0){
           Matter.Composite.remove(this.world, this.parentComposite);
@@ -183,7 +192,7 @@ class Bot {
   }
 
   eat(food){
-    this.life+=0.001;
+    this.life+=0.01;
     food.life-=0.001;
   }
 

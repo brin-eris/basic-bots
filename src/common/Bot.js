@@ -1,11 +1,12 @@
 'use strict';
-const    Brain = require('./Brain');
-const    Plant = require('./Plant');
+
 const    Matter = require('matter-js');
 const    MatterWrap = require('matter-wrap');
 const    MatterAttractors = require('matter-attractors');
 
-
+const    Wall = require('./Wall');
+const    Brain = require('./Brain');
+const    Plant = require('./Plant');
 
 const World = require('matter-js').World;
 const Bodies = require('matter-js').Bodies;
@@ -53,9 +54,9 @@ class Bot {
     body.gameObject = this;
     body.onCollideActive = function(me, them){
         if(them.gameObject && them.gameObject.class==Plant){
-          //if(me.gameObject.brain.eat){
+
             me.gameObject.eat(them);
-          //}
+
         }
     };
     body.onCollide = function(me, them){
@@ -65,21 +66,26 @@ class Bot {
             them.gameObject.life -= 0.001;
             me.gameObject.brain.ouchie = 1.0;
         } else if(them.gameObject && them.gameObject.class==Plant){
-            //if(me.gameObject.brain.eat){
               me.gameObject.eat(them);
-            //}
-          }
+        } else if(them.gameObject && them.gameObject.class==Wall){
+              me.gameObject.life -= 0.001;
+        }
     };
 
     let smellSensor = Bodies.circle(position.x, position.y, smellRadius, {
       collisionFilter: {
         group: group
       },
-      isSensor: true
+      isSensor: true,
+      render: {
+        wireframes: true
+      }
     });
     smellSensor.gameObject = this;
     smellSensor.onCollideActive = function(me, them){
-        me.gameObject.brain.smellInput = 1.0;
+        if(them.gameObject && them.gameObject.class==Plant){
+              me.gameObject.brain.smellInput = 1.0;
+        }
     };
 
 
@@ -91,7 +97,9 @@ class Bot {
     });
     eyeA.gameObject = this;
     eyeA.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeAInput = 0.0;
+      me.gameObject.brain.eyeAInput.red += them.gameObject.body.red;
+      me.gameObject.brain.eyeAInput.blue += them.gameObject.body.blue;
+      me.gameObject.brain.eyeAInput.green += them.gameObject.body.green;
     };
 
     let eyeB = Bodies.circle(position.x + eyeBOffset.x, position.y + eyeBOffset.y, eyeRadius, {
@@ -102,7 +110,9 @@ class Bot {
     });
     eyeB.gameObject = this;
     eyeB.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeBInput = 0.0;
+      me.gameObject.brain.eyeBInput.red += them.gameObject.body.red;
+      me.gameObject.brain.eyeBInput.blue += them.gameObject.body.blue;
+      me.gameObject.brain.eyeBInput.green += them.gameObject.body.green;
     };
 
     let eyeC = Bodies.circle(position.x + eyeCOffset.x, position.y + eyeCOffset.y, eyeRadius, {
@@ -113,7 +123,9 @@ class Bot {
     });
     eyeC.gameObject = this;
     eyeC.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeCInput = 0.0;
+      me.gameObject.brain.eyeCInput.red += them.gameObject.body.red;
+      me.gameObject.brain.eyeCInput.blue += them.gameObject.body.blue;
+      me.gameObject.brain.eyeCInput.green += them.gameObject.body.green;
     };
 
     let shitA = Matter.Constraint.create({
@@ -184,6 +196,10 @@ class Bot {
           Matter.Composite.remove(this.world, this.parentComposite);
           console.log('i dead');
       }
+
+      this.body.red = this.brain.red;
+      this.body.blue = this.brain.blue;
+      this.body.green = this.brain.green;
 
       this.body.render.fillStyle = (0xFF0000 * this.brain.red) + (0x00FF00 * this.brain.green) + (0x0000FF * this.brain.blue);
 

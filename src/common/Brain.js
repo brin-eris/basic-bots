@@ -21,6 +21,12 @@ class Brain{
       //this.eat = 0.0;
       this.ouchie = 0.0;
 
+      this.eyeAInput = { red:0, green: 0, blue:0 };
+      this.eyeBInput = { red:0, green: 0, blue:0 };
+      this.eyeCInput = { red:0, green: 0, blue:0 };
+
+
+
       this.inputWeights = Mathjs.matrix([
         [ (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
@@ -29,8 +35,6 @@ class Brain{
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
@@ -45,8 +49,6 @@ class Brain{
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
@@ -61,8 +63,6 @@ class Brain{
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
@@ -77,8 +77,146 @@ class Brain{
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
           (Math.random()-0.5)*4 ],
         [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
@@ -89,6 +227,12 @@ class Brain{
         ]);
 
       this.outputBias = Mathjs.matrix([
+        (Math.random()-0.5),
+        (Math.random()-0.5),
+        (Math.random()-0.5),
+        (Math.random()-0.5),
+        (Math.random()-0.5),
+        (Math.random()-0.5),
         (Math.random()-0.5),
         (Math.random()-0.5),
         (Math.random()-0.5),
@@ -115,20 +259,22 @@ class Brain{
       this.ccClock = (this.clock - 30)/60;
 
       this.inputVector = Mathjs.matrix([
-        this.eyeAInput,
-        this.eyeBInput,
-        this.eyeCInput,
+        this.eyeAInput.red,
+        this.eyeBInput.red,
+        this.eyeCInput.red,
+        this.eyeAInput.blue,
+        this.eyeBInput.blue,
+        this.eyeCInput.blue,
+        this.eyeAInput.green,
+        this.eyeBInput.green,
+        this.eyeCInput.green,
         this.ccClock,
         this.turn,
         this.thrust,
         this.smellInput,
         this.ouchie
         ]);
-        //,
-        // this.lifeInput,
-        // this.turn,
-        // this.thrust,
-        // this.ccClock
+
       this.connectVector = Mathjs.multiply(this.inputWeights, this.inputVector);
       this.outputVector = Mathjs.add(this.connectVector, this.outputBias);
       this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-0.5)/Math.PI;
@@ -139,11 +285,19 @@ class Brain{
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
       //this.eat = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) > 0.6;
 
-      this.eyeAInput = 1.0;
-      this.eyeBInput = 1.0;
-      this.eyeCInput = 1.0;
       this.smellInput = 0.0;
       this.ouchie = 0.0;
+
+      this.eyeAInput.red = 0.0;
+      this.eyeBInput.red = 0.0;
+      this.eyeCInput.red = 0.0;
+      this.eyeAInput.blue = 0.0;
+      this.eyeBInput.blue = 0.0;
+      this.eyeCInput.blue = 0.0;
+      this.eyeAInput.green = 0.0;
+      this.eyeBInput.green = 0.0;
+      this.eyeCInput.green = 0.0;
+
     }
 
     sigmoid(x){

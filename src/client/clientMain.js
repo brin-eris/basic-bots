@@ -16,7 +16,7 @@ const    Plant = require('../common/Plant');
 
 const MAX_BOTS = 50;
 const MAX_PLANTS = 150;
-const WALLS = 200;
+const WALLS = 100;
 
 
 document.addEventListener('DOMContentLoaded', function(e) {
@@ -35,8 +35,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
             showForce: true,
             showAngleIndicator: true,
             showCollisions: true,
-            showVelocity: true
-            //wireframes: false
+            showVelocity: true,
+            wireframes: true
         }
     });
 
@@ -59,8 +59,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
     for (let i = 0; i < WALLS; i++){
       new Wall().create(engine.world, {
-        x : Math.random() * 15 + 1000,
-        y : Math.random() * 15 + 1000
+        x : Math.random() * 800 * ((i - 1) % 3 - 1) + 800,
+        y : Math.random() * 800 * ((i + 1) % 3 - 1) + 800
         });
     }
 

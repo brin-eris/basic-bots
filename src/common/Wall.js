@@ -5,36 +5,32 @@ const    World = require('matter-js').World;
 const    Bodies = require('matter-js').Bodies;
 
 
-class Plant {
+class Wall {
   constructor() {
-    this.life = 1.0;
-    this.class = Plant;
+    this.class = Wall;
   }
 
       create(world, position){
 
 
-          this.body =  Bodies.rectangle(position.x, position.y, 40, 40, {
+          this.body =  Bodies.rectangle(position.x, position.y, 20, 20, {
             friction: 0.5,
             frictionStatic: 0.1,
             isStatic: true,
-            isSensor: true,
             render: {
-              fillStyle: '#00FF00',
-              strokeStyle: '#00FF00',
+              fillStyle: '#0000FF',
+              strokeStyle: '#0000FF',
               lineWidth: 3
             }
           });
 
-          this.body.blue = 0.0;
+          this.body.blue = 1.0;
           this.body.red = 0.0;
-          this.body.green = 1.0;
+          this.body.green = 0.0;
 
-          this.body.onCollideActive = function(me, them){
-            if(me.gameObject.life <=0.0){
-              Matter.Body.remove(this.world, this.body);
-            }
-          }
+          // this.body.onCollideActive = function(me, them){
+          //
+          // }
 
           this.body.gameObject = this;
           this.world = world;
@@ -43,4 +39,4 @@ class Plant {
 }
 
 
-module.exports = Plant;
+module.exports = Wall;

@@ -81959,7 +81959,7 @@ const    Plant = require('../common/Plant');
 
 const MAX_BOTS = 50;
 const MAX_PLANTS = 150;
-const WALLS = 200;
+const WALLS = 100;
 
 
 document.addEventListener('DOMContentLoaded', function(e) {
@@ -81978,8 +81978,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
             showForce: true,
             showAngleIndicator: true,
             showCollisions: true,
-            showVelocity: true
-            //wireframes: false
+            showVelocity: true,
+            wireframes: true
         }
     });
 
@@ -82002,8 +82002,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
     for (let i = 0; i < WALLS; i++){
       new Wall().create(engine.world, {
-        x : Math.random() * 15 + 1000,
-        y : Math.random() * 15 + 1000
+        x : Math.random() * 800 * ((i - 1) % 3 - 1) + 800,
+        y : Math.random() * 800 * ((i + 1) % 3 - 1) + 800
         });
     }
 
@@ -82098,13 +82098,14 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
 },{"../common/Bot":562,"../common/BrainVat":564,"../common/Cppn":565,"../common/Plant":566,"../common/Wall":567,"./Plotter":560,"matter-attractors":546,"matter-collision-events":547,"matter-js":549,"matter-wrap":550}],562:[function(require,module,exports){
 'use strict';
-const    Brain = require('./Brain');
-const    Plant = require('./Plant');
+
 const    Matter = require('matter-js');
 const    MatterWrap = require('matter-wrap');
 const    MatterAttractors = require('matter-attractors');
 
-
+const    Wall = require('./Wall');
+const    Brain = require('./Brain');
+const    Plant = require('./Plant');
 
 const World = require('matter-js').World;
 const Bodies = require('matter-js').Bodies;
@@ -82152,9 +82153,9 @@ class Bot {
     body.gameObject = this;
     body.onCollideActive = function(me, them){
         if(them.gameObject && them.gameObject.class==Plant){
-          //if(me.gameObject.brain.eat){
+
             me.gameObject.eat(them);
-          //}
+
         }
     };
     body.onCollide = function(me, them){
@@ -82164,21 +82165,26 @@ class Bot {
             them.gameObject.life -= 0.001;
             me.gameObject.brain.ouchie = 1.0;
         } else if(them.gameObject && them.gameObject.class==Plant){
-            //if(me.gameObject.brain.eat){
               me.gameObject.eat(them);
-            //}
-          }
+        } else if(them.gameObject && them.gameObject.class==Wall){
+              me.gameObject.life -= 0.001;
+        }
     };
 
     let smellSensor = Bodies.circle(position.x, position.y, smellRadius, {
       collisionFilter: {
         group: group
       },
-      isSensor: true
+      isSensor: true,
+      render: {
+        wireframes: true
+      }
     });
     smellSensor.gameObject = this;
     smellSensor.onCollideActive = function(me, them){
-        me.gameObject.brain.smellInput = 1.0;
+        if(them.gameObject && them.gameObject.class==Plant){
+              me.gameObject.brain.smellInput = 1.0;
+        }
     };
 
 
@@ -82190,7 +82196,9 @@ class Bot {
     });
     eyeA.gameObject = this;
     eyeA.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeAInput = 0.0;
+      me.gameObject.brain.eyeAInput.red += them.gameObject.body.red;
+      me.gameObject.brain.eyeAInput.blue += them.gameObject.body.blue;
+      me.gameObject.brain.eyeAInput.green += them.gameObject.body.green;
     };
 
     let eyeB = Bodies.circle(position.x + eyeBOffset.x, position.y + eyeBOffset.y, eyeRadius, {
@@ -82201,7 +82209,9 @@ class Bot {
     });
     eyeB.gameObject = this;
     eyeB.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeBInput = 0.0;
+      me.gameObject.brain.eyeBInput.red += them.gameObject.body.red;
+      me.gameObject.brain.eyeBInput.blue += them.gameObject.body.blue;
+      me.gameObject.brain.eyeBInput.green += them.gameObject.body.green;
     };
 
     let eyeC = Bodies.circle(position.x + eyeCOffset.x, position.y + eyeCOffset.y, eyeRadius, {
@@ -82212,7 +82222,9 @@ class Bot {
     });
     eyeC.gameObject = this;
     eyeC.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeCInput = 0.0;
+      me.gameObject.brain.eyeCInput.red += them.gameObject.body.red;
+      me.gameObject.brain.eyeCInput.blue += them.gameObject.body.blue;
+      me.gameObject.brain.eyeCInput.green += them.gameObject.body.green;
     };
 
     let shitA = Matter.Constraint.create({
@@ -82284,6 +82296,10 @@ class Bot {
           console.log('i dead');
       }
 
+      this.body.red = this.brain.red;
+      this.body.blue = this.brain.blue;
+      this.body.green = this.brain.green;
+
       this.body.render.fillStyle = (0xFF0000 * this.brain.red) + (0x00FF00 * this.brain.green) + (0x0000FF * this.brain.blue);
 
   }
@@ -82298,7 +82314,7 @@ class Bot {
 
 module.exports = Bot
 
-},{"./Brain":563,"./Plant":566,"matter-attractors":546,"matter-js":549,"matter-wrap":550}],563:[function(require,module,exports){
+},{"./Brain":563,"./Plant":566,"./Wall":567,"matter-attractors":546,"matter-js":549,"matter-wrap":550}],563:[function(require,module,exports){
 'use strict';
 
 const Mathjs = require('mathjs');
@@ -82322,6 +82338,12 @@ class Brain{
       //this.eat = 0.0;
       this.ouchie = 0.0;
 
+      this.eyeAInput = { red:0, green: 0, blue:0 };
+      this.eyeBInput = { red:0, green: 0, blue:0 };
+      this.eyeCInput = { red:0, green: 0, blue:0 };
+
+
+
       this.inputWeights = Mathjs.matrix([
         [ (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
@@ -82330,8 +82352,6 @@ class Brain{
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
@@ -82346,8 +82366,6 @@ class Brain{
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
@@ -82362,8 +82380,6 @@ class Brain{
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
@@ -82378,8 +82394,146 @@ class Brain{
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
           (Math.random()-0.5)*4 ],
         [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4 ],
+        [ (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
+          (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
           (Math.random()-0.5)*4,
@@ -82390,6 +82544,12 @@ class Brain{
         ]);
 
       this.outputBias = Mathjs.matrix([
+        (Math.random()-0.5),
+        (Math.random()-0.5),
+        (Math.random()-0.5),
+        (Math.random()-0.5),
+        (Math.random()-0.5),
+        (Math.random()-0.5),
         (Math.random()-0.5),
         (Math.random()-0.5),
         (Math.random()-0.5),
@@ -82416,20 +82576,22 @@ class Brain{
       this.ccClock = (this.clock - 30)/60;
 
       this.inputVector = Mathjs.matrix([
-        this.eyeAInput,
-        this.eyeBInput,
-        this.eyeCInput,
+        this.eyeAInput.red,
+        this.eyeBInput.red,
+        this.eyeCInput.red,
+        this.eyeAInput.blue,
+        this.eyeBInput.blue,
+        this.eyeCInput.blue,
+        this.eyeAInput.green,
+        this.eyeBInput.green,
+        this.eyeCInput.green,
         this.ccClock,
         this.turn,
         this.thrust,
         this.smellInput,
         this.ouchie
         ]);
-        //,
-        // this.lifeInput,
-        // this.turn,
-        // this.thrust,
-        // this.ccClock
+
       this.connectVector = Mathjs.multiply(this.inputWeights, this.inputVector);
       this.outputVector = Mathjs.add(this.connectVector, this.outputBias);
       this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-0.5)/Math.PI;
@@ -82440,11 +82602,19 @@ class Brain{
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
       //this.eat = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) > 0.6;
 
-      this.eyeAInput = 1.0;
-      this.eyeBInput = 1.0;
-      this.eyeCInput = 1.0;
       this.smellInput = 0.0;
       this.ouchie = 0.0;
+
+      this.eyeAInput.red = 0.0;
+      this.eyeBInput.red = 0.0;
+      this.eyeCInput.red = 0.0;
+      this.eyeAInput.blue = 0.0;
+      this.eyeBInput.blue = 0.0;
+      this.eyeCInput.blue = 0.0;
+      this.eyeAInput.green = 0.0;
+      this.eyeBInput.green = 0.0;
+      this.eyeCInput.green = 0.0;
+
     }
 
     sigmoid(x){
@@ -82539,6 +82709,10 @@ class Plant {
             }
           });
 
+          this.body.blue = 0.0;
+          this.body.red = 0.0;
+          this.body.green = 1.0;
+
           this.body.onCollideActive = function(me, them){
             if(me.gameObject.life <=0.0){
               Matter.Body.remove(this.world, this.body);
@@ -82564,14 +82738,13 @@ const    Bodies = require('matter-js').Bodies;
 
 class Wall {
   constructor() {
-    this.life = 1.0;
     this.class = Wall;
   }
 
       create(world, position){
 
 
-          this.body =  Bodies.rectangle(position.x, position.y, 30, 30, {
+          this.body =  Bodies.rectangle(position.x, position.y, 20, 20, {
             friction: 0.5,
             frictionStatic: 0.1,
             isStatic: true,
@@ -82582,11 +82755,13 @@ class Wall {
             }
           });
 
-          this.body.onCollideActive = function(me, them){
-            if(me.gameObject.life <=0.0){
-              Matter.Body.remove(this.world, this.body);
-            }
-          }
+          this.body.blue = 1.0;
+          this.body.red = 0.0;
+          this.body.green = 0.0;
+
+          // this.body.onCollideActive = function(me, them){
+          //
+          // }
 
           this.body.gameObject = this;
           this.world = world;

@@ -98,7 +98,7 @@ class Brain{
 
       this.outputVector = Mathjs.add(tempOutputVector, this.outputBias);
 
-      this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-0.5)/Math.PI;
+      this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-0.5)/2;
       this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1)))-  0.5)/2 ;
       this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) ;
       this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3))) ;

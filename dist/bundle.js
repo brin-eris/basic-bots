@@ -82086,11 +82086,6 @@ document.addEventListener('DOMContentLoaded', function(e) {
         // keep the mouse in sync with rendering
         render.mouse = mouse;
 
-        // // fit the render viewport to the scene
-        // Matter.Render.lookAt(render, {
-        //     min: { x: 0, y: 0 },
-        //     max: { x: 800, y: 600 }
-        // });
 
             engine.world.bounds.min.x = 0;
             engine.world.bounds.min.y = 0;
@@ -82166,6 +82161,8 @@ class Bot {
     let eyeCOffset = Matter.Vector.create( offsetRadius * 1.3, 0 );
     let eyeC2AOffset = Matter.Vector.create( offsetLayer2Radius  ,  offsetLayer2Radius * Math.sin(-0.5));
     let eyeC2BOffset = Matter.Vector.create( offsetLayer2Radius , offsetLayer2Radius * Math.sin(0.5));
+    let eyeC3AOffset = Matter.Vector.create( offsetLayer2Radius * 1.3,0);
+
 
     let smellRadius = radius * 5;
 
@@ -82374,6 +82371,21 @@ class Bot {
       me.gameObject.brain.eyeCInput.blue += them.gameObject.body.blue * 0.5;
       me.gameObject.brain.eyeCInput.green += them.gameObject.body.green * 0.5;
     };
+    let eyeC3A = Bodies.circle(position.x + eyeC3AOffset.x, position.y + eyeC3AOffset.y, eyeRadius, {
+      collisionFilter: {
+        group: group
+      },
+      isSensor: true,
+      render: {
+        fillStyle: '#aaaaaa'
+      }
+    });
+    eyeC3A.gameObject = this;
+    eyeC3A.onCollideActive = function(me, them){
+      me.gameObject.brain.eyeCInput.red += them.gameObject.body.red * 0.25;
+      me.gameObject.brain.eyeCInput.blue += them.gameObject.body.blue * 0.25;
+      me.gameObject.brain.eyeCInput.green += them.gameObject.body.green * 0.25;
+    };
 
     let shitA = Matter.Constraint.create({
       bodyB: body,
@@ -82433,6 +82445,13 @@ class Bot {
       stiffness: 1
     });
 
+    let shitC3A = Matter.Constraint.create({
+      bodyB: body,
+      pointB: eyeC3AOffset,
+      bodyA: eyeC3A,
+      stiffness: 1
+    });
+
     let shitD = Matter.Constraint.create({
       bodyB: body,
       pointB: Matter.Vector.create(0,0),
@@ -82451,6 +82470,7 @@ class Bot {
     Matter.Composite.addBody(bot, eyeC);
     Matter.Composite.addBody(bot, eyeC2A);
     Matter.Composite.addBody(bot, eyeC2B);
+    Matter.Composite.addBody(bot, eyeC3A);
     Matter.Composite.addBody(bot, smellSensor);
     Matter.Composite.addConstraint(bot, shitA);
     //Matter.Composite.addConstraint(bot, shitA2A);
@@ -82461,6 +82481,7 @@ class Bot {
     Matter.Composite.addConstraint(bot, shitC);
     Matter.Composite.addConstraint(bot, shitC2A);
     Matter.Composite.addConstraint(bot, shitC2B);
+    Matter.Composite.addConstraint(bot, shitC3A);
     Matter.Composite.addConstraint(bot, shitD);
 
     this.body = body;
@@ -82633,7 +82654,7 @@ class Brain{
 
       this.outputVector = Mathjs.add(tempOutputVector, this.outputBias);
 
-      this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-0.5)/Math.PI;
+      this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-0.5)/2;
       this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1)))-  0.5)/2 ;
       this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) ;
       this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3))) ;

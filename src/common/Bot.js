@@ -191,9 +191,7 @@ class Bot {
     this.life -= 0.0001 * this.brain.age;
     this.brain.tick();
 
-    if(this.brain.age % 50 == 0){
-      this.spawn();
-    }
+    
 
       let thrust = this.brain.thrust;
       let facing = this.body.angle;

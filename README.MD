@@ -1,4 +1,4 @@
-heroku hosted running
+Live work in progress https://still-garden-90822.herokuapp.com/
 
 Basic evolution sim inspired by scriptbots
 

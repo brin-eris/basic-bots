@@ -82563,18 +82563,35 @@ class Brain{
       let inputWeights = Mathjs.ones(Mathjs.matrix([15, 15]));
 
       this.inputWeights = inputWeights.map( function(value, index, matrix) {
+          if(Math.random()> 0.8){
+            let newValue = value + Math.random()-0.5;
+            return newValue;
+          }
+        return value;
+        });
 
-          let newValue = value + Math.random()-0.5;
+      let hiddenBias = Mathjs.zeros(15);
+      this.hiddenBias = hiddenBias.map( function(value, index, matrix) {
+        let newValue = (Math.random() - 0.5);
           return newValue;
         });
 
+      let hiddenWeights = Mathjs.ones(Mathjs.matrix([15, 15]));
+
+      this.hiddenWeights = hiddenWeights.map(function(value, index, matrix){
+        if(Math.random() > 0.2){
+          let newValue = Math.random() * value + Math.random() - 0.5;
+          return newValue
+        }
+        return value;
+      });
+
+
       let outputBias = Mathjs.zeros(15);
       this.outputBias = outputBias.map( function(value, index, matrix) {
-
-          let newValue = (Math.random() -0.5);
+          let newValue = (Math.random() - 0.5);
           return newValue;
-
-      });
+        });
 
     }
 
@@ -82605,8 +82622,17 @@ class Brain{
         0
         ]);
 
-      this.connectVector = Mathjs.multiply(this.inputWeights, this.inputVector);
-      this.outputVector = Mathjs.add(this.connectVector, this.outputBias);
+
+      let inputsConnectVector = Mathjs.multiply(this.inputWeights, this.inputVector);
+
+      let tempHiddenVector = Mathjs.add(inputsConnectVector, this.hiddenBias).map(function(value, index, matrix){
+          return 1/(1 + Mathjs.exp(-1 + value));
+      });
+
+      let tempOutputVector = Mathjs.multiply(tempHiddenVector, this.hiddenWeights);
+
+      this.outputVector = Mathjs.add(tempOutputVector, this.outputBias);
+
       this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-0.5)/Math.PI;
       this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1)))-  0.5)/2 ;
       this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) ;
@@ -82661,6 +82687,26 @@ class Brain{
         }
         return value;
       });
+
+      let hiddenBias = Mathjs.zeros(15);
+      childBrain.hiddenBias = hiddenBias.map( function(value, index, matrix) {
+        if(Math.random() > 0.8){
+          let newValue =  value + Math.random()-0.5;
+          return newValue;
+        }
+        return value;
+        });
+
+      let hiddenWeights = Mathjs.ones(Mathjs.matrix([15, 15]));
+
+      childBrain.hiddenWeights = hiddenWeights.map(function(value, index, matrix){
+        if(Math.random() > 0.8){
+          let newValue = Math.random() * value + Math.random()-0.5;
+          return newValue;
+        }
+        return value;
+      });
+
       childBrain.inputWeights = childInputWeights;
       childBrain.outputBias = childOutputBias;
       return childBrain;

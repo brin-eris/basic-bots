@@ -24,7 +24,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "build": "browserify -i node_modules/matter-collision-events/build/matter-collision-events.js src/client/clientMain.js   -o dist/bundle.js ",
+    "postinstall": "browserify -e src/client/clientMain.js   -o dist/bundle.js ",
+    "build": "browserify -e src/client/clientMain.js   -o dist/bundle.js ",
     "watchify": "watchify  src/client/clientMain.js  -o dist/bundle.js -v -d"
   },
   "author": "brian leahy",

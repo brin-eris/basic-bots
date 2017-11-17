@@ -81958,8 +81958,8 @@ const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
 
 const MAX_BOTS = 50;
-const MAX_PLANTS = 250;
-const WALLS = 100;
+const MAX_PLANTS = 400;
+const WALLS = 360;
 
 
 document.addEventListener('DOMContentLoaded', function(e) {
@@ -81973,8 +81973,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
         element: document.body,
         engine: engine,
         options: {
-            width: 1800,
-            height: 1600,
+            width: 2000,
+            height: 1800,
             // showForce: true,
             // showAngleIndicator: true,
             // showCollisions: true,
@@ -81988,26 +81988,26 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
 
     for (let i = 0; i < WALLS; i++){
-        let  j = ((i+1 )% 3) -1 ;
-        let  k = (i % 3) - 1;
-        let  l = (i+2 % 3) - 1;
+        //  let  j = i % 60 ;
+        // let  k = (i % 3) - 1;
+        // let  l = (i+2 % 3) - 1;
           new Wall().create(engine.world, {
-            x :  Math.random() * j * i * 20  - Math.random() * 20 * i * k + Math.random() * i * l * 20 + 100,
-            y : j * 20  + 20 * i * k + Math.random() * i * l * 20 + 100
+            x : Math.cos(i*3.14/180) * 1000 + 900,
+            y : Math.sin(i*3.14/180)* 900 + 800
           });
     }
 
     for (let i = 0; i < MAX_BOTS; i++ ){
       new  Bot().create(engine.world, {
-        x : Math.random() * 1600,
-        y : Math.random() * 1600
+        x : Math.random() * 1300 + 200,
+        y : Math.random() * 1000 +100
       });
     }
 
     for (let i = 0; i < MAX_PLANTS; i++){
       new Plant().create(engine.world, {
-        x : Math.random() * 1500,
-        y : Math.random() * 1500
+        x : Math.random() * 1800,
+        y : Math.random() * 1600
         });
     }
 
@@ -82036,8 +82036,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
         }
         if(plantCount < MAX_PLANTS){
           new Plant().create(engine.world, {
-            x : Math.random() * 1500,
-            y : Math.random() * 1500
+            x : Math.random() * 1800,
+            y : Math.random() * 1600
             });
         }
     });
@@ -82098,14 +82098,14 @@ document.addEventListener('DOMContentLoaded', function(e) {
             engine.world.bounds.max.y = 1600;
 
   // wrapping using matter-wrap plugin
-      var allBodies = Matter.Composite.allBodies(engine.world);
-
-      for (var i = 0; i < allBodies.length; i++) {
-          allBodies[i].plugin.wrap = {
-              min: { x: engine.world.bounds.min.x, y: engine.world.bounds.min.y },
-              max: { x: engine.world.bounds.max.x, y: engine.world.bounds.max.y }
-          };
-      }
+      // var allBodies = Matter.Composite.allBodies(engine.world);
+      //
+      // for (var i = 0; i < allBodies.length; i++) {
+      //     allBodies[i].plugin.wrap = {
+      //         min: { x: engine.world.bounds.min.x , y: engine.world.bounds.min.y },
+      //         max: { x: engine.world.bounds.max.x , y: engine.world.bounds.max.y  }
+      //     };
+      // }
 
 
 
@@ -82147,12 +82147,26 @@ class Bot {
 
   create(world, position) {
     let group = Body.nextGroup(true);
+    let category = 0x0008;
     let radius = 10;
+    this.radius = radius;
     let eyeRadius = 5;
     let offsetRadius = radius * 2 + eyeRadius;
-    let eyeAOffset = Matter.Vector.create( offsetRadius * Math.cos(0.9), offsetRadius * Math.sin(0.7));
-    let eyeBOffset = Matter.Vector.create( offsetRadius * Math.cos(0.9), - offsetRadius * Math.sin(0.7));
-    let eyeCOffset = Matter.Vector.create( offsetRadius * 1.5, 0 );
+    let offsetLayer2Radius = offsetRadius * 2;
+
+    let eyeAOffset = Matter.Vector.create( offsetRadius * Math.cos(0.7), offsetRadius * Math.sin(0.7));
+    let eyeA2AOffset = Matter.Vector.create( offsetLayer2Radius * Math.cos(0.5), offsetLayer2Radius * Math.sin(0.5));
+    let eyeA2BOffset = Matter.Vector.create( offsetLayer2Radius * Math.cos(0.9), offsetLayer2Radius * Math.sin(0.9));
+
+    let eyeBOffset = Matter.Vector.create( offsetRadius * Math.cos(-0.7),  offsetRadius * Math.sin(-0.7));
+    let eyeB2AOffset = Matter.Vector.create( offsetLayer2Radius * Math.cos(-0.5),  offsetLayer2Radius * Math.sin(-0.5));
+    let eyeB2BOffset = Matter.Vector.create( offsetLayer2Radius * Math.cos(-0.9),  offsetLayer2Radius * Math.sin(-0.9));
+
+
+    let eyeCOffset = Matter.Vector.create( offsetRadius * 1.3, 0 );
+    let eyeC2AOffset = Matter.Vector.create( offsetLayer2Radius  ,  offsetLayer2Radius * Math.sin(-0.5));
+    let eyeC2BOffset = Matter.Vector.create( offsetLayer2Radius , offsetLayer2Radius * Math.sin(0.5));
+
     let smellRadius = radius * 5;
 
     let bot = Matter.Composite.create({
@@ -82163,7 +82177,7 @@ class Bot {
       collisionFilter: {
         group: group
       },
-      density: 0.9,
+      density: 0.5,
       restitution: 0.1,
       friction: 0.9,
       frictionAir: 0.1,
@@ -82173,38 +82187,46 @@ class Bot {
     body.gameObject = this;
     body.onCollideActive = function(me, them){
         if(them.gameObject && them.gameObject.class==Plant){
+          if(me.gameObject.life <=1.0){
             me.gameObject.eat(them.gameObject);
-            // if(them.gameObject.life <= 0.0){
-            //   Matter.Composite.remove(them.gameObject.world, them, true);
-            //   console.log('deforestation is real');
-            // }
+          }
+          }else if(them.gameObject && them.gameObject.class==Wall){
+                me.gameObject.life -= 0.1;
+                  me.gameObject.brain.ouchie += 0.5;
           }
     };
     body.onCollide = function(me, them){
         if(them.gameObject && them.gameObject.class==Bot){
             // todo force based spike damage
-            me.gameObject.life -= 0.001;
-            them.gameObject.life -= 0.001;
-            me.gameObject.brain.ouchie = 1.0;
+            if(me.gameObject.brain.spike > 0.0){
+                them.gameObject.life -= 0.01 *me.gameObject.brain.spike;
+            }
+
+            me.gameObject.brain.ouchie += 0.5;
         } else if(them.gameObject && them.gameObject.class==Plant){
-              me.gameObject.eat(them.gameObject);
-              // if(them.gameObject.life <= 0.0){
-              //   Matter.Composite.remove(them.gameObject.world, them, true);
-              //   //console.log('deforestation is real');
-              // }
+              if(me.gameObject.life <=1.0){
+                  me.gameObject.eat(them.gameObject);
+              }
+
+
         } else if(them.gameObject && them.gameObject.class==Wall){
-              me.gameObject.life -= 0.001;
+              me.gameObject.life -= 0.1;
+                me.gameObject.brain.ouchie += 0.5;
         }
     };
 
     let smellSensor = Bodies.circle(position.x, position.y, smellRadius, {
       collisionFilter: {
-        group: group
+        group: group,
+        mask: category
       },
       isSensor: true,
       render: {
         visible: false
-      }
+      },
+      friction: 0.0,
+      frictionAir: 0.0,
+      frictionStatic: 0.0
     });
     smellSensor.gameObject = this;
     smellSensor.onCollideActive = function(me, them){
@@ -82212,7 +82234,7 @@ class Bot {
               me.gameObject.brain.smellInput += 0.1;
         }
         if(them.gameObject && them.gameObject.class==Bot){
-              me.gameObject.brain.smellInput += 0.1;
+              me.gameObject.brain.smellInput -= 0.1;
               if(me.gameObject.brain.give > 0.0){
                 me.gameObject.give(them.gameObject);
               }
@@ -82222,84 +82244,265 @@ class Bot {
 
     let eyeA = Bodies.circle(position.x + eyeAOffset.x, position.y + eyeAOffset.y, eyeRadius, {
       collisionFilter: {
-        group: group
+        group: group,
+        mask: category
       },
-      isSensor: true
+      isSensor: true,
+      render: {
+        fillStyle: '#aaaaaa'
+      },
+      friction: 0.0,
+      frictionAir: 0.0,
+      frictionStatic: 0.0
     });
     eyeA.gameObject = this;
     eyeA.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeAInput.red += them.gameObject.body.red;
-      me.gameObject.brain.eyeAInput.blue += them.gameObject.body.blue;
-      me.gameObject.brain.eyeAInput.green += them.gameObject.body.green;
+      me.gameObject.brain.eyeAInput.red += them.gameObject.body.red * 0.75;
+      me.gameObject.brain.eyeAInput.blue += them.gameObject.body.blue * 0.75;
+      me.gameObject.brain.eyeAInput.green += them.gameObject.body.green * 0.75;
+    };
+
+    let eyeA2A = Bodies.circle(position.x + eyeA2AOffset.x, position.y + eyeA2AOffset.y, eyeRadius, {
+      collisionFilter: {
+        group: group,
+        mask: category
+      },
+      isSensor: true,
+      render: {
+        fillStyle: '#aaaaaa'
+      },
+      friction: 0.0,
+      frictionAir: 0.0,
+      frictionStatic: 0.0
+    });
+    eyeA2A.gameObject = this;
+    eyeA2A.onCollideActive = function(me, them){
+      me.gameObject.brain.eyeAInput.red += them.gameObject.body.red * 0.5;
+      me.gameObject.brain.eyeAInput.blue += them.gameObject.body.blue * 0.5;
+      me.gameObject.brain.eyeAInput.green += them.gameObject.body.green * 0.5;
+    };
+    let eyeA2B = Bodies.circle(position.x + eyeA2BOffset.x, position.y + eyeA2BOffset.y, eyeRadius, {
+      collisionFilter: {
+        group: group,
+        mask: category
+      },
+      isSensor: true,
+      render: {
+        fillStyle: '#aaaaaa'
+      },
+      friction: 0.0,
+      frictionAir: 0.0,
+      frictionStatic: 0.0
+    });
+    eyeA2B.gameObject = this;
+    eyeA2B.onCollideActive = function(me, them){
+      me.gameObject.brain.eyeAInput.red += them.gameObject.body.red * 0.5;
+      me.gameObject.brain.eyeAInput.blue += them.gameObject.body.blue * 0.5;
+      me.gameObject.brain.eyeAInput.green += them.gameObject.body.green * 0.5;
     };
 
     let eyeB = Bodies.circle(position.x + eyeBOffset.x, position.y + eyeBOffset.y, eyeRadius, {
       collisionFilter: {
-        group: group
+        group: group,
+        mask: category
       },
-      isSensor: true
+      isSensor: true,
+      render: {
+        fillStyle: '#aaaaaa'
+      },
+      friction: 0.0,
+      frictionAir: 0.0,
+      frictionStatic: 0.0
     });
     eyeB.gameObject = this;
     eyeB.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeBInput.red += them.gameObject.body.red;
-      me.gameObject.brain.eyeBInput.blue += them.gameObject.body.blue;
-      me.gameObject.brain.eyeBInput.green += them.gameObject.body.green;
+      me.gameObject.brain.eyeBInput.red += them.gameObject.body.red * 0.75;
+      me.gameObject.brain.eyeBInput.blue += them.gameObject.body.blue * 0.75;
+      me.gameObject.brain.eyeBInput.green += them.gameObject.body.green * 0.75;
+    };
+    let eyeB2A = Bodies.circle(position.x + eyeB2AOffset.x, position.y + eyeB2AOffset.y, eyeRadius, {
+      collisionFilter: {
+        group: group,
+        mask: category
+      },
+      isSensor: true,
+      render: {
+        fillStyle: '#aaaaaa'
+      },
+      friction: 0.0,
+      frictionAir: 0.0,
+      frictionStatic: 0.0
+    });
+    eyeB2A.gameObject = this;
+    eyeB2A.onCollideActive = function(me, them){
+      me.gameObject.brain.eyeBInput.red += them.gameObject.body.red * 0.5;
+      me.gameObject.brain.eyeBInput.blue += them.gameObject.body.blue * 0.5;
+      me.gameObject.brain.eyeBInput.green += them.gameObject.body.green * 0.5;
+    };
+    let eyeB2B = Bodies.circle(position.x + eyeB2BOffset.x, position.y + eyeB2BOffset.y, eyeRadius, {
+      collisionFilter: {
+        group: group,
+        mask: category
+      },
+      isSensor: true,
+      render: {
+        fillStyle: '#aaaaaa'
+      },
+      friction: 0.0,
+      frictionAir: 0.0,
+      frictionStatic: 0.0
+    });
+    eyeB2B.gameObject = this;
+    eyeB2B.onCollideActive = function(me, them){
+      me.gameObject.brain.eyeBInput.red += them.gameObject.body.red * 0.5;
+      me.gameObject.brain.eyeBInput.blue += them.gameObject.body.blue * 0.5;
+      me.gameObject.brain.eyeBInput.green += them.gameObject.body.green * 0.5;
     };
 
     let eyeC = Bodies.circle(position.x + eyeCOffset.x, position.y + eyeCOffset.y, eyeRadius, {
       collisionFilter: {
-        group: group
+        group: group,
+        mask: category
       },
-      isSensor: true
+      isSensor: true,
+      render: {
+        fillStyle: '#aaaaaa'
+      },
+      friction: 0.0,
+      frictionAir: 0.0,
+      frictionStatic: 0.0
     });
     eyeC.gameObject = this;
     eyeC.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeCInput.red += them.gameObject.body.red;
-      me.gameObject.brain.eyeCInput.blue += them.gameObject.body.blue;
-      me.gameObject.brain.eyeCInput.green += them.gameObject.body.green;
+      me.gameObject.brain.eyeCInput.red += them.gameObject.body.red * 0.75;
+      me.gameObject.brain.eyeCInput.blue += them.gameObject.body.blue * 0.75;
+      me.gameObject.brain.eyeCInput.green += them.gameObject.body.green * 0.75;
+    };
+    let eyeC2A = Bodies.circle(position.x + eyeC2AOffset.x, position.y + eyeC2AOffset.y, eyeRadius, {
+      collisionFilter: {
+        group: group,
+        mask: category
+      },
+      isSensor: true,
+      render: {
+        fillStyle: '#aaaaaa'
+      },
+      friction: 0.0,
+      frictionAir: 0.0,
+      frictionStatic: 0.0
+    });
+    eyeC2A.gameObject = this;
+    eyeC2A.onCollideActive = function(me, them){
+      me.gameObject.brain.eyeCInput.red += them.gameObject.body.red * 0.5;
+      me.gameObject.brain.eyeCInput.blue += them.gameObject.body.blue * 0.5;
+      me.gameObject.brain.eyeCInput.green += them.gameObject.body.green * 0.5;
+    };
+    let eyeC2B = Bodies.circle(position.x + eyeC2BOffset.x, position.y + eyeC2BOffset.y, eyeRadius, {
+      collisionFilter: {
+        group: group,
+        mask: category
+      },
+      isSensor: true,
+      render: {
+        fillStyle: '#aaaaaa'
+      },
+      friction: 0.0,
+      frictionAir: 0.0,
+      frictionStatic: 0.0
+    });
+    eyeC2B.gameObject = this;
+    eyeC2B.onCollideActive = function(me, them){
+      me.gameObject.brain.eyeCInput.red += them.gameObject.body.red * 0.5;
+      me.gameObject.brain.eyeCInput.blue += them.gameObject.body.blue * 0.5;
+      me.gameObject.brain.eyeCInput.green += them.gameObject.body.green * 0.5;
     };
 
     let shitA = Matter.Constraint.create({
       bodyB: body,
       pointB: eyeAOffset,
       bodyA: eyeA,
-      stiffness: 1,
-      dampening:1
+      stiffness: 1
+    });
+    let shitA2A = Matter.Constraint.create({
+      bodyB: body,
+      pointB: eyeA2AOffset,
+      bodyA: eyeA2A,
+      stiffness: 1
+    });
+    let shitA2B = Matter.Constraint.create({
+      bodyB: body,
+      pointB: eyeA2BOffset,
+      bodyA: eyeA2B,
+      stiffness: 1
     });
 
     let shitB = Matter.Constraint.create({
       bodyB: body,
       pointB: eyeBOffset,
       bodyA: eyeB,
-      stiffness: 1,
-      dampening:1
+      stiffness: 1
+    });
+    let shitB2A = Matter.Constraint.create({
+      bodyB: body,
+      pointB: eyeB2AOffset,
+      bodyA: eyeB2A,
+      stiffness: 1
+    });
+    let shitB2B = Matter.Constraint.create({
+      bodyB: body,
+      pointB: eyeB2BOffset,
+      bodyA: eyeB2B,
+      stiffness: 1
     });
 
     let shitC = Matter.Constraint.create({
       bodyB: body,
       pointB: eyeCOffset,
       bodyA: eyeC,
-      stiffness: 1,
-      dampening:1
+      stiffness: 1
+    });
+
+    let shitC2A = Matter.Constraint.create({
+      bodyB: body,
+      pointB: eyeC2AOffset,
+      bodyA: eyeC2A,
+      stiffness: 1
+    });
+    let shitC2B = Matter.Constraint.create({
+      bodyB: body,
+      pointB: eyeC2BOffset,
+      bodyA: eyeC2B,
+      stiffness: 1
     });
 
     let shitD = Matter.Constraint.create({
       bodyB: body,
       pointB: Matter.Vector.create(0,0),
       bodyA: smellSensor,
-      stiffness: 1,
-      dampening:1
+      stiffness: 1
     });
     //let spike = Body.create({});
 
     Matter.Composite.addBody(bot, body);
     Matter.Composite.addBody(bot, eyeA);
+    //Matter.Composite.addBody(bot, eyeA2A);
+    //Matter.Composite.addBody(bot, eyeA2B);
     Matter.Composite.addBody(bot, eyeB);
+    //Matter.Composite.addBody(bot, eyeB2A);
+    //Matter.Composite.addBody(bot, eyeB2B);
     Matter.Composite.addBody(bot, eyeC);
+    Matter.Composite.addBody(bot, eyeC2A);
+    Matter.Composite.addBody(bot, eyeC2B);
     Matter.Composite.addBody(bot, smellSensor);
     Matter.Composite.addConstraint(bot, shitA);
+    //Matter.Composite.addConstraint(bot, shitA2A);
+    //Matter.Composite.addConstraint(bot, shitA2B);
     Matter.Composite.addConstraint(bot, shitB);
+    //Matter.Composite.addConstraint(bot, shitB2A);
+    //Matter.Composite.addConstraint(bot, shitB2B);
     Matter.Composite.addConstraint(bot, shitC);
+    Matter.Composite.addConstraint(bot, shitC2A);
+    Matter.Composite.addConstraint(bot, shitC2B);
     Matter.Composite.addConstraint(bot, shitD);
 
     this.body = body;
@@ -82315,12 +82518,13 @@ class Bot {
     this.life -= 0.0001 * this.brain.age;
     this.brain.tick();
 
-    
+
 
       let thrust = this.brain.thrust;
       let facing = this.body.angle;
       let turn = this.brain.turn + facing;
-      let butt = Matter.Vector.create(-5 * Math.cos(facing) + this.body.position.x, -5 * Math.sin(facing) + this.body.position.y);
+      let position = Matter.Vector.clone(this.body.position);
+      let butt = Matter.Vector.create(- this.radius * Math.cos(facing) + position.x, -this.radius * Math.sin(facing) + position.y);
       Matter.Body.applyForce(this.body,
         butt,
         Matter.Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
@@ -82334,13 +82538,13 @@ class Bot {
       this.body.blue = this.brain.blue;
       this.body.green = this.brain.green;
 
-      this.body.render.fillStyle = this.rgbToHex(this.brain.red, this.brain.green, this.brain.blue);
+      this.body.render.fillStyle = this.rgbToHex(this.brain.red * 255, this.brain.green * 255, this.brain.blue * 255);
 
   }
 
   eat(food){
     this.life += 0.01;
-    food.life -= 0.011;
+    food.life -= 0.001;
     //console.log('nom' + food.class);
   }
 
@@ -82354,7 +82558,7 @@ class Bot {
     let child = new Bot();
     //console.log('spawn');
     child.brain = this.brain.mutate();
-    child.create(this.world, this.body.position);
+    child.create(this.world, Matter.Vector.create(this.body.position.x +10, this.body.position.y +10));
   }
 
   componentToHex(c) {
@@ -82398,231 +82602,22 @@ class Brain{
       this.eyeBInput = { red:0, green: 0, blue:0 };
       this.eyeCInput = { red:0, green: 0, blue:0 };
 
+      let inputWeights = Mathjs.ones(Mathjs.matrix([15, 15]));
 
+      this.inputWeights = inputWeights.map( function(value, index, matrix) {
 
-      this.inputWeights = Mathjs.matrix([
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ]
-        ]);
+          let newValue = value + Math.random()-0.5;
+          return newValue;
+        });
 
-      this.outputBias = Mathjs.matrix([
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5)
-      ]);
-      // this.outputBias = Mathjs.matrix([
-      //   0,
-      //   0,
-      //   0,
-      //   0,
-      //   0,
-      //   0
-      // ]);
+      let outputBias = Mathjs.zeros(15);
+      this.outputBias = outputBias.map( function(value, index, matrix) {
+
+          let newValue = (Math.random() -0.5);
+          return newValue;
+
+      });
+
     }
 
     tick(){
@@ -82648,16 +82643,17 @@ class Brain{
         this.turn,
         this.thrust,
         this.smellInput,
-        this.ouchie
+        this.ouchie,
+        0
         ]);
 
       this.connectVector = Mathjs.multiply(this.inputWeights, this.inputVector);
       this.outputVector = Mathjs.add(this.connectVector, this.outputBias);
       this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-0.5)/Math.PI;
       this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1)))-  0.5)/2 ;
-      this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) * 255;
-      this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3))) * 255;
-      this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4))) * 255;
+      this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) ;
+      this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3))) ;
+      this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4))) ;
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
       this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.6;
 
@@ -82686,8 +82682,11 @@ class Brain{
       let childOutputBias = this.outputBias.clone();
       childInputWeights = childInputWeights.map( function(value, index, matrix) {
         if(Math.random() > 0.9){
-          let newValue = value + value * (Math.random() -0.5) * 0.1;
-          return newValue;
+          if(value!=0){
+            let newValue = value + value * (Math.random() -0.5) ;
+            return newValue;
+          }
+        return  (Math.random() -0.5)*0.1;
           //matrix.subset( Mathjs.index(index), newValue);
         }
         return value;
@@ -82695,8 +82694,11 @@ class Brain{
 
       childOutputBias = childOutputBias.map( function(value, index, matrix) {
         if(Math.random() > 0.9){
-          let newValue = value + value * (Math.random() -0.5) * 0.1;
-          return newValue;
+          if(value!=0){
+            let newValue = value + value * (Math.random() -0.5);
+            return newValue;
+          }
+        return  (Math.random() -0.5)*0.1
           //matrix.subset( Mathjs.index(index), newValue);
         }
         return value;

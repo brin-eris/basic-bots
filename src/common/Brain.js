@@ -25,231 +25,22 @@ class Brain{
       this.eyeBInput = { red:0, green: 0, blue:0 };
       this.eyeCInput = { red:0, green: 0, blue:0 };
 
+      let inputWeights = Mathjs.ones(Mathjs.matrix([15, 15]));
 
+      this.inputWeights = inputWeights.map( function(value, index, matrix) {
 
-      this.inputWeights = Mathjs.matrix([
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ],
-        [ (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4,
-          (Math.random()-0.5)*4 ]
-        ]);
+          let newValue = value + Math.random()-0.5;
+          return newValue;
+        });
 
-      this.outputBias = Mathjs.matrix([
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5),
-        (Math.random()-0.5)
-      ]);
-      // this.outputBias = Mathjs.matrix([
-      //   0,
-      //   0,
-      //   0,
-      //   0,
-      //   0,
-      //   0
-      // ]);
+      let outputBias = Mathjs.zeros(15);
+      this.outputBias = outputBias.map( function(value, index, matrix) {
+
+          let newValue = (Math.random() -0.5);
+          return newValue;
+
+      });
+
     }
 
     tick(){
@@ -275,16 +66,17 @@ class Brain{
         this.turn,
         this.thrust,
         this.smellInput,
-        this.ouchie
+        this.ouchie,
+        0
         ]);
 
       this.connectVector = Mathjs.multiply(this.inputWeights, this.inputVector);
       this.outputVector = Mathjs.add(this.connectVector, this.outputBias);
       this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-0.5)/Math.PI;
       this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1)))-  0.5)/2 ;
-      this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) * 255;
-      this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3))) * 255;
-      this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4))) * 255;
+      this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) ;
+      this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3))) ;
+      this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4))) ;
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
       this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.6;
 
@@ -313,8 +105,11 @@ class Brain{
       let childOutputBias = this.outputBias.clone();
       childInputWeights = childInputWeights.map( function(value, index, matrix) {
         if(Math.random() > 0.9){
-          let newValue = value + value * (Math.random() -0.5) * 0.1;
-          return newValue;
+          if(value!=0){
+            let newValue = value + value * (Math.random() -0.5) ;
+            return newValue;
+          }
+        return  (Math.random() -0.5)*0.1;
           //matrix.subset( Mathjs.index(index), newValue);
         }
         return value;
@@ -322,8 +117,11 @@ class Brain{
 
       childOutputBias = childOutputBias.map( function(value, index, matrix) {
         if(Math.random() > 0.9){
-          let newValue = value + value * (Math.random() -0.5) * 0.1;
-          return newValue;
+          if(value!=0){
+            let newValue = value + value * (Math.random() -0.5);
+            return newValue;
+          }
+        return  (Math.random() -0.5)*0.1
           //matrix.subset( Mathjs.index(index), newValue);
         }
         return value;

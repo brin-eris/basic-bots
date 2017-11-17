@@ -15,8 +15,8 @@ const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
 
 const MAX_BOTS = 50;
-const MAX_PLANTS = 250;
-const WALLS = 100;
+const MAX_PLANTS = 400;
+const WALLS = 360;
 
 
 document.addEventListener('DOMContentLoaded', function(e) {
@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
         element: document.body,
         engine: engine,
         options: {
-            width: 1800,
-            height: 1600,
+            width: 2000,
+            height: 1800,
             // showForce: true,
             // showAngleIndicator: true,
             // showCollisions: true,
@@ -45,26 +45,26 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
 
     for (let i = 0; i < WALLS; i++){
-        let  j = ((i+1 )% 3) -1 ;
-        let  k = (i % 3) - 1;
-        let  l = (i+2 % 3) - 1;
+        //  let  j = i % 60 ;
+        // let  k = (i % 3) - 1;
+        // let  l = (i+2 % 3) - 1;
           new Wall().create(engine.world, {
-            x :  Math.random() * j * i * 20  - Math.random() * 20 * i * k + Math.random() * i * l * 20 + 100,
-            y : j * 20  + 20 * i * k + Math.random() * i * l * 20 + 100
+            x : Math.cos(i*3.14/180) * 1000 + 900,
+            y : Math.sin(i*3.14/180)* 900 + 800
           });
     }
 
     for (let i = 0; i < MAX_BOTS; i++ ){
       new  Bot().create(engine.world, {
-        x : Math.random() * 1600,
-        y : Math.random() * 1600
+        x : Math.random() * 1300 + 200,
+        y : Math.random() * 1000 +100
       });
     }
 
     for (let i = 0; i < MAX_PLANTS; i++){
       new Plant().create(engine.world, {
-        x : Math.random() * 1500,
-        y : Math.random() * 1500
+        x : Math.random() * 1800,
+        y : Math.random() * 1600
         });
     }
 
@@ -93,8 +93,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
         }
         if(plantCount < MAX_PLANTS){
           new Plant().create(engine.world, {
-            x : Math.random() * 1500,
-            y : Math.random() * 1500
+            x : Math.random() * 1800,
+            y : Math.random() * 1600
             });
         }
     });
@@ -155,14 +155,14 @@ document.addEventListener('DOMContentLoaded', function(e) {
             engine.world.bounds.max.y = 1600;
 
   // wrapping using matter-wrap plugin
-      var allBodies = Matter.Composite.allBodies(engine.world);
-
-      for (var i = 0; i < allBodies.length; i++) {
-          allBodies[i].plugin.wrap = {
-              min: { x: engine.world.bounds.min.x, y: engine.world.bounds.min.y },
-              max: { x: engine.world.bounds.max.x, y: engine.world.bounds.max.y }
-          };
-      }
+      // var allBodies = Matter.Composite.allBodies(engine.world);
+      //
+      // for (var i = 0; i < allBodies.length; i++) {
+      //     allBodies[i].plugin.wrap = {
+      //         min: { x: engine.world.bounds.min.x , y: engine.world.bounds.min.y },
+      //         max: { x: engine.world.bounds.max.x , y: engine.world.bounds.max.y  }
+      //     };
+      // }
 
 
 

@@ -43,6 +43,17 @@ document.addEventListener('DOMContentLoaded', function(e) {
     engine.world.gravity.y = 0;
     engine.world.gravity.x = 0;
 
+
+    for (let i = 0; i < WALLS; i++){
+        let  j = ((i+1 )% 3) -1 ;
+        let  k = (i % 3) - 1;
+        let  l = (i+2 % 3) - 1;
+          new Wall().create(engine.world, {
+            x :  Math.random() * j * i * 20  - Math.random() * 20 * i * k + Math.random() * i * l * 20 + 100,
+            y : j * 20  + 20 * i * k + Math.random() * i * l * 20 + 100
+          });
+    }
+
     for (let i = 0; i < MAX_BOTS; i++ ){
       new  Bot().create(engine.world, {
         x : Math.random() * 1600,
@@ -57,15 +68,6 @@ document.addEventListener('DOMContentLoaded', function(e) {
         });
     }
 
-    for (let i = 0; i < WALLS; i++){
-    let  j = ((i+1 )% 3) -1 ;
-    let  k = (i % 3) - 1;
-    let  l = (i+2 % 3) - 1;
-      new Wall().create(engine.world, {
-        x :  Math.random() * j * i * 20  - Math.random() * 20 * i * k + Math.random() * i * l * 20 + 100,
-        y : j * 20  + 20 * i * k + Math.random() * i * l * 20 + 100
-      });
-    }
 
     Matter.Events.on(engine, "beforeUpdate", function(e){
       let botCount = 0;

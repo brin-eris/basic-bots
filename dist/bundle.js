@@ -82147,7 +82147,7 @@ class Bot {
 
   create(world, position) {
     let group = Body.nextGroup(true);
-    let category = 0x0008;
+
     let radius = 10;
     this.radius = radius;
     let eyeRadius = 5;
@@ -82199,7 +82199,7 @@ class Bot {
         if(them.gameObject && them.gameObject.class==Bot){
             // todo force based spike damage
             if(me.gameObject.brain.spike > 0.0){
-                them.gameObject.life -= 0.01 *me.gameObject.brain.spike;
+                them.gameObject.life -= 0.01 * me.gameObject.brain.spike * me.velocity;
             }
 
             me.gameObject.brain.ouchie += 0.5;
@@ -82207,9 +82207,7 @@ class Bot {
               if(me.gameObject.life <=1.0){
                   me.gameObject.eat(them.gameObject);
               }
-
-
-        } else if(them.gameObject && them.gameObject.class==Wall){
+          } else if(them.gameObject && them.gameObject.class==Wall){
               me.gameObject.life -= 0.1;
                 me.gameObject.brain.ouchie += 0.5;
         }
@@ -82217,16 +82215,12 @@ class Bot {
 
     let smellSensor = Bodies.circle(position.x, position.y, smellRadius, {
       collisionFilter: {
-        group: group,
-        mask: category
+        group: group
       },
       isSensor: true,
       render: {
         visible: false
-      },
-      friction: 0.0,
-      frictionAir: 0.0,
-      frictionStatic: 0.0
+      }
     });
     smellSensor.gameObject = this;
     smellSensor.onCollideActive = function(me, them){
@@ -82244,16 +82238,12 @@ class Bot {
 
     let eyeA = Bodies.circle(position.x + eyeAOffset.x, position.y + eyeAOffset.y, eyeRadius, {
       collisionFilter: {
-        group: group,
-        mask: category
+        group: group
       },
       isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
-      },
-      friction: 0.0,
-      frictionAir: 0.0,
-      frictionStatic: 0.0
+      }
     });
     eyeA.gameObject = this;
     eyeA.onCollideActive = function(me, them){
@@ -82270,10 +82260,7 @@ class Bot {
       isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
-      },
-      friction: 0.0,
-      frictionAir: 0.0,
-      frictionStatic: 0.0
+      }
     });
     eyeA2A.gameObject = this;
     eyeA2A.onCollideActive = function(me, them){
@@ -82289,10 +82276,7 @@ class Bot {
       isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
-      },
-      friction: 0.0,
-      frictionAir: 0.0,
-      frictionStatic: 0.0
+      }
     });
     eyeA2B.gameObject = this;
     eyeA2B.onCollideActive = function(me, them){
@@ -82309,10 +82293,7 @@ class Bot {
       isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
-      },
-      friction: 0.0,
-      frictionAir: 0.0,
-      frictionStatic: 0.0
+      }
     });
     eyeB.gameObject = this;
     eyeB.onCollideActive = function(me, them){
@@ -82328,10 +82309,7 @@ class Bot {
       isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
-      },
-      friction: 0.0,
-      frictionAir: 0.0,
-      frictionStatic: 0.0
+      }
     });
     eyeB2A.gameObject = this;
     eyeB2A.onCollideActive = function(me, them){
@@ -82347,10 +82325,7 @@ class Bot {
       isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
-      },
-      friction: 0.0,
-      frictionAir: 0.0,
-      frictionStatic: 0.0
+      }
     });
     eyeB2B.gameObject = this;
     eyeB2B.onCollideActive = function(me, them){
@@ -82367,10 +82342,7 @@ class Bot {
       isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
-      },
-      friction: 0.0,
-      frictionAir: 0.0,
-      frictionStatic: 0.0
+      }
     });
     eyeC.gameObject = this;
     eyeC.onCollideActive = function(me, them){
@@ -82386,10 +82358,7 @@ class Bot {
       isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
-      },
-      friction: 0.0,
-      frictionAir: 0.0,
-      frictionStatic: 0.0
+      }
     });
     eyeC2A.gameObject = this;
     eyeC2A.onCollideActive = function(me, them){
@@ -82405,10 +82374,7 @@ class Bot {
       isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
-      },
-      friction: 0.0,
-      frictionAir: 0.0,
-      frictionStatic: 0.0
+      }
     });
     eyeC2B.gameObject = this;
     eyeC2B.onCollideActive = function(me, them){

@@ -375,7 +375,9 @@ class Bot {
   }
 
   tick() {
-    this.life -= 0.0001 * this.brain.age;
+
+
+    this.brain.life = this.life;
     this.brain.tick();
 
 
@@ -389,6 +391,7 @@ class Bot {
         butt,
         Matter.Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
 
+      this.life -= 0.0001 * this.brain.age;
       if(this.life <=0){
           Matter.Composite.remove(this.world, this.parentComposite, true);
 //          console.log('i dead');

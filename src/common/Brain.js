@@ -84,7 +84,7 @@ class Brain{
         this.thrust,
         this.smellInput,
         this.ouchie,
-        0
+        this.life
         ]);
 
 

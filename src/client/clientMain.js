@@ -15,7 +15,7 @@ const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
 
 const MAX_BOTS = 50;
-const MAX_PLANTS = 150;
+const MAX_PLANTS = 250;
 const WALLS = 100;
 
 
@@ -58,19 +58,42 @@ document.addEventListener('DOMContentLoaded', function(e) {
     }
 
     for (let i = 0; i < WALLS; i++){
+    let  j = ((i+1 )% 3) -1 ;
+    let  k = (i % 3) - 1;
+    let  l = (i+2 % 3) - 1;
       new Wall().create(engine.world, {
-        x : Math.random() * 800 * ((i - 1) % 3 - 1) + 800,
-        y : Math.random() * 800 * ((i + 1) % 3 - 1) + 800
-        });
+        x :  Math.random() * j * i * 20  - Math.random() * 20 * i * k + Math.random() * i * l * 20 +500,
+        y : j * 20  + 20 * i * k + Math.random() * i * l * 20 + 500
+      });
     }
 
     Matter.Events.on(engine, "beforeUpdate", function(e){
-
+      let botCount = 0;
+      let plantCount = 0;
+      let oldestBot = null;
         for (var i = 0; i < engine.world.composites.length; i++) {
           let urmom = engine.world.composites[i];
-          if(urmom.gameObject != null && urmom.gameObject.class == Bot){
+          if(urmom.gameObject != null ){
+          if( urmom.gameObject.class == Bot){
             urmom.gameObject.tick();
+            botCount++;
+            if(oldestBot == null || oldestBot.age < urmom.gameObject.age){
+              oldestBot = urmom.gameObject;
+            }
+          }else if ( urmom.gameObject.class == Plant){
+            urmom.gameObject.tick();
+            plantCount++;
           }
+          }
+        }
+        if(botCount < MAX_BOTS){
+          oldestBot.spawn();
+        }
+        if(plantCount < MAX_PLANTS){
+          new Plant().create(engine.world, {
+            x : Math.random() * 1500,
+            y : Math.random() * 1500
+            });
         }
     });
 

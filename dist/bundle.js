@@ -81958,7 +81958,7 @@ const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
 
 const MAX_BOTS = 50;
-const MAX_PLANTS = 150;
+const MAX_PLANTS = 250;
 const WALLS = 100;
 
 
@@ -82001,19 +82001,42 @@ document.addEventListener('DOMContentLoaded', function(e) {
     }
 
     for (let i = 0; i < WALLS; i++){
+    let  j = ((i+1 )% 3) -1 ;
+    let  k = (i % 3) - 1;
+    let  l = (i+2 % 3) - 1;
       new Wall().create(engine.world, {
-        x : Math.random() * 800 * ((i - 1) % 3 - 1) + 800,
-        y : Math.random() * 800 * ((i + 1) % 3 - 1) + 800
-        });
+        x :  Math.random() * j * i * 20  - Math.random() * 20 * i * k + Math.random() * i * l * 20 +500,
+        y : j * 20  + 20 * i * k + Math.random() * i * l * 20 + 500
+      });
     }
 
     Matter.Events.on(engine, "beforeUpdate", function(e){
-
+      let botCount = 0;
+      let plantCount = 0;
+      let oldestBot = null;
         for (var i = 0; i < engine.world.composites.length; i++) {
           let urmom = engine.world.composites[i];
-          if(urmom.gameObject != null && urmom.gameObject.class == Bot){
+          if(urmom.gameObject != null ){
+          if( urmom.gameObject.class == Bot){
             urmom.gameObject.tick();
+            botCount++;
+            if(oldestBot == null || oldestBot.age < urmom.gameObject.age){
+              oldestBot = urmom.gameObject;
+            }
+          }else if ( urmom.gameObject.class == Plant){
+            urmom.gameObject.tick();
+            plantCount++;
           }
+          }
+        }
+        if(botCount < MAX_BOTS){
+          oldestBot.spawn();
+        }
+        if(plantCount < MAX_PLANTS){
+          new Plant().create(engine.world, {
+            x : Math.random() * 1500,
+            y : Math.random() * 1500
+            });
         }
     });
 
@@ -82131,7 +82154,7 @@ class Bot {
     let smellRadius = radius * 5;
 
     let bot = Matter.Composite.create({
-      label: Bot
+      label: 'Bot'
     });
 
     let body = Bodies.circle(position.x, position.y, radius, {
@@ -82153,10 +82176,12 @@ class Bot {
     body.gameObject = this;
     body.onCollideActive = function(me, them){
         if(them.gameObject && them.gameObject.class==Plant){
-
-            me.gameObject.eat(them);
-
-        }
+            me.gameObject.eat(them.gameObject);
+            // if(them.gameObject.life <= 0.0){
+            //   Matter.Composite.remove(them.gameObject.world, them, true);
+            //   console.log('deforestation is real');
+            // }
+          }
     };
     body.onCollide = function(me, them){
         if(them.gameObject && them.gameObject.class==Bot){
@@ -82165,7 +82190,11 @@ class Bot {
             them.gameObject.life -= 0.001;
             me.gameObject.brain.ouchie = 1.0;
         } else if(them.gameObject && them.gameObject.class==Plant){
-              me.gameObject.eat(them);
+              me.gameObject.eat(them.gameObject);
+              // if(them.gameObject.life <= 0.0){
+              //   Matter.Composite.remove(them.gameObject.world, them, true);
+              //   //console.log('deforestation is real');
+              // }
         } else if(them.gameObject && them.gameObject.class==Wall){
               me.gameObject.life -= 0.001;
         }
@@ -82183,7 +82212,13 @@ class Bot {
     smellSensor.gameObject = this;
     smellSensor.onCollideActive = function(me, them){
         if(them.gameObject && them.gameObject.class==Plant){
-              me.gameObject.brain.smellInput = 1.0;
+              me.gameObject.brain.smellInput += 0.1;
+        }
+        if(them.gameObject && them.gameObject.class==Bot){
+              me.gameObject.brain.smellInput += 0.1;
+              if(me.gameObject.brain.give > 0.0){
+                me.gameObject.give(them.gameObject);
+              }
         }
     };
 
@@ -82280,8 +82315,12 @@ class Bot {
   }
 
   tick() {
-    this.life -= 0.0005;
+    this.life -= 0.001 * this.brain.age;
     this.brain.tick();
+
+    if(this.brain.age % 50 == 0){
+      this.spawn();
+    }
 
       let thrust = this.brain.thrust;
       let facing = this.body.angle;
@@ -82292,23 +82331,36 @@ class Bot {
         Matter.Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
 
       if(this.life <=0){
-          Matter.Composite.remove(this.world, this.parentComposite);
-          console.log('i dead');
+          Matter.Composite.remove(this.world, this.parentComposite, true);
+//          console.log('i dead');
       }
 
       this.body.red = this.brain.red;
       this.body.blue = this.brain.blue;
       this.body.green = this.brain.green;
 
-      this.body.render.fillStyle = (0xFF0000 * this.brain.red) + (0x00FF00 * this.brain.green) + (0x0000FF * this.brain.blue);
+      //this.body.render.fillStyle = '#' + (this.brain.red * 255).toString(16) + (this.brain.green * 255).toString(16)  + (this.brain.blue * 255).toString(16);
 
   }
 
   eat(food){
-    this.life+=0.01;
-    food.life-=0.001;
+    this.life += 0.02;
+    food.life -= 0.03;
+    //console.log('nom' + food.class);
   }
 
+  give(them){
+    let toGive = this.brain.give * 0.01;
+    this.life -=toGive;
+    them.life +=toGive;
+  }
+
+  spawn(){
+    let child = new Bot();
+    //console.log('spawn');
+    child.brain = this.brain.mutate();
+    child.create(this.world, this.body.position);
+  }
 }
 
 
@@ -82335,9 +82387,9 @@ class Brain{
       this.blue = 0.0;
       this.sound = 0.0;
       this.smellInput = 1.0;
-      //this.eat = 0.0;
+      this.give = 0.0;
       this.ouchie = 0.0;
-
+      this.age = 0;
       this.eyeAInput = { red:0, green: 0, blue:0 };
       this.eyeBInput = { red:0, green: 0, blue:0 };
       this.eyeCInput = { red:0, green: 0, blue:0 };
@@ -82573,6 +82625,9 @@ class Brain{
 
       this.clock++;
       this.clock %= 60;
+      if(this.clock == 1){
+        this.age++;
+      }
       this.ccClock = (this.clock - 30)/60;
 
       this.inputVector = Mathjs.matrix([
@@ -82600,7 +82655,7 @@ class Brain{
       this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3)));
       this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4)));
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
-      //this.eat = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) > 0.6;
+      this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.6;
 
       this.smellInput = 0.0;
       this.ouchie = 0.0;
@@ -82621,6 +82676,31 @@ class Brain{
         return 1/(1 + Mathjs.exp(-1 + x));
     }
 
+    mutate(){
+      let childBrain = new Brain();
+      let childInputWeights = this.inputWeights.clone();
+      let childOutputBias = this.outputBias.clone();
+      childInputWeights = childInputWeights.map( function(value, index, matrix) {
+        if(Math.random() > 0.9){
+          let newValue = value + value * (Math.random() -0.5) * 0.1;
+          return newValue;
+          //matrix.subset( Mathjs.index(index), newValue);
+        }
+        return value;
+      });
+
+      childOutputBias = childOutputBias.map( function(value, index, matrix) {
+        if(Math.random() > 0.9){
+          let newValue = value + value * (Math.random() -0.5) * 0.1;
+          return newValue;
+          //matrix.subset( Mathjs.index(index), newValue);
+        }
+        return value;
+      });
+      childBrain.inputWeights = childInputWeights;
+      childBrain.outputBias = childOutputBias;
+      return childBrain;
+    }
 }
 
 
@@ -82695,7 +82775,9 @@ class Plant {
   }
 
       create(world, position){
-
+        let plant = Matter.Composite.create({
+          label: 'Plant'
+        });
 
           this.body =  Bodies.rectangle(position.x, position.y, 40, 40, {
             friction: 0.5,
@@ -82713,16 +82795,23 @@ class Plant {
           this.body.red = 0.0;
           this.body.green = 1.0;
 
-          this.body.onCollideActive = function(me, them){
-            if(me.gameObject.life <=0.0){
-              Matter.Body.remove(this.world, this.body);
-            }
-          }
-
+          plant.gameObject = this;
+          this.parentComposite = plant;
+          Matter.Composite.addBody(plant, this.body);
           this.body.gameObject = this;
           this.world = world;
-          World.add(world, this.body);
+          World.add(world, plant);
       }
+
+      tick(){
+        //console.log(this.life);
+        if(this.life <= 0.0){
+            Matter.Composite.remove(this.world, this.parentComposite, true);
+            console.log('deforestization');
+        }
+
+      }
+
 }
 
 

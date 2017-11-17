@@ -32,7 +32,7 @@ class Bot {
     let smellRadius = radius * 5;
 
     let bot = Matter.Composite.create({
-      label: Bot
+      label: 'Bot'
     });
 
     let body = Bodies.circle(position.x, position.y, radius, {
@@ -54,10 +54,12 @@ class Bot {
     body.gameObject = this;
     body.onCollideActive = function(me, them){
         if(them.gameObject && them.gameObject.class==Plant){
-
-            me.gameObject.eat(them);
-
-        }
+            me.gameObject.eat(them.gameObject);
+            // if(them.gameObject.life <= 0.0){
+            //   Matter.Composite.remove(them.gameObject.world, them, true);
+            //   console.log('deforestation is real');
+            // }
+          }
     };
     body.onCollide = function(me, them){
         if(them.gameObject && them.gameObject.class==Bot){
@@ -66,7 +68,11 @@ class Bot {
             them.gameObject.life -= 0.001;
             me.gameObject.brain.ouchie = 1.0;
         } else if(them.gameObject && them.gameObject.class==Plant){
-              me.gameObject.eat(them);
+              me.gameObject.eat(them.gameObject);
+              // if(them.gameObject.life <= 0.0){
+              //   Matter.Composite.remove(them.gameObject.world, them, true);
+              //   //console.log('deforestation is real');
+              // }
         } else if(them.gameObject && them.gameObject.class==Wall){
               me.gameObject.life -= 0.001;
         }
@@ -84,7 +90,13 @@ class Bot {
     smellSensor.gameObject = this;
     smellSensor.onCollideActive = function(me, them){
         if(them.gameObject && them.gameObject.class==Plant){
-              me.gameObject.brain.smellInput = 1.0;
+              me.gameObject.brain.smellInput += 0.1;
+        }
+        if(them.gameObject && them.gameObject.class==Bot){
+              me.gameObject.brain.smellInput += 0.1;
+              if(me.gameObject.brain.give > 0.0){
+                me.gameObject.give(them.gameObject);
+              }
         }
     };
 
@@ -181,8 +193,12 @@ class Bot {
   }
 
   tick() {
-    this.life -= 0.0005;
+    this.life -= 0.001 * this.brain.age;
     this.brain.tick();
+
+    if(this.brain.age % 50 == 0){
+      this.spawn();
+    }
 
       let thrust = this.brain.thrust;
       let facing = this.body.angle;
@@ -193,23 +209,36 @@ class Bot {
         Matter.Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
 
       if(this.life <=0){
-          Matter.Composite.remove(this.world, this.parentComposite);
-          console.log('i dead');
+          Matter.Composite.remove(this.world, this.parentComposite, true);
+//          console.log('i dead');
       }
 
       this.body.red = this.brain.red;
       this.body.blue = this.brain.blue;
       this.body.green = this.brain.green;
 
-      this.body.render.fillStyle = (0xFF0000 * this.brain.red) + (0x00FF00 * this.brain.green) + (0x0000FF * this.brain.blue);
+      //this.body.render.fillStyle = '#' + (this.brain.red * 255).toString(16) + (this.brain.green * 255).toString(16)  + (this.brain.blue * 255).toString(16);
 
   }
 
   eat(food){
-    this.life+=0.01;
-    food.life-=0.001;
+    this.life += 0.02;
+    food.life -= 0.03;
+    //console.log('nom' + food.class);
   }
 
+  give(them){
+    let toGive = this.brain.give * 0.01;
+    this.life -=toGive;
+    them.life +=toGive;
+  }
+
+  spawn(){
+    let child = new Bot();
+    //console.log('spawn');
+    child.brain = this.brain.mutate();
+    child.create(this.world, this.body.position);
+  }
 }
 
 

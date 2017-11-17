@@ -12,7 +12,9 @@ class Plant {
   }
 
       create(world, position){
-
+        let plant = Matter.Composite.create({
+          label: 'Plant'
+        });
 
           this.body =  Bodies.rectangle(position.x, position.y, 40, 40, {
             friction: 0.5,
@@ -30,16 +32,23 @@ class Plant {
           this.body.red = 0.0;
           this.body.green = 1.0;
 
-          this.body.onCollideActive = function(me, them){
-            if(me.gameObject.life <=0.0){
-              Matter.Body.remove(this.world, this.body);
-            }
-          }
-
+          plant.gameObject = this;
+          this.parentComposite = plant;
+          Matter.Composite.addBody(plant, this.body);
           this.body.gameObject = this;
           this.world = world;
-          World.add(world, this.body);
+          World.add(world, plant);
       }
+
+      tick(){
+        //console.log(this.life);
+        if(this.life <= 0.0){
+            Matter.Composite.remove(this.world, this.parentComposite, true);
+            console.log('deforestization');
+        }
+
+      }
+
 }
 
 

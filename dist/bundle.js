@@ -82254,8 +82254,7 @@ class Bot {
 
     let eyeA2A = Bodies.circle(position.x + eyeA2AOffset.x, position.y + eyeA2AOffset.y, eyeRadius, {
       collisionFilter: {
-        group: group,
-        mask: category
+        group: group
       },
       isSensor: true,
       render: {
@@ -82270,8 +82269,7 @@ class Bot {
     };
     let eyeA2B = Bodies.circle(position.x + eyeA2BOffset.x, position.y + eyeA2BOffset.y, eyeRadius, {
       collisionFilter: {
-        group: group,
-        mask: category
+        group: group
       },
       isSensor: true,
       render: {
@@ -82287,8 +82285,7 @@ class Bot {
 
     let eyeB = Bodies.circle(position.x + eyeBOffset.x, position.y + eyeBOffset.y, eyeRadius, {
       collisionFilter: {
-        group: group,
-        mask: category
+        group: group
       },
       isSensor: true,
       render: {
@@ -82303,8 +82300,7 @@ class Bot {
     };
     let eyeB2A = Bodies.circle(position.x + eyeB2AOffset.x, position.y + eyeB2AOffset.y, eyeRadius, {
       collisionFilter: {
-        group: group,
-        mask: category
+        group: group
       },
       isSensor: true,
       render: {
@@ -82319,8 +82315,7 @@ class Bot {
     };
     let eyeB2B = Bodies.circle(position.x + eyeB2BOffset.x, position.y + eyeB2BOffset.y, eyeRadius, {
       collisionFilter: {
-        group: group,
-        mask: category
+        group: group
       },
       isSensor: true,
       render: {
@@ -82336,8 +82331,7 @@ class Bot {
 
     let eyeC = Bodies.circle(position.x + eyeCOffset.x, position.y + eyeCOffset.y, eyeRadius, {
       collisionFilter: {
-        group: group,
-        mask: category
+        group: group
       },
       isSensor: true,
       render: {
@@ -82352,8 +82346,7 @@ class Bot {
     };
     let eyeC2A = Bodies.circle(position.x + eyeC2AOffset.x, position.y + eyeC2AOffset.y, eyeRadius, {
       collisionFilter: {
-        group: group,
-        mask: category
+        group: group
       },
       isSensor: true,
       render: {
@@ -82368,8 +82361,7 @@ class Bot {
     };
     let eyeC2B = Bodies.circle(position.x + eyeC2BOffset.x, position.y + eyeC2BOffset.y, eyeRadius, {
       collisionFilter: {
-        group: group,
-        mask: category
+        group: group
       },
       isSensor: true,
       render: {

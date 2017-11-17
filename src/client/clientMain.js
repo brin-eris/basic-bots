@@ -32,11 +32,11 @@ document.addEventListener('DOMContentLoaded', function(e) {
         options: {
             width: 1800,
             height: 1600,
-            showForce: true,
-            showAngleIndicator: true,
-            showCollisions: true,
-            showVelocity: true,
-            wireframes: true
+            // showForce: true,
+            // showAngleIndicator: true,
+            // showCollisions: true,
+            // showVelocity: true,
+            wireframes: false
         }
     });
 
@@ -62,8 +62,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
     let  k = (i % 3) - 1;
     let  l = (i+2 % 3) - 1;
       new Wall().create(engine.world, {
-        x :  Math.random() * j * i * 20  - Math.random() * 20 * i * k + Math.random() * i * l * 20 +500,
-        y : j * 20  + 20 * i * k + Math.random() * i * l * 20 + 500
+        x :  Math.random() * j * i * 20  - Math.random() * 20 * i * k + Math.random() * i * l * 20 + 100,
+        y : j * 20  + 20 * i * k + Math.random() * i * l * 20 + 100
       });
     }
 

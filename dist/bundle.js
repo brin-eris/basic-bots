@@ -81975,11 +81975,11 @@ document.addEventListener('DOMContentLoaded', function(e) {
         options: {
             width: 1800,
             height: 1600,
-            showForce: true,
-            showAngleIndicator: true,
-            showCollisions: true,
-            showVelocity: true,
-            wireframes: true
+            // showForce: true,
+            // showAngleIndicator: true,
+            // showCollisions: true,
+            // showVelocity: true,
+            wireframes: false
         }
     });
 
@@ -82165,12 +82165,7 @@ class Bot {
       restitution: 0.1,
       friction: 0.9,
       frictionAir: 0.1,
-      frictionStatic: 0.5,
-      render: {
-        fillStyle: '#C44D58',
-        strokeStyle: '#C44D58',
-        lineWidth: 3
-      }
+      frictionStatic: 0.5
     });
 
     body.gameObject = this;
@@ -82206,7 +82201,7 @@ class Bot {
       },
       isSensor: true,
       render: {
-        wireframes: true
+        visible: false
       }
     });
     smellSensor.gameObject = this;
@@ -82315,7 +82310,7 @@ class Bot {
   }
 
   tick() {
-    this.life -= 0.001 * this.brain.age;
+    this.life -= 0.0001 * this.brain.age;
     this.brain.tick();
 
     if(this.brain.age % 50 == 0){
@@ -82339,13 +82334,13 @@ class Bot {
       this.body.blue = this.brain.blue;
       this.body.green = this.brain.green;
 
-      //this.body.render.fillStyle = '#' + (this.brain.red * 255).toString(16) + (this.brain.green * 255).toString(16)  + (this.brain.blue * 255).toString(16);
+      this.body.render.fillStyle = this.rgbToHex(this.brain.red, this.brain.green, this.brain.blue);
 
   }
 
   eat(food){
-    this.life += 0.02;
-    food.life -= 0.03;
+    this.life += 0.01;
+    food.life -= 0.011;
     //console.log('nom' + food.class);
   }
 
@@ -82360,6 +82355,15 @@ class Bot {
     //console.log('spawn');
     child.brain = this.brain.mutate();
     child.create(this.world, this.body.position);
+  }
+
+  componentToHex(c) {
+    var hex = c.toString(16).substring(0,2);
+    return hex.length == 1 ? "0" + hex : hex;
+  }
+
+  rgbToHex(r, g, b) {
+    return "#" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
   }
 }
 
@@ -82651,9 +82655,9 @@ class Brain{
       this.outputVector = Mathjs.add(this.connectVector, this.outputBias);
       this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-0.5)/Math.PI;
       this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1)))-  0.5)/2 ;
-      this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2)));
-      this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3)));
-      this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4)));
+      this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) * 255;
+      this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3))) * 255;
+      this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4))) * 255;
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
       this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.6;
 

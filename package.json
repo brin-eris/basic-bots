@@ -24,7 +24,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "postinstall": "browserify -e src/client/clientMain.js  -i -o dist/bundle.js ",
+    "postinstall": "browserify -e src/client/clientMain.js  -o dist/bundle.js ",
     "build": "browserify -e src/client/clientMain.js   -o dist/bundle.js ",
     "watchify": "watchify  src/client/clientMain.js  -o dist/bundle.js -v -d"
   },

@@ -70,7 +70,7 @@ class Brain{
       let inputsConnectVector = Mathjs.multiply(this.inputWeights, this.inputVector);
 
       let tempHiddenVector = Mathjs.add(inputsConnectVector, this.hiddenBias).map(function(value, index, matrix){
-          let result = Math.sin(value);
+          let result = Math.atan(value);
 
           return result == NaN ? 1.0 : result;
       });

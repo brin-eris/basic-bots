@@ -28,9 +28,9 @@ class Plant {
             }
           });
 
-          this.body.blue = 0.0;
-          this.body.red = 0.0;
-          this.body.green = 1.0;
+          this.blue = 0.1;
+          this.red = 0.1;
+          this.green = 0.9;
 
           plant.gameObject = this;
           this.parentComposite = plant;
@@ -40,14 +40,14 @@ class Plant {
           World.add(world, plant);
       }
 
-      tick(){
-        //console.log(this.life);
-        if(this.life <= 0.0){
-            Matter.Composite.remove(this.world, this.parentComposite, true);
-            console.log('deforestization');
-        }
-
+      destroy(){
+        Matter.Composite.remove(this.world, this.parentComposite, true);
+        console.log('deforestization');
       }
+
+
+
+
 
 }
 

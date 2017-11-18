@@ -81957,10 +81957,12 @@ const    BrainVat = require('../common/BrainVat');
 const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
 
-const MAX_BOTS = 60;
+const MAX_BOTS = 20;
 const MAX_PLANTS = 1000;
-const WALLS = 360;
+const WALLS = 200;
 
+const WIDTH = 3000;
+const HEIGHT = 2000;
 
 document.addEventListener('DOMContentLoaded', function(e) {
 
@@ -81973,8 +81975,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
         element: document.body,
         engine: engine,
         options: {
-            width: 3000,
-            height: 2000,
+            width: WIDTH,
+            height: HEIGHT,
             // showForce: true,
             // showAngleIndicator: true,
             // showCollisions: true,
@@ -81992,22 +81994,22 @@ document.addEventListener('DOMContentLoaded', function(e) {
         // let  k = (i % 3) - 1;
         // let  l = (i+2 % 3) - 1;
           new Wall().create(engine.world, {
-            x : Math.cos(i*3.14/180) * 1500 + 1500,
-            y : Math.sin(i*3.14/180)* 1000 + 1000
+            x : Math.cos(i*3.14/60) * WIDTH/2 + i * 10 ,
+            y : Math.sin(i*3.14/60)* HEIGHT/2 + HEIGHT/2
           });
     }
 
     for (let i = 0; i < MAX_BOTS; i++ ){
       new  Bot().create(engine.world, {
-        x : (Math.random() -0.5) * 3000 + 1500,
-        y : (Math.random() - 0.5) * 2000 + 1000
+        x : (Math.random() -0.5) * WIDTH + WIDTH/2,
+        y : (Math.random() - 0.5) * HEIGHT + HEIGHT/2
       });
     }
 
     for (let i = 0; i < MAX_PLANTS; i++){
       new Plant().create(engine.world, {
-        x : (Math.random() -0.5) * 3000 + 1500,
-        y : (Math.random() - 0.5) * 2000 + 1000
+        x : (Math.random() -0.5) * WIDTH + HEIGHT/2,
+        y : (Math.random() - 0.5) * HEIGHT + HEIGHT/2
         });
     }
 
@@ -82019,25 +82021,26 @@ document.addEventListener('DOMContentLoaded', function(e) {
         for (var i = 0; i < engine.world.composites.length; i++) {
           let urmom = engine.world.composites[i];
           if(urmom.gameObject != null ){
-          if( urmom.gameObject.class == Bot){
-            urmom.gameObject.tick();
-            botCount++;
-            if(oldestBot == null || oldestBot.age < urmom.gameObject.age){
-              oldestBot = urmom.gameObject;
-            }
-          }else if ( urmom.gameObject.class == Plant){
-            urmom.gameObject.tick();
-            plantCount++;
-          }
+            if( urmom.gameObject.class == Bot){
+              urmom.gameObject.tick();
+              botCount++;
+                if(oldestBot == null || oldestBot.age < urmom.gameObject.age){
+                  oldestBot = urmom.gameObject;
+                }
+              }else if ( urmom.gameObject.class == Plant){
+
+                plantCount++;
+              }
           }
         }
         if(botCount < MAX_BOTS){
           oldestBot.spawn();
         }
         if(plantCount < MAX_PLANTS){
+          plantCount++;
           new Plant().create(engine.world, {
-            x : Math.random() * 1800,
-            y : Math.random() * 1600
+            x : (Math.random() -0.5)* (Math.random() -0.5) * WIDTH +WIDTH,
+            y : (Math.random() -0.5)*(Math.random() -0.5) * HEIGHT +HEIGHT
             });
         }
     });
@@ -82089,8 +82092,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
             engine.world.bounds.min.x = 0;
             engine.world.bounds.min.y = 0;
-            engine.world.bounds.max.x = 1800;
-            engine.world.bounds.max.y = 1600;
+            engine.world.bounds.max.x = WIDTH;
+            engine.world.bounds.max.y = HEIGHT;
 
   // wrapping using matter-wrap plugin
       // var allBodies = Matter.Composite.allBodies(engine.world);
@@ -82142,7 +82145,7 @@ class Bot {
 
   create(world, position) {
     let group = Body.nextGroup(true);
-
+    this.gestationTimer = 0;
     let radius = 10;
     this.radius = radius;
     let eyeRadius = 5;
@@ -82183,25 +82186,27 @@ class Bot {
 
     body.gameObject = this;
     body.onCollideActive = function(me, them){
+      if(them.imAfukinSensor){return;}
         if(them.gameObject && them.gameObject.class==Plant){
-          if(me.gameObject.life <=1.0){
+          if(me.gameObject.life <=2.0){
             me.gameObject.eat(them.gameObject);
           }
           }else if(them.gameObject && them.gameObject.class==Wall){
-                me.gameObject.life -= 0.1;
+                me.gameObject.life -= 0.001;
                   me.gameObject.brain.ouchie += 0.5;
           }
     };
     body.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
         if(them.gameObject && them.gameObject.class==Bot){
             // todo force based spike damage
             if(me.gameObject.brain.spike > 0.0){
-                them.gameObject.life -= (0.01 * me.gameObject.brain.spike * me.speed);
+                them.gameObject.life -= (1.0 * me.gameObject.brain.spike * me.speed);
             }
 
             me.gameObject.brain.ouchie += 0.5;
         } else if(them.gameObject && them.gameObject.class==Plant){
-              if(me.gameObject.life <=1.0){
+              if(me.gameObject.life <=2.0){
                   me.gameObject.eat(them.gameObject);
               }
           } else if(them.gameObject && them.gameObject.class==Wall){
@@ -82220,8 +82225,9 @@ class Bot {
       }
     });
     soundSensor.gameObject = this;
+    soundSensor.imAfukinSensor = true;
     soundSensor.onCollideActive = function(me, them){
-
+if(them.imAfukinSensor){return;}
         if(them.gameObject && them.gameObject.class==Bot){
               me.gameObject.brain.soundInput += them.motion ;
               if(me.gameObject.brain.give > 0.0){
@@ -82241,10 +82247,12 @@ class Bot {
       }
     });
     eyeA.gameObject = this;
+    eyeA.imAfukinSensor = true;
     eyeA.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeAInput.red += them.gameObject.body.red;
-      me.gameObject.brain.eyeAInput.blue += them.gameObject.body.blue;
-      me.gameObject.brain.eyeAInput.green += them.gameObject.body.green;
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeAInput.red += them.gameObject.red;
+      me.gameObject.brain.eyeAInput.blue += them.gameObject.blue;
+      me.gameObject.brain.eyeAInput.green += them.gameObject.green;
     };
 
     let eyeA2A = Bodies.circle(position.x + eyeA2AOffset.x, position.y + eyeA2AOffset.y, eyeRadius, {
@@ -82257,10 +82265,12 @@ class Bot {
       }
     });
     eyeA2A.gameObject = this;
+    eyeA2A.imAfukinSensor = true;
     eyeA2A.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeAInput.red += (them.gameObject.body.red);
-      me.gameObject.brain.eyeAInput.blue += them.gameObject.body.blue;
-      me.gameObject.brain.eyeAInput.green += them.gameObject.body.green;
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeAInput.red += (them.gameObject.red);
+      me.gameObject.brain.eyeAInput.blue += them.gameObject.blue;
+      me.gameObject.brain.eyeAInput.green += them.gameObject.green;
     };
     let eyeA2B = Bodies.circle(position.x + eyeA2BOffset.x, position.y + eyeA2BOffset.y, eyeRadius, {
       collisionFilter: {
@@ -82272,10 +82282,12 @@ class Bot {
       }
     });
     eyeA2B.gameObject = this;
+    eyeA2B.imAfukinSensor = true;
     eyeA2B.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeAInput.red += them.gameObject.body.red;
-      me.gameObject.brain.eyeAInput.blue += them.gameObject.body.blue;
-      me.gameObject.brain.eyeAInput.green += them.gameObject.body.green;
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeAInput.red += them.gameObject.red;
+      me.gameObject.brain.eyeAInput.blue += them.gameObject.blue;
+      me.gameObject.brain.eyeAInput.green += them.gameObject.green;
     };
 
     let eyeB = Bodies.circle(position.x + eyeBOffset.x, position.y + eyeBOffset.y, eyeRadius, {
@@ -82288,10 +82300,12 @@ class Bot {
       }
     });
     eyeB.gameObject = this;
+    eyeB.imAfukinSensor = true;
     eyeB.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeBInput.red += them.gameObject.body.red;
-      me.gameObject.brain.eyeBInput.blue += them.gameObject.body.blue;
-      me.gameObject.brain.eyeBInput.green += them.gameObject.body.green;
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeBInput.red += them.gameObject.red;
+      me.gameObject.brain.eyeBInput.blue += them.gameObject.blue;
+      me.gameObject.brain.eyeBInput.green += them.gameObject.green;
     };
     let eyeB2A = Bodies.circle(position.x + eyeB2AOffset.x, position.y + eyeB2AOffset.y, eyeRadius, {
       collisionFilter: {
@@ -82303,10 +82317,12 @@ class Bot {
       }
     });
     eyeB2A.gameObject = this;
+    eyeB2A.imAfukinSensor = true;
     eyeB2A.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeBInput.red += them.gameObject.body.red;
-      me.gameObject.brain.eyeBInput.blue += them.gameObject.body.blue;
-      me.gameObject.brain.eyeBInput.green += them.gameObject.body.green;
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeBInput.red += them.gameObject.red;
+      me.gameObject.brain.eyeBInput.blue += them.gameObject.blue;
+      me.gameObject.brain.eyeBInput.green += them.gameObject.green;
     };
     let eyeB2B = Bodies.circle(position.x + eyeB2BOffset.x, position.y + eyeB2BOffset.y, eyeRadius, {
       collisionFilter: {
@@ -82318,10 +82334,12 @@ class Bot {
       }
     });
     eyeB2B.gameObject = this;
+    eyeB2B.imAfukinSensor = true;
     eyeB2B.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeBInput.red += them.gameObject.body.red;
-      me.gameObject.brain.eyeBInput.blue += them.gameObject.body.blue;
-      me.gameObject.brain.eyeBInput.green += them.gameObject.body.green;
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeBInput.red += them.gameObject.red;
+      me.gameObject.brain.eyeBInput.blue += them.gameObject.blue;
+      me.gameObject.brain.eyeBInput.green += them.gameObject.green;
     };
 
     let eyeC = Bodies.circle(position.x + eyeCOffset.x, position.y + eyeCOffset.y, eyeRadius, {
@@ -82334,10 +82352,12 @@ class Bot {
       }
     });
     eyeC.gameObject = this;
+    eyeC.imAfukinSensor = true;
     eyeC.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeCInput.red += them.gameObject.body.red;
-      me.gameObject.brain.eyeCInput.blue += them.gameObject.body.blue;
-      me.gameObject.brain.eyeCInput.green += them.gameObject.body.green;
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeCInput.red += them.gameObject.red;
+      me.gameObject.brain.eyeCInput.blue += them.gameObject.blue;
+      me.gameObject.brain.eyeCInput.green += them.gameObject.green;
     };
     let eyeC2A = Bodies.circle(position.x + eyeC2AOffset.x, position.y + eyeC2AOffset.y, eyeRadius, {
       collisionFilter: {
@@ -82349,10 +82369,12 @@ class Bot {
       }
     });
     eyeC2A.gameObject = this;
+    eyeC2A.imAfukinSensor = true;
     eyeC2A.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeCInput.red += (them.gameObject.body.red);
-      me.gameObject.brain.eyeCInput.blue += (them.gameObject.body.blue);
-      me.gameObject.brain.eyeCInput.green += (them.gameObject.body.green);
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeCInput.red += (them.gameObject.red);
+      me.gameObject.brain.eyeCInput.blue += (them.gameObject.blue);
+      me.gameObject.brain.eyeCInput.green += (them.gameObject.green);
     };
     let eyeC2B = Bodies.circle(position.x + eyeC2BOffset.x, position.y + eyeC2BOffset.y, eyeRadius, {
       collisionFilter: {
@@ -82364,10 +82386,12 @@ class Bot {
       }
     });
     eyeC2B.gameObject = this;
+    eyeC2B.imAfukinSensor = true;
     eyeC2B.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeCInput.red += (them.gameObject.body.red);
-      me.gameObject.brain.eyeCInput.blue += (them.gameObject.body.blue);
-      me.gameObject.brain.eyeCInput.green += (them.gameObject.body.green);
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeCInput.red += (them.gameObject.red);
+      me.gameObject.brain.eyeCInput.blue += (them.gameObject.blue);
+      me.gameObject.brain.eyeCInput.green += (them.gameObject.green);
     };
     let eyeC3A = Bodies.circle(position.x + eyeC3AOffset.x, position.y + eyeC3AOffset.y, eyeRadius, {
       collisionFilter: {
@@ -82379,10 +82403,12 @@ class Bot {
       }
     });
     eyeC3A.gameObject = this;
+    eyeC3A.imAfukinSensor = true;
     eyeC3A.onCollideActive = function(me, them){
-      me.gameObject.brain.eyeCInput.red += them.gameObject.body.red;
-      me.gameObject.brain.eyeCInput.blue += them.gameObject.body.blue;
-      me.gameObject.brain.eyeCInput.green += them.gameObject.body.green;
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeCInput.red += them.gameObject.red;
+      me.gameObject.brain.eyeCInput.blue += them.gameObject.blue;
+      me.gameObject.brain.eyeCInput.green += them.gameObject.green;
     };
 
     let shitA = Matter.Constraint.create({
@@ -82493,7 +82519,7 @@ class Bot {
 
   tick() {
 
-
+    this.brain.heat = Math.abs(Mathjs.distance([ this.body.position.x, this.body.position.y], [ this.world.bounds.max.x/2, this.world.bounds.max.y/2]));
     this.brain.life = this.life;
     this.brain.tick();
 
@@ -82503,28 +82529,41 @@ class Bot {
       let facing = this.body.angle;
       let turn = this.brain.turn + facing;
       let position = Matter.Vector.clone(this.body.position);
-      let butt = Matter.Vector.create(- this.radius/2 * Math.cos(facing) + position.x, -this.radius/2 * Math.sin(facing) + position.y);
+      let butt = Matter.Vector.create(- this.radius * Math.cos(facing) + position.x, -this.radius * Math.sin(facing) + position.y);
       Matter.Body.applyForce(this.body,
         butt,
         Matter.Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
 
-      this.life -= (0.0001 * this.brain.age);
+
+      this.age = this.brain.age;
+      this.life -= (0.00005 * this.age + this.brain.heat * 0.000003 );
+
       if(this.life <=0){
           Matter.Composite.remove(this.world, this.parentComposite, true);
 //          console.log('i dead');
       }
 
-      this.body.red = this.brain.red;
-      this.body.blue = this.brain.blue;
-      this.body.green = this.brain.green;
+      this.red = this.brain.red;
+      this.blue = this.brain.blue;
+      this.green = this.brain.green;
 
       this.body.render.fillStyle = this.rgbToHex(this.brain.red * 255, this.brain.green * 255, this.brain.blue * 255);
-
+      if(this.age > 50 && this.life > 0.6){
+        if(this.gestationTimer <= 0){
+          this.spawn();
+          this.life *= 0.5;
+          console.log('natural birth');
+          this.gestationTimer = 200;
+        }
+        this.gestationTimer--;
+      }
   }
 
   eat(food){
-    this.life += 0.01;
-    food.life -= 0.01;
+    this.life += 0.004;
+    food.life -= 0.005;
+    if(food.life <0.0){ food.destroy()}
+
     //console.log('nom' + food.class);
   }
 
@@ -82565,7 +82604,7 @@ class Brain{
 
     constructor(){
 
-
+      this.heat = 0.0;
       this.turn = 0.0;
       this.thrust = 0.0;
       this.clock = 0;
@@ -82600,7 +82639,7 @@ class Brain{
 
       this.clock++;
       this.clock %= 60;
-      if(this.clock == 1){
+      if(this.clock % 5 == 0 ){
         this.age++;
       }
       this.ccClock = (this.clock - 30)/60;
@@ -82615,7 +82654,7 @@ class Brain{
         this.eyeAInput.green,
         this.eyeBInput.green,
         this.eyeCInput.green,
-        this.ccClock,
+        this.heat,
         this.turn,
         this.thrust,
         this.soundInput,
@@ -82627,26 +82666,26 @@ class Brain{
       let inputsConnectVector = Mathjs.multiply(this.inputWeights, this.inputVector);
 
       let tempHiddenVector = Mathjs.add(inputsConnectVector, this.hiddenBias).map(function(value, index, matrix){
-          let result = Math.atan(value);
+        let result = 1.0/(1.0 + Mathjs.exp(-1 + value));
 
-          return result == NaN ? 1.0 : result;
-      });
+        return isNaN(result) ? 1.0 : result;
+        });
 
       let tempOutputVector = Mathjs.multiply(tempHiddenVector, this.hiddenWeights);
 
       this.outputVector = Mathjs.add(tempOutputVector, this.outputBias);
 
-      this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0))) - 0.5)/3;
-      this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1)))-  0.5)/2 ;
+      this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-this.sigmoid(this.outputVector.subset(Mathjs.index(7))) );
+      this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1)))* this.sigmoid(this.outputVector.subset(Mathjs.index(8)))) - 0.2 ;
       this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) ;
       this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3))) ;
       this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4))) ;
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
-      this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.6;
+      this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5;
 
       this.soundInput = 0.0;
       this.ouchie = 0.0;
-
+      this.heat = 0.0;
       this.eyeAInput = { red:0, green: 0, blue:0 };
       this.eyeBInput = { red:0, green: 0, blue:0 };
       this.eyeCInput = { red:0, green: 0, blue:0 };
@@ -82656,32 +82695,24 @@ class Brain{
     sigmoid(value){
       let result = 1.0/(1.0 + Mathjs.exp(-1 + value));
 
-      return result == NaN ? 1.0 : result;
+      return isNaN(result) ? 1.0 : result;
     }
 
     mutate(){
       let childBrain = new Brain();
 
       childBrain.inputWeights = this.inputWeights.map( function(value, index, matrix) {
-        if(Math.random() > 0.9){
-          if(value!=0){
-            let newValue = value + value * (Math.random() -0.5) ;
-            return newValue;
-          }
-        return  (Math.random() -0.5)*0.1;
+        if(Math.random() > 0.6){
+          return value * (Math.random() - 0.5) + value;
         }
         return value;
       });
 
       childBrain.outputBias = this.outputBias.map( function(value, index, matrix) {
         if(Math.random() > 0.9){
-          if(value!=0){
-            let newValue = value + value * (Math.random() -0.5);
-            return newValue;
-          }
-        return  (Math.random() -0.5)*0.1;
+          return value * Math.random() +value;//weee
         }
-        return value;
+        return value + value * 0.1;
       });
 
 
@@ -82698,7 +82729,7 @@ class Brain{
 
       childBrain.hiddenWeights = this.hiddenWeights.map(function(value, index, matrix){
         if(Math.random() > 0.8){
-          let newValue = Math.random() * value + Math.random()-0.5;
+          let newValue = Math.random() * value + Math.random() -0.5 + value ;
           return newValue;
         }
         return value;
@@ -82797,9 +82828,9 @@ class Plant {
             }
           });
 
-          this.body.blue = 0.0;
-          this.body.red = 0.0;
-          this.body.green = 1.0;
+          this.blue = 0.1;
+          this.red = 0.1;
+          this.green = 0.9;
 
           plant.gameObject = this;
           this.parentComposite = plant;
@@ -82809,14 +82840,14 @@ class Plant {
           World.add(world, plant);
       }
 
-      tick(){
-        //console.log(this.life);
-        if(this.life <= 0.0){
-            Matter.Composite.remove(this.world, this.parentComposite, true);
-            console.log('deforestization');
-        }
-
+      destroy(){
+        Matter.Composite.remove(this.world, this.parentComposite, true);
+        console.log('deforestization');
       }
+
+
+
+
 
 }
 
@@ -82839,7 +82870,7 @@ class Wall {
       create(world, position){
 
 
-          this.body =  Bodies.rectangle(position.x, position.y, 20, 20, {
+          this.body =  Bodies.rectangle(position.x, position.y, 30, 30, {
             friction: 0.5,
             frictionStatic: 0.1,
             isStatic: true,
@@ -82850,9 +82881,9 @@ class Wall {
             }
           });
 
-          this.body.blue = 1.0;
-          this.body.red = 0.0;
-          this.body.green = 0.0;
+          this.blue = 1.0;
+          this.red = 0.2;
+          this.green = 0.0;
 
           // this.body.onCollideActive = function(me, them){
           //

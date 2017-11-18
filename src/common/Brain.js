@@ -8,7 +8,7 @@ class Brain{
 
     constructor(){
 
-
+      this.heat = 0.0;
       this.turn = 0.0;
       this.thrust = 0.0;
       this.clock = 0;
@@ -43,7 +43,7 @@ class Brain{
 
       this.clock++;
       this.clock %= 60;
-      if(this.clock == 1){
+      if(this.clock % 5 == 0 ){
         this.age++;
       }
       this.ccClock = (this.clock - 30)/60;
@@ -58,7 +58,7 @@ class Brain{
         this.eyeAInput.green,
         this.eyeBInput.green,
         this.eyeCInput.green,
-        this.ccClock,
+        this.heat,
         this.turn,
         this.thrust,
         this.soundInput,
@@ -70,26 +70,26 @@ class Brain{
       let inputsConnectVector = Mathjs.multiply(this.inputWeights, this.inputVector);
 
       let tempHiddenVector = Mathjs.add(inputsConnectVector, this.hiddenBias).map(function(value, index, matrix){
-          let result = Math.atan(value);
+        let result = 1.0/(1.0 + Mathjs.exp(-1 + value));
 
-          return result == NaN ? 1.0 : result;
-      });
+        return isNaN(result) ? 1.0 : result;
+        });
 
       let tempOutputVector = Mathjs.multiply(tempHiddenVector, this.hiddenWeights);
 
       this.outputVector = Mathjs.add(tempOutputVector, this.outputBias);
 
-      this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0))) - 0.5)/3;
-      this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1)))-  0.5)/2 ;
+      this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-this.sigmoid(this.outputVector.subset(Mathjs.index(7))) );
+      this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1)))* this.sigmoid(this.outputVector.subset(Mathjs.index(8)))) - 0.2 ;
       this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) ;
       this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3))) ;
       this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4))) ;
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
-      this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.6;
+      this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5;
 
       this.soundInput = 0.0;
       this.ouchie = 0.0;
-
+      this.heat = 0.0;
       this.eyeAInput = { red:0, green: 0, blue:0 };
       this.eyeBInput = { red:0, green: 0, blue:0 };
       this.eyeCInput = { red:0, green: 0, blue:0 };
@@ -99,32 +99,24 @@ class Brain{
     sigmoid(value){
       let result = 1.0/(1.0 + Mathjs.exp(-1 + value));
 
-      return result == NaN ? 1.0 : result;
+      return isNaN(result) ? 1.0 : result;
     }
 
     mutate(){
       let childBrain = new Brain();
 
       childBrain.inputWeights = this.inputWeights.map( function(value, index, matrix) {
-        if(Math.random() > 0.9){
-          if(value!=0){
-            let newValue = value + value * (Math.random() -0.5) ;
-            return newValue;
-          }
-        return  (Math.random() -0.5)*0.1;
+        if(Math.random() > 0.6){
+          return value * (Math.random() - 0.5) + value;
         }
         return value;
       });
 
       childBrain.outputBias = this.outputBias.map( function(value, index, matrix) {
         if(Math.random() > 0.9){
-          if(value!=0){
-            let newValue = value + value * (Math.random() -0.5);
-            return newValue;
-          }
-        return  (Math.random() -0.5)*0.1;
+          return value * Math.random() +value;//weee
         }
-        return value;
+        return value + value * 0.1;
       });
 
 
@@ -141,7 +133,7 @@ class Brain{
 
       childBrain.hiddenWeights = this.hiddenWeights.map(function(value, index, matrix){
         if(Math.random() > 0.8){
-          let newValue = Math.random() * value + Math.random()-0.5;
+          let newValue = Math.random() * value + Math.random() -0.5 + value ;
           return newValue;
         }
         return value;

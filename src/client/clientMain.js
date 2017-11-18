@@ -14,10 +14,12 @@ const    BrainVat = require('../common/BrainVat');
 const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
 
-const MAX_BOTS = 60;
+const MAX_BOTS = 20;
 const MAX_PLANTS = 1000;
-const WALLS = 360;
+const WALLS = 200;
 
+const WIDTH = 3000;
+const HEIGHT = 2000;
 
 document.addEventListener('DOMContentLoaded', function(e) {
 
@@ -30,8 +32,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
         element: document.body,
         engine: engine,
         options: {
-            width: 3000,
-            height: 2000,
+            width: WIDTH,
+            height: HEIGHT,
             // showForce: true,
             // showAngleIndicator: true,
             // showCollisions: true,
@@ -49,22 +51,22 @@ document.addEventListener('DOMContentLoaded', function(e) {
         // let  k = (i % 3) - 1;
         // let  l = (i+2 % 3) - 1;
           new Wall().create(engine.world, {
-            x : Math.cos(i*3.14/180) * 1500 + 1500,
-            y : Math.sin(i*3.14/180)* 1000 + 1000
+            x : Math.cos(i*3.14/60) * WIDTH/2 + i * 10 ,
+            y : Math.sin(i*3.14/60)* HEIGHT/2 + HEIGHT/2
           });
     }
 
     for (let i = 0; i < MAX_BOTS; i++ ){
       new  Bot().create(engine.world, {
-        x : (Math.random() -0.5) * 3000 + 1500,
-        y : (Math.random() - 0.5) * 2000 + 1000
+        x : (Math.random() -0.5) * WIDTH + WIDTH/2,
+        y : (Math.random() - 0.5) * HEIGHT + HEIGHT/2
       });
     }
 
     for (let i = 0; i < MAX_PLANTS; i++){
       new Plant().create(engine.world, {
-        x : (Math.random() -0.5) * 3000 + 1500,
-        y : (Math.random() - 0.5) * 2000 + 1000
+        x : (Math.random() -0.5) * WIDTH + HEIGHT/2,
+        y : (Math.random() - 0.5) * HEIGHT + HEIGHT/2
         });
     }
 
@@ -76,25 +78,26 @@ document.addEventListener('DOMContentLoaded', function(e) {
         for (var i = 0; i < engine.world.composites.length; i++) {
           let urmom = engine.world.composites[i];
           if(urmom.gameObject != null ){
-          if( urmom.gameObject.class == Bot){
-            urmom.gameObject.tick();
-            botCount++;
-            if(oldestBot == null || oldestBot.age < urmom.gameObject.age){
-              oldestBot = urmom.gameObject;
-            }
-          }else if ( urmom.gameObject.class == Plant){
-            urmom.gameObject.tick();
-            plantCount++;
-          }
+            if( urmom.gameObject.class == Bot){
+              urmom.gameObject.tick();
+              botCount++;
+                if(oldestBot == null || oldestBot.age < urmom.gameObject.age){
+                  oldestBot = urmom.gameObject;
+                }
+              }else if ( urmom.gameObject.class == Plant){
+
+                plantCount++;
+              }
           }
         }
         if(botCount < MAX_BOTS){
           oldestBot.spawn();
         }
         if(plantCount < MAX_PLANTS){
+          plantCount++;
           new Plant().create(engine.world, {
-            x : Math.random() * 1800,
-            y : Math.random() * 1600
+            x : (Math.random() -0.5)* (Math.random() -0.5) * WIDTH +WIDTH,
+            y : (Math.random() -0.5)*(Math.random() -0.5) * HEIGHT +HEIGHT
             });
         }
     });
@@ -146,8 +149,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
             engine.world.bounds.min.x = 0;
             engine.world.bounds.min.y = 0;
-            engine.world.bounds.max.x = 1800;
-            engine.world.bounds.max.y = 1600;
+            engine.world.bounds.max.x = WIDTH;
+            engine.world.bounds.max.y = HEIGHT;
 
   // wrapping using matter-wrap plugin
       // var allBodies = Matter.Composite.allBodies(engine.world);

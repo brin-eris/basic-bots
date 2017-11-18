@@ -14,8 +14,8 @@ const    BrainVat = require('../common/BrainVat');
 const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
 
-const MAX_BOTS = 50;
-const MAX_PLANTS = 400;
+const MAX_BOTS = 60;
+const MAX_PLANTS = 1000;
 const WALLS = 360;
 
 
@@ -30,8 +30,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
         element: document.body,
         engine: engine,
         options: {
-            width: 2000,
-            height: 1800,
+            width: 3000,
+            height: 2000,
             // showForce: true,
             // showAngleIndicator: true,
             // showCollisions: true,
@@ -49,22 +49,22 @@ document.addEventListener('DOMContentLoaded', function(e) {
         // let  k = (i % 3) - 1;
         // let  l = (i+2 % 3) - 1;
           new Wall().create(engine.world, {
-            x : Math.cos(i*3.14/180) * 1000 + 900,
-            y : Math.sin(i*3.14/180)* 900 + 800
+            x : Math.cos(i*3.14/180) * 1500 + 1500,
+            y : Math.sin(i*3.14/180)* 1000 + 1000
           });
     }
 
     for (let i = 0; i < MAX_BOTS; i++ ){
       new  Bot().create(engine.world, {
-        x : Math.random() * 1300 + 200,
-        y : Math.random() * 1000 +100
+        x : (Math.random() -0.5) * 3000 + 1500,
+        y : (Math.random() - 0.5) * 2000 + 1000
       });
     }
 
     for (let i = 0; i < MAX_PLANTS; i++){
       new Plant().create(engine.world, {
-        x : Math.random() * 1800,
-        y : Math.random() * 1600
+        x : (Math.random() -0.5) * 3000 + 1500,
+        y : (Math.random() - 0.5) * 2000 + 1000
         });
     }
 

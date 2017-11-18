@@ -37,8 +37,6 @@ class Brain{
 
       this.outputBias = Mathjs.random([15]);
 
-      this.functionKey = null;
-      this.functionMap = null;
     }
 
     tick(){

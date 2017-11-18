@@ -82200,8 +82200,15 @@ class Bot {
       if(them.imAfukinSensor){return;}
         if(them.gameObject && them.gameObject.class==Bot){
             // todo force based spike damage
+            let myMomentum = Vector.mult(me.velocity, me.mass);
+            let theirMomentum = Vector.mult(them.velocity, them.mass);
+            let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
+            let motion = mew.motion;
+            if (Vector.magnitude(relativeMomentum) > threshold) {
+              // do something
+            }
             if(me.gameObject.brain.spike > 0.0){
-                them.gameObject.life -= (1.0 * me.gameObject.brain.spike * me.speed);
+                them.gameObject.life -= (2.0 * me.gameObject.brain.spike * me.motion);
             }
 
             me.gameObject.brain.ouchie += 0.5;

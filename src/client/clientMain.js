@@ -13,6 +13,7 @@ const    Plotter = require('./Plotter');
 const    BrainVat = require('../common/BrainVat');
 const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
+const    Meat = require('../common/Meat');
 
 const MAX_BOTS = 20;
 const MAX_PLANTS = 1000;

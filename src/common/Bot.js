@@ -8,6 +8,7 @@ const    Wall = require('./Wall');
 const    Brain = require('./Brain');
 const    Plant = require('./Plant');
 
+const Vector = require('matter-js').Vector;
 const World = require('matter-js').World;
 const Bodies = require('matter-js').Bodies;
 const Body = require('matter-js').Body;
@@ -30,19 +31,19 @@ class Bot {
     let offsetRadius = radius * 2 + eyeRadius;
     let offsetLayer2Radius = offsetRadius * 2;
 
-    let eyeAOffset = Matter.Vector.create( offsetRadius * Math.cos(0.7), offsetRadius * Math.sin(0.7));
-    let eyeA2AOffset = Matter.Vector.create( offsetLayer2Radius * Math.cos(0.5), offsetLayer2Radius * Math.sin(0.5));
-    let eyeA2BOffset = Matter.Vector.create( offsetLayer2Radius * Math.cos(0.9), offsetLayer2Radius * Math.sin(0.9));
+    let eyeAOffset = Vector.create( offsetRadius * Math.cos(0.7), offsetRadius * Math.sin(0.7));
+    let eyeA2AOffset = Vector.create( offsetLayer2Radius * Math.cos(0.5), offsetLayer2Radius * Math.sin(0.5));
+    let eyeA2BOffset = Vector.create( offsetLayer2Radius * Math.cos(0.9), offsetLayer2Radius * Math.sin(0.9));
 
-    let eyeBOffset = Matter.Vector.create( offsetRadius * Math.cos(-0.7),  offsetRadius * Math.sin(-0.7));
-    let eyeB2AOffset = Matter.Vector.create( offsetLayer2Radius * Math.cos(-0.5),  offsetLayer2Radius * Math.sin(-0.5));
-    let eyeB2BOffset = Matter.Vector.create( offsetLayer2Radius * Math.cos(-0.9),  offsetLayer2Radius * Math.sin(-0.9));
+    let eyeBOffset = Vector.create( offsetRadius * Math.cos(-0.7),  offsetRadius * Math.sin(-0.7));
+    let eyeB2AOffset = Vector.create( offsetLayer2Radius * Math.cos(-0.5),  offsetLayer2Radius * Math.sin(-0.5));
+    let eyeB2BOffset = Vector.create( offsetLayer2Radius * Math.cos(-0.9),  offsetLayer2Radius * Math.sin(-0.9));
 
 
-    let eyeCOffset = Matter.Vector.create( offsetRadius * 1.3, 0 );
-    let eyeC2AOffset = Matter.Vector.create( offsetLayer2Radius  ,  offsetLayer2Radius * Math.sin(-0.5));
-    let eyeC2BOffset = Matter.Vector.create( offsetLayer2Radius , offsetLayer2Radius * Math.sin(0.5));
-    let eyeC3AOffset = Matter.Vector.create( offsetLayer2Radius * 1.3,0);
+    let eyeCOffset = Vector.create( offsetRadius * 1.3, 0 );
+    let eyeC2AOffset = Vector.create( offsetLayer2Radius  ,  offsetLayer2Radius * Math.sin(-0.5));
+    let eyeC2BOffset = Vector.create( offsetLayer2Radius , offsetLayer2Radius * Math.sin(0.5));
+    let eyeC3AOffset = Vector.create( offsetLayer2Radius * 1.3,0);
 
 
     let soundRadius = radius * 5;
@@ -78,8 +79,15 @@ class Bot {
       if(them.imAfukinSensor){return;}
         if(them.gameObject && them.gameObject.class==Bot){
             // todo force based spike damage
+            let myMomentum = Vector.mult(me.velocity, me.mass);
+            let theirMomentum = Vector.mult(them.velocity, them.mass);
+            let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
+            let motion = mew.motion;
+            if (Vector.magnitude(relativeMomentum) > threshold) {
+              // do something
+            }
             if(me.gameObject.brain.spike > 0.0){
-                them.gameObject.life -= (1.0 * me.gameObject.brain.spike * me.speed);
+                them.gameObject.life -= (2.0 * me.gameObject.brain.spike * me.motion);
             }
 
             me.gameObject.brain.ouchie += 0.5;
@@ -356,7 +364,7 @@ if(them.imAfukinSensor){return;}
 
     let shitD = Matter.Constraint.create({
       bodyB: body,
-      pointB: Matter.Vector.create(0,0),
+      pointB: Vector.create(0,0),
       bodyA: soundSensor,
       stiffness: 1
     });
@@ -406,11 +414,11 @@ if(them.imAfukinSensor){return;}
       let thrust = this.brain.thrust;
       let facing = this.body.angle;
       let turn = this.brain.turn + facing;
-      let position = Matter.Vector.clone(this.body.position);
-      let butt = Matter.Vector.create(- this.radius * Math.cos(facing) + position.x, -this.radius * Math.sin(facing) + position.y);
+      let position = Vector.clone(this.body.position);
+      let butt = Vector.create(- this.radius * Math.cos(facing) + position.x, -this.radius * Math.sin(facing) + position.y);
       Matter.Body.applyForce(this.body,
         butt,
-        Matter.Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
+        Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
 
 
       this.age = this.brain.age;
@@ -455,7 +463,7 @@ if(them.imAfukinSensor){return;}
     let child = new Bot();
     //console.log('spawn');
     child.brain = this.brain.mutate();
-    child.create(this.world, Matter.Vector.create(this.body.position.x +10, this.body.position.y +10));
+    child.create(this.world, Vector.create(this.body.position.x +10, this.body.position.y +10));
   }
 
   componentToHex(c) {

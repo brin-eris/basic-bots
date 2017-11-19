@@ -80,10 +80,10 @@ class Brain{
       this.outputVector = Mathjs.add(tempOutputVector, this.outputBias);
 
       this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-this.sigmoid(this.outputVector.subset(Mathjs.index(7))) );
-      this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1)))* this.sigmoid(this.outputVector.subset(Mathjs.index(8)))) - 0.2 ;
-      this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) ;
-      this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3))) ;
-      this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4))) ;
+      this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1))) * this.sigmoid(this.outputVector.subset(Mathjs.index(8)))) - 0.2 ;
+      this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) * this.sigmoid(this.outputVector.subset(Mathjs.index(9))) ;
+      this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3))) * this.sigmoid(this.outputVector.subset(Mathjs.index(10))) ;
+      this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4))) * this.sigmoid(this.outputVector.subset(Mathjs.index(11)));
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
       this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5;
 

@@ -6,13 +6,13 @@ const    Bodies = require('matter-js').Bodies;
 
 
 class Meat {
-  constructor() {
-    this.life = 1.0;
+  constructor(quantity) {
+    this.life = quantity * .01;
     this.class = Meat;
   }
 
       create(world, position){
-        let plant = Matter.Composite.create({
+        let meat = Matter.Composite.create({
           label: 'Meat'
         });
 
@@ -32,21 +32,17 @@ class Meat {
           this.red = 1.1;
           this.green = 0.1;
 
-          plant.gameObject = this;
-          this.parentComposite = plant;
-          Matter.Composite.addBody(plant, this.body);
+          meat.gameObject = this;
+          this.parentComposite = meat;
+          Matter.Composite.addBody(meat, this.body);
           this.body.gameObject = this;
           this.world = world;
-          World.add(world, plant);
+          World.add(world, meat);
       }
 
       destroy(){
         Matter.Composite.remove(this.world, this.parentComposite, true);
       }
-
-
-
-
 
 }
 

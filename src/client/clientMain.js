@@ -15,7 +15,7 @@ const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
 const    Meat = require('../common/Meat');
 
-const MAX_BOTS = 20;
+const MAX_BOTS = 35;
 const MAX_PLANTS = 1000;
 const WALLS = 200;
 
@@ -81,6 +81,12 @@ document.addEventListener('DOMContentLoaded', function(e) {
           if(urmom.gameObject != null ){
             if( urmom.gameObject.class == Bot){
               urmom.gameObject.tick();
+              if(urmom.gameObject.life <=0){
+                  new Meat(urmom.gameObject.maxLife).create(engine.world, urmom.gameObject.body.position);
+                  urmom.gameObject = null;
+                  Matter.Composite.remove(engine.world, urmom, true);
+                  continue;
+              }
               botCount++;
                 if(oldestBot == null || oldestBot.age < urmom.gameObject.age){
                   oldestBot = urmom.gameObject;
@@ -99,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
           new Plant().create(engine.world, {
             x : (Math.random() -0.5)* (Math.random() -0.5) * WIDTH +WIDTH,
             y : (Math.random() -0.5)*(Math.random() -0.5) * HEIGHT +HEIGHT
-            });
+          });
         }
     });
 

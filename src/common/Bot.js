@@ -7,19 +7,22 @@ const    MatterAttractors = require('matter-attractors');
 const    Wall = require('./Wall');
 const    Brain = require('./Brain');
 const    Plant = require('./Plant');
+const    Meat = require('./Meat');
 
 const Vector = require('matter-js').Vector;
 const World = require('matter-js').World;
 const Bodies = require('matter-js').Bodies;
 const Body = require('matter-js').Body;
-const Vertices = require('matter-js').Vertices;
+
 const Mathjs = require('mathjs');
 
 class Bot {
   constructor() {
+    this.kills = 0.0;
     this.class = Bot;
     this.brain = new Brain();
     this.life = 1.0;
+    this.maxLife = 2.0;
   }
 
   create(world, position) {
@@ -66,38 +69,55 @@ class Bot {
     body.gameObject = this;
     body.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-        if(them.gameObject && them.gameObject.class==Plant){
-          if(me.gameObject.life <=2.0){
+      if(them.gameObject){
+        if(them.gameObject.class==Plant){
+          if(me.gameObject.life <= me.gameObject.maxLife){
             me.gameObject.eat(them.gameObject);
           }
-          }else if(them.gameObject && them.gameObject.class==Wall){
+          }else if(them.gameObject.class==Wall){
                 me.gameObject.life -= 0.001;
                   me.gameObject.brain.ouchie += 0.5;
+          }else if(them.gameObject.class==Meat){
+            // only the blood thirsty eat meat
+            if(me.gameObject.kills > 0){
+              console.log('fresh meat!')
+              this.gestationTimer-=50;
+                me.gameObject.eat(them.gameObject) ;
+            }
           }
+      }
+
     };
     body.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
         if(them.gameObject && them.gameObject.class==Bot){
-            // todo force based spike damage
-            let myMomentum = Vector.mult(me.velocity, me.mass);
-            let theirMomentum = Vector.mult(them.velocity, them.mass);
-            let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
-            let motion = mew.motion;
-            if (Vector.magnitude(relativeMomentum) > threshold) {
-              // do something
-            }
-            if(me.gameObject.brain.spike > 0.0){
-                them.gameObject.life -= (2.0 * me.gameObject.brain.spike * me.motion);
-            }
+          if(me.gameObject.brain.spike > 0.0){
+              let myMomentum = Vector.mult(me.velocity, 1.0);
+              let theirMomentum = Vector.mult(them.velocity, 1.0);
+              let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-            me.gameObject.brain.ouchie += 0.5;
+              let damage = (0.01 * me.gameObject.brain.spike * Vector.magnitude(relativeMomentum));
+              them.gameObject.life -= damage;
+              if(them.gameObject.life <= 0.0){
+                // i killed yah biatch
+                me.gameObject.kills++
+                me.gameObject.maxLife++;
+              }
+          }
         } else if(them.gameObject && them.gameObject.class==Plant){
-              if(me.gameObject.life <=2.0){
+              if(me.gameObject.life <=me.gameObject.maxLife){
                   me.gameObject.eat(them.gameObject);
               }
           } else if(them.gameObject && them.gameObject.class==Wall){
-              me.gameObject.life -= 0.1;
+                me.gameObject.life -= 0.1;
                 me.gameObject.brain.ouchie += 0.5;
+        } else if(them.gameObject.class==Meat){
+          // only the blood thirsty eat meat
+            if(me.gameObject.kills > 0){
+              console.log('fresh meat!')
+              this.gestationTimer-=50;
+              me.gameObject.eat(them.gameObject) ;
+          }
         }
     };
 
@@ -405,6 +425,7 @@ if(them.imAfukinSensor){return;}
 
   tick() {
 
+
     this.brain.heat = Math.abs(Mathjs.distance([ this.body.position.x, this.body.position.y], [ this.world.bounds.max.x/2, this.world.bounds.max.y/2]));
     this.brain.life = this.life;
     this.brain.tick();
@@ -424,10 +445,7 @@ if(them.imAfukinSensor){return;}
       this.age = this.brain.age;
       this.life -= (0.00005 * this.age + this.brain.heat * 0.000003 );
 
-      if(this.life <=0){
-          Matter.Composite.remove(this.world, this.parentComposite, true);
-//          console.log('i dead');
-      }
+
 
       this.red = this.brain.red;
       this.blue = this.brain.blue;
@@ -437,9 +455,9 @@ if(them.imAfukinSensor){return;}
       if(this.age > 50 && this.life > 0.6){
         if(this.gestationTimer <= 0){
           this.spawn();
-          this.life *= 0.5;
+          this.life *= 0.7;
           console.log('natural birth');
-          this.gestationTimer = 200;
+          this.gestationTimer = 400;
         }
         this.gestationTimer--;
       }
@@ -461,7 +479,7 @@ if(them.imAfukinSensor){return;}
 
   spawn(){
     let child = new Bot();
-    //console.log('spawn');
+    child.kills = this.kills;
     child.brain = this.brain.mutate();
     child.create(this.world, Vector.create(this.body.position.x +10, this.body.position.y +10));
   }

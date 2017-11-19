@@ -81956,8 +81956,9 @@ const    Plotter = require('./Plotter');
 const    BrainVat = require('../common/BrainVat');
 const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
+const    Meat = require('../common/Meat');
 
-const MAX_BOTS = 20;
+const MAX_BOTS = 35;
 const MAX_PLANTS = 1000;
 const WALLS = 200;
 
@@ -82023,6 +82024,12 @@ document.addEventListener('DOMContentLoaded', function(e) {
           if(urmom.gameObject != null ){
             if( urmom.gameObject.class == Bot){
               urmom.gameObject.tick();
+              if(urmom.gameObject.life <=0){
+                  new Meat(urmom.gameObject.maxLife).create(engine.world, urmom.gameObject.body.position);
+                  urmom.gameObject = null;
+                  Matter.Composite.remove(engine.world, urmom, true);
+                  continue;
+              }
               botCount++;
                 if(oldestBot == null || oldestBot.age < urmom.gameObject.age){
                   oldestBot = urmom.gameObject;
@@ -82041,7 +82048,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
           new Plant().create(engine.world, {
             x : (Math.random() -0.5)* (Math.random() -0.5) * WIDTH +WIDTH,
             y : (Math.random() -0.5)*(Math.random() -0.5) * HEIGHT +HEIGHT
-            });
+          });
         }
     });
 
@@ -82119,7 +82126,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
 });
 
-},{"../common/Bot":562,"../common/BrainVat":564,"../common/Cppn":565,"../common/Plant":566,"../common/Wall":567,"./Plotter":560,"matter-attractors":546,"matter-collision-events":547,"matter-js":549,"matter-wrap":550}],562:[function(require,module,exports){
+},{"../common/Bot":562,"../common/BrainVat":564,"../common/Cppn":565,"../common/Meat":566,"../common/Plant":567,"../common/Wall":568,"./Plotter":560,"matter-attractors":546,"matter-collision-events":547,"matter-js":549,"matter-wrap":550}],562:[function(require,module,exports){
 'use strict';
 
 const    Matter = require('matter-js');
@@ -82129,18 +82136,22 @@ const    MatterAttractors = require('matter-attractors');
 const    Wall = require('./Wall');
 const    Brain = require('./Brain');
 const    Plant = require('./Plant');
+const    Meat = require('./Meat');
 
+const Vector = require('matter-js').Vector;
 const World = require('matter-js').World;
 const Bodies = require('matter-js').Bodies;
 const Body = require('matter-js').Body;
-const Vertices = require('matter-js').Vertices;
+
 const Mathjs = require('mathjs');
 
 class Bot {
   constructor() {
+    this.kills = 0.0;
     this.class = Bot;
     this.brain = new Brain();
     this.life = 1.0;
+    this.maxLife = 2.0;
   }
 
   create(world, position) {
@@ -82152,19 +82163,19 @@ class Bot {
     let offsetRadius = radius * 2 + eyeRadius;
     let offsetLayer2Radius = offsetRadius * 2;
 
-    let eyeAOffset = Matter.Vector.create( offsetRadius * Math.cos(0.7), offsetRadius * Math.sin(0.7));
-    let eyeA2AOffset = Matter.Vector.create( offsetLayer2Radius * Math.cos(0.5), offsetLayer2Radius * Math.sin(0.5));
-    let eyeA2BOffset = Matter.Vector.create( offsetLayer2Radius * Math.cos(0.9), offsetLayer2Radius * Math.sin(0.9));
+    let eyeAOffset = Vector.create( offsetRadius * Math.cos(0.7), offsetRadius * Math.sin(0.7));
+    let eyeA2AOffset = Vector.create( offsetLayer2Radius * Math.cos(0.5), offsetLayer2Radius * Math.sin(0.5));
+    let eyeA2BOffset = Vector.create( offsetLayer2Radius * Math.cos(0.9), offsetLayer2Radius * Math.sin(0.9));
 
-    let eyeBOffset = Matter.Vector.create( offsetRadius * Math.cos(-0.7),  offsetRadius * Math.sin(-0.7));
-    let eyeB2AOffset = Matter.Vector.create( offsetLayer2Radius * Math.cos(-0.5),  offsetLayer2Radius * Math.sin(-0.5));
-    let eyeB2BOffset = Matter.Vector.create( offsetLayer2Radius * Math.cos(-0.9),  offsetLayer2Radius * Math.sin(-0.9));
+    let eyeBOffset = Vector.create( offsetRadius * Math.cos(-0.7),  offsetRadius * Math.sin(-0.7));
+    let eyeB2AOffset = Vector.create( offsetLayer2Radius * Math.cos(-0.5),  offsetLayer2Radius * Math.sin(-0.5));
+    let eyeB2BOffset = Vector.create( offsetLayer2Radius * Math.cos(-0.9),  offsetLayer2Radius * Math.sin(-0.9));
 
 
-    let eyeCOffset = Matter.Vector.create( offsetRadius * 1.3, 0 );
-    let eyeC2AOffset = Matter.Vector.create( offsetLayer2Radius  ,  offsetLayer2Radius * Math.sin(-0.5));
-    let eyeC2BOffset = Matter.Vector.create( offsetLayer2Radius , offsetLayer2Radius * Math.sin(0.5));
-    let eyeC3AOffset = Matter.Vector.create( offsetLayer2Radius * 1.3,0);
+    let eyeCOffset = Vector.create( offsetRadius * 1.3, 0 );
+    let eyeC2AOffset = Vector.create( offsetLayer2Radius  ,  offsetLayer2Radius * Math.sin(-0.5));
+    let eyeC2BOffset = Vector.create( offsetLayer2Radius , offsetLayer2Radius * Math.sin(0.5));
+    let eyeC3AOffset = Vector.create( offsetLayer2Radius * 1.3,0);
 
 
     let soundRadius = radius * 5;
@@ -82187,38 +82198,55 @@ class Bot {
     body.gameObject = this;
     body.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-        if(them.gameObject && them.gameObject.class==Plant){
-          if(me.gameObject.life <=2.0){
+      if(them.gameObject){
+        if(them.gameObject.class==Plant){
+          if(me.gameObject.life <= me.gameObject.maxLife){
             me.gameObject.eat(them.gameObject);
           }
-          }else if(them.gameObject && them.gameObject.class==Wall){
+          }else if(them.gameObject.class==Wall){
                 me.gameObject.life -= 0.001;
                   me.gameObject.brain.ouchie += 0.5;
+          }else if(them.gameObject.class==Meat){
+            // only the blood thirsty eat meat
+            if(me.gameObject.kills > 0){
+              console.log('fresh meat!')
+              this.gestationTimer-=50;
+                me.gameObject.eat(them.gameObject) ;
+            }
           }
+      }
+
     };
     body.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
         if(them.gameObject && them.gameObject.class==Bot){
-            // todo force based spike damage
-            let myMomentum = Vector.mult(me.velocity, me.mass);
-            let theirMomentum = Vector.mult(them.velocity, them.mass);
-            let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
-            let motion = mew.motion;
-            if (Vector.magnitude(relativeMomentum) > threshold) {
-              // do something
-            }
-            if(me.gameObject.brain.spike > 0.0){
-                them.gameObject.life -= (2.0 * me.gameObject.brain.spike * me.motion);
-            }
+          if(me.gameObject.brain.spike > 0.0){
+              let myMomentum = Vector.mult(me.velocity, 1.0);
+              let theirMomentum = Vector.mult(them.velocity, 1.0);
+              let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-            me.gameObject.brain.ouchie += 0.5;
+              let damage = (0.01 * me.gameObject.brain.spike * Vector.magnitude(relativeMomentum));
+              them.gameObject.life -= damage;
+              if(them.gameObject.life <= 0.0){
+                // i killed yah biatch
+                me.gameObject.kills++
+                me.gameObject.maxLife++;
+              }
+          }
         } else if(them.gameObject && them.gameObject.class==Plant){
-              if(me.gameObject.life <=2.0){
+              if(me.gameObject.life <=me.gameObject.maxLife){
                   me.gameObject.eat(them.gameObject);
               }
           } else if(them.gameObject && them.gameObject.class==Wall){
-              me.gameObject.life -= 0.1;
+                me.gameObject.life -= 0.1;
                 me.gameObject.brain.ouchie += 0.5;
+        } else if(them.gameObject.class==Meat){
+          // only the blood thirsty eat meat
+            if(me.gameObject.kills > 0){
+              console.log('fresh meat!')
+              this.gestationTimer-=50;
+              me.gameObject.eat(them.gameObject) ;
+          }
         }
     };
 
@@ -82485,7 +82513,7 @@ if(them.imAfukinSensor){return;}
 
     let shitD = Matter.Constraint.create({
       bodyB: body,
-      pointB: Matter.Vector.create(0,0),
+      pointB: Vector.create(0,0),
       bodyA: soundSensor,
       stiffness: 1
     });
@@ -82526,6 +82554,7 @@ if(them.imAfukinSensor){return;}
 
   tick() {
 
+
     this.brain.heat = Math.abs(Mathjs.distance([ this.body.position.x, this.body.position.y], [ this.world.bounds.max.x/2, this.world.bounds.max.y/2]));
     this.brain.life = this.life;
     this.brain.tick();
@@ -82535,20 +82564,17 @@ if(them.imAfukinSensor){return;}
       let thrust = this.brain.thrust;
       let facing = this.body.angle;
       let turn = this.brain.turn + facing;
-      let position = Matter.Vector.clone(this.body.position);
-      let butt = Matter.Vector.create(- this.radius * Math.cos(facing) + position.x, -this.radius * Math.sin(facing) + position.y);
+      let position = Vector.clone(this.body.position);
+      let butt = Vector.create(- this.radius * Math.cos(facing) + position.x, -this.radius * Math.sin(facing) + position.y);
       Matter.Body.applyForce(this.body,
         butt,
-        Matter.Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
+        Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
 
 
       this.age = this.brain.age;
       this.life -= (0.00005 * this.age + this.brain.heat * 0.000003 );
 
-      if(this.life <=0){
-          Matter.Composite.remove(this.world, this.parentComposite, true);
-//          console.log('i dead');
-      }
+
 
       this.red = this.brain.red;
       this.blue = this.brain.blue;
@@ -82558,9 +82584,9 @@ if(them.imAfukinSensor){return;}
       if(this.age > 50 && this.life > 0.6){
         if(this.gestationTimer <= 0){
           this.spawn();
-          this.life *= 0.5;
+          this.life *= 0.7;
           console.log('natural birth');
-          this.gestationTimer = 200;
+          this.gestationTimer = 400;
         }
         this.gestationTimer--;
       }
@@ -82582,9 +82608,9 @@ if(them.imAfukinSensor){return;}
 
   spawn(){
     let child = new Bot();
-    //console.log('spawn');
+    child.kills = this.kills;
     child.brain = this.brain.mutate();
-    child.create(this.world, Matter.Vector.create(this.body.position.x +10, this.body.position.y +10));
+    child.create(this.world, Vector.create(this.body.position.x +10, this.body.position.y +10));
   }
 
   componentToHex(c) {
@@ -82600,7 +82626,7 @@ if(them.imAfukinSensor){return;}
 
 module.exports = Bot
 
-},{"./Brain":563,"./Plant":566,"./Wall":567,"mathjs":6,"matter-attractors":546,"matter-js":549,"matter-wrap":550}],563:[function(require,module,exports){
+},{"./Brain":563,"./Meat":566,"./Plant":567,"./Wall":568,"mathjs":6,"matter-attractors":546,"matter-js":549,"matter-wrap":550}],563:[function(require,module,exports){
 'use strict';
 
 const Mathjs = require('mathjs');
@@ -82683,10 +82709,10 @@ class Brain{
       this.outputVector = Mathjs.add(tempOutputVector, this.outputBias);
 
       this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-this.sigmoid(this.outputVector.subset(Mathjs.index(7))) );
-      this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1)))* this.sigmoid(this.outputVector.subset(Mathjs.index(8)))) - 0.2 ;
-      this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) ;
-      this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3))) ;
-      this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4))) ;
+      this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1))) * this.sigmoid(this.outputVector.subset(Mathjs.index(8)))) - 0.2 ;
+      this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) * this.sigmoid(this.outputVector.subset(Mathjs.index(9))) ;
+      this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3))) * this.sigmoid(this.outputVector.subset(Mathjs.index(10))) ;
+      this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4))) * this.sigmoid(this.outputVector.subset(Mathjs.index(11)));
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
       this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5;
 
@@ -82812,6 +82838,58 @@ const    World = require('matter-js').World;
 const    Bodies = require('matter-js').Bodies;
 
 
+class Meat {
+  constructor(quantity) {
+    this.life = quantity * .01;
+    this.class = Meat;
+  }
+
+      create(world, position){
+        let meat = Matter.Composite.create({
+          label: 'Meat'
+        });
+
+          this.body =  Bodies.circle(position.x, position.y, 10, {
+            friction: 0.5,
+            frictionStatic: 0.1,
+            isStatic: true,
+            isSensor: true,
+            render: {
+              fillStyle: '#FF1111',
+              strokeStyle: '#FF1111',
+              lineWidth: 3
+            }
+          });
+
+          this.blue = 0.1;
+          this.red = 1.1;
+          this.green = 0.1;
+
+          meat.gameObject = this;
+          this.parentComposite = meat;
+          Matter.Composite.addBody(meat, this.body);
+          this.body.gameObject = this;
+          this.world = world;
+          World.add(world, meat);
+      }
+
+      destroy(){
+        Matter.Composite.remove(this.world, this.parentComposite, true);
+      }
+
+}
+
+
+module.exports = Meat;
+
+},{"matter-js":549}],567:[function(require,module,exports){
+'use strict';
+
+const    Matter = require('matter-js');
+const    World = require('matter-js').World;
+const    Bodies = require('matter-js').Bodies;
+
+
 class Plant {
   constructor() {
     this.life = 1.0;
@@ -82861,7 +82939,7 @@ class Plant {
 
 module.exports = Plant;
 
-},{"matter-js":549}],567:[function(require,module,exports){
+},{"matter-js":549}],568:[function(require,module,exports){
 'use strict';
 
 const    Matter = require('matter-js');

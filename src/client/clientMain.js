@@ -1,5 +1,5 @@
 'use strict';
-
+const     Mathjs  = require('mathjs');
 const    Matter = require('matter-js');
 const    MatterWrap = require('matter-wrap');
 const    MatterAttractors = require('matter-attractors');
@@ -15,9 +15,11 @@ const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
 const    Meat = require('../common/Meat');
 
-const MAX_BOTS = 35;
-const MAX_PLANTS = 1000;
-const WALLS = 200;
+const STARTING_BOTS = 10;
+const MIN_BOTS = 10;
+const MAX_BOTS = 30;
+const MIN_PLANTS = 1000;
+const WALLS = 150;
 
 const WIDTH = 3000;
 const HEIGHT = 2000;
@@ -52,22 +54,22 @@ document.addEventListener('DOMContentLoaded', function(e) {
         // let  k = (i % 3) - 1;
         // let  l = (i+2 % 3) - 1;
           new Wall().create(engine.world, {
-            x : Math.cos(i*3.14/60) * WIDTH/2 + i * 10 ,
-            y : Math.sin(i*3.14/60)* HEIGHT/2 + HEIGHT/2
+            x : Mathjs.round(Math.cos(i*3.14/60) * WIDTH/100 )*20+ i * 10 ,
+            y : Mathjs.round(Math.sin(i*3.14/60)* HEIGHT/100 )*20+ i * 10
           });
     }
 
-    for (let i = 0; i < MAX_BOTS; i++ ){
+    for (let i = 0; i < STARTING_BOTS; i++ ){
       new  Bot().create(engine.world, {
         x : (Math.random() -0.5) * WIDTH + WIDTH/2,
         y : (Math.random() - 0.5) * HEIGHT + HEIGHT/2
       });
     }
 
-    for (let i = 0; i < MAX_PLANTS; i++){
+    for (let i = 0; i < MIN_PLANTS; i++){
       new Plant().create(engine.world, {
-        x : (Math.random() -0.5) * WIDTH + HEIGHT/2,
-        y : (Math.random() - 0.5) * HEIGHT + HEIGHT/2
+        x : Mathjs.round((Math.random() -0.5) * WIDTH/50) * 45 + WIDTH/2 +20,
+        y : Mathjs.round((Math.random() - 0.5) * HEIGHT/50) * 45 + HEIGHT/2 +20
         });
     }
 
@@ -92,19 +94,21 @@ document.addEventListener('DOMContentLoaded', function(e) {
                   oldestBot = urmom.gameObject;
                 }
               }else if ( urmom.gameObject.class == Plant){
-
                 plantCount++;
               }
           }
         }
-        if(botCount < MAX_BOTS){
-          oldestBot.spawn();
+        if(botCount < MIN_BOTS){
+          oldestBot.spawn({x:WIDTH/2 , y:HEIGHT/2 });
+          new Bot().create(engine.world,{x:WIDTH/2 , y:HEIGHT/2 } );
+        }else if(botCount > MAX_BOTS){
+          oldestBot.life = -1;
         }
-        if(plantCount < MAX_PLANTS){
+        if(plantCount < MIN_PLANTS){
           plantCount++;
           new Plant().create(engine.world, {
-            x : (Math.random() -0.5)* (Math.random() -0.5) * WIDTH +WIDTH,
-            y : (Math.random() -0.5)*(Math.random() -0.5) * HEIGHT +HEIGHT
+            x : Mathjs.round((Math.random() -0.5) * WIDTH/50) * 25 + WIDTH/2,
+            y : Mathjs.round((Math.random() -0.5) * HEIGHT/50) * 25 + HEIGHT/2
           });
         }
     });
@@ -160,14 +164,14 @@ document.addEventListener('DOMContentLoaded', function(e) {
             engine.world.bounds.max.y = HEIGHT;
 
   // wrapping using matter-wrap plugin
-      // var allBodies = Matter.Composite.allBodies(engine.world);
-      //
-      // for (var i = 0; i < allBodies.length; i++) {
-      //     allBodies[i].plugin.wrap = {
-      //         min: { x: engine.world.bounds.min.x , y: engine.world.bounds.min.y },
-      //         max: { x: engine.world.bounds.max.x , y: engine.world.bounds.max.y  }
-      //     };
-      // }
+      var allBodies = Matter.Composite.allBodies(engine.world);
+
+      for (var i = 0; i < allBodies.length; i++) {
+          allBodies[i].plugin.wrap = {
+              min: { x: engine.world.bounds.min.x -100, y: engine.world.bounds.min.y -100},
+              max: { x: engine.world.bounds.max.x +100, y: engine.world.bounds.max.y +100 }
+          };
+      }
 
 
 

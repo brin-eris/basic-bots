@@ -2,6 +2,8 @@
 
 const Mathjs = require('mathjs');
 
+const INPUT_SIZE = 25;
+
 class Brain{
 
 
@@ -20,22 +22,22 @@ class Brain{
       this.give = 0.0;
       this.ouchie = 0.0;
       this.age = 0;
+
       this.eyeAInput = { red:0, green: 0, blue:0 };
       this.eyeBInput = { red:0, green: 0, blue:0 };
       this.eyeCInput = { red:0, green: 0, blue:0 };
+      this.eyeC2AInput = { red:0, green: 0, blue:0 };
+      this.eyeC2BInput = { red:0, green: 0, blue:0 };
+      this.eyeC3AInput = { red:0, green: 0, blue:0 };
 
-      this.inputWeights = Mathjs.random(Mathjs.matrix([15, 15]));
-
-
-      this.hiddenBias = Mathjs.random([15]);
-
-
-      this.hiddenWeights = Mathjs.random(Mathjs.matrix([15, 15]));
+      this.inputWeights = Mathjs.ones(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
 
 
+      this.hiddenBias = Mathjs.random([INPUT_SIZE], -1.5, 1.5);
 
+      this.hiddenWeights = Mathjs.ones(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
 
-      this.outputBias = Mathjs.random([15]);
+      this.outputBias = Mathjs.random([INPUT_SIZE], -1.5, 1.5);
 
     }
 
@@ -50,20 +52,36 @@ class Brain{
 
       this.inputVector = Mathjs.matrix([
         this.eyeAInput.red,
-        this.eyeBInput.red,
-        this.eyeCInput.red,
         this.eyeAInput.blue,
-        this.eyeBInput.blue,
-        this.eyeCInput.blue,
         this.eyeAInput.green,
+
+        this.eyeBInput.red,
+        this.eyeBInput.blue,
         this.eyeBInput.green,
+
+        this.eyeCInput.red,
+        this.eyeCInput.blue,
         this.eyeCInput.green,
+
+        this.eyeC2AInput.red,
+        this.eyeC2AInput.blue,
+        this.eyeC2AInput.green,
+
+        this.eyeC2BInput.red,
+        this.eyeC2BInput.blue,
+        this.eyeC2BInput.green,
+
+        this.eyeC3AInput.red,
+        this.eyeC3AInput.blue,
+        this.eyeC3AInput.green,
+
         this.heat,
-        this.turn,
-        this.thrust,
+        this.turn1 - this.turn2,
+        this.thrust1 - this.thrust2,
         this.soundInput,
         this.ouchie,
-        this.life
+        this.life,
+        Math.random()
         ]);
 
 
@@ -79,11 +97,14 @@ class Brain{
 
       this.outputVector = Mathjs.add(tempOutputVector, this.outputBias);
 
-      this.turn = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))-this.sigmoid(this.outputVector.subset(Mathjs.index(7))) );
-      this.thrust = (this.sigmoid(this.outputVector.subset(Mathjs.index(1))) * this.sigmoid(this.outputVector.subset(Mathjs.index(8)))) - 0.2 ;
-      this.red = this.sigmoid(this.outputVector.subset(Mathjs.index(2))) * this.sigmoid(this.outputVector.subset(Mathjs.index(9))) ;
-      this.green = this.sigmoid(this.outputVector.subset(Mathjs.index(3))) * this.sigmoid(this.outputVector.subset(Mathjs.index(10))) ;
-      this.blue = this.sigmoid(this.outputVector.subset(Mathjs.index(4))) * this.sigmoid(this.outputVector.subset(Mathjs.index(11)));
+      this.turn1 = (this.sigmoid(this.outputVector.subset(Mathjs.index(0)))*this.sigmoid(this.outputVector.subset(Mathjs.index(9)))*(this.sigmoid(this.outputVector.subset(Mathjs.index(10)))>0.5 ? -1:1 )  );
+      this.thrust1 = (this.sigmoid(this.outputVector.subset(Mathjs.index(1))) - 0.49)/5  ;
+      this.turn2 = (this.sigmoid(this.outputVector.subset(Mathjs.index(7)))*this.sigmoid(this.outputVector.subset(Mathjs.index(13)))*(this.sigmoid(this.outputVector.subset(Mathjs.index(12)))>0.5 ? -1:1 )  );
+      this.thrust2 = (this.sigmoid(this.outputVector.subset(Mathjs.index(8))) - 0.49)/5  ;
+
+      this.red = Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(2)))  );
+      this.green = Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(3))) );
+      this.blue = Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(4)))  );
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
       this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5;
 
@@ -93,7 +114,9 @@ class Brain{
       this.eyeAInput = { red:0, green: 0, blue:0 };
       this.eyeBInput = { red:0, green: 0, blue:0 };
       this.eyeCInput = { red:0, green: 0, blue:0 };
-
+      this.eyeC2AInput = { red:0, green: 0, blue:0 };
+      this.eyeC2BInput = { red:0, green: 0, blue:0 };
+      this.eyeC3AInput = { red:0, green: 0, blue:0 };
     }
 
     sigmoid(value){
@@ -106,34 +129,32 @@ class Brain{
       let childBrain = new Brain();
 
       childBrain.inputWeights = this.inputWeights.map( function(value, index, matrix) {
-        if(Math.random() > 0.6){
-          return value * (Math.random() - 0.5) + value;
+        if(Math.random() > 0.8){
+          return  (Math.random() - 0.5)*(Math.random()-0.5) + value;
         }
         return value;
       });
 
       childBrain.outputBias = this.outputBias.map( function(value, index, matrix) {
-        if(Math.random() > 0.9){
-          return value * Math.random() +value;//weee
+        if(Math.random() > 0.8){
+          return (Math.random() - 0.5)*(Math.random()-0.5) +value;//weee
         }
-        return value + value * 0.1;
+        return value ;
       });
 
 
       childBrain.hiddenBias = this.hiddenBias.map( function(value, index, matrix) {
         if(Math.random() > 0.8){
-          let newValue =  value + Math.random()-0.5;
+          let newValue =  value +(Math.random()-0.5)*(Math.random()-0.5);
           return newValue;
         }
         return value;
         });
 
 
-
-
       childBrain.hiddenWeights = this.hiddenWeights.map(function(value, index, matrix){
         if(Math.random() > 0.8){
-          let newValue = Math.random() * value + Math.random() -0.5 + value ;
+          let newValue = (Math.random()-0.5)*(Math.random()-0.5)   + value ;
           return newValue;
         }
         return value;

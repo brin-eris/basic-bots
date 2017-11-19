@@ -23,6 +23,7 @@ class Bot {
     this.brain = new Brain();
     this.life = 1.0;
     this.maxLife = 2.0;
+    this.heat = 0.0
   }
 
   create(world, position) {
@@ -49,7 +50,7 @@ class Bot {
     let eyeC3AOffset = Vector.create( offsetLayer2Radius * 1.3,0);
 
 
-    let soundRadius = radius * 5;
+    let soundRadius = offsetRadius * 3;
 
     let bot = Matter.Composite.create({
       label: 'Bot'
@@ -59,11 +60,9 @@ class Bot {
       collisionFilter: {
         group: group
       },
-      density: 0.5,
-      restitution: 0.1,
-      friction: 0.9,
-      frictionAir: 0.1,
-      frictionStatic: 0.5
+      density: 0.2,
+      restitution: 0.1
+
     });
 
     body.gameObject = this;
@@ -73,6 +72,7 @@ class Bot {
         if(them.gameObject.class==Plant){
           if(me.gameObject.life <= me.gameObject.maxLife){
             me.gameObject.eat(them.gameObject);
+
           }
           }else if(them.gameObject.class==Wall){
                 me.gameObject.life -= 0.001;
@@ -82,7 +82,9 @@ class Bot {
             if(me.gameObject.kills > 0){
               console.log('fresh meat!')
               this.gestationTimer-=50;
-                me.gameObject.eat(them.gameObject) ;
+              me.gameObject.eat(them.gameObject);
+              me.gameObject.eat(them.gameObject);
+
             }
           }
       }
@@ -96,7 +98,7 @@ class Bot {
               let theirMomentum = Vector.mult(them.velocity, 1.0);
               let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-              let damage = (0.01 * me.gameObject.brain.spike * Vector.magnitude(relativeMomentum));
+              let damage = (0.5 * me.gameObject.brain.spike * Vector.magnitude(relativeMomentum));
               them.gameObject.life -= damage;
               if(them.gameObject.life <= 0.0){
                 // i killed yah biatch
@@ -115,8 +117,10 @@ class Bot {
           // only the blood thirsty eat meat
             if(me.gameObject.kills > 0){
               console.log('fresh meat!')
-              this.gestationTimer-=50;
+              this.gestationTimer-=100;
               me.gameObject.eat(them.gameObject) ;
+              me.gameObject.eat(them.gameObject) ;
+
           }
         }
     };
@@ -133,13 +137,23 @@ class Bot {
     soundSensor.gameObject = this;
     soundSensor.imAfukinSensor = true;
     soundSensor.onCollideActive = function(me, them){
-if(them.imAfukinSensor){return;}
-        if(them.gameObject && them.gameObject.class==Bot){
-              me.gameObject.brain.soundInput += them.motion ;
-              if(me.gameObject.brain.give > 0.0){
+      if(them.imAfukinSensor){return;}
+      if(them.gameObject){
+        if(them.gameObject.class==Bot){
+              me.gameObject.brain.soundInput += them.gameObject.body.speed ;
+              if(me.gameObject.brain.give > 0.0 && them.gameObject.life <0.5){
                 me.gameObject.give(them.gameObject);
               }
+        }else if(them.gameObject.class==Meat){
+          // only the blood thirsty eat meat
+          if(me.gameObject.kills > 0){
+            console.log('fresh meat!')
+            // blood sensor...
+            me.gameObject.brain.soundInput -= them.gameObject.life ;
+          }
         }
+
+      }
     };
 
 
@@ -278,9 +292,9 @@ if(them.imAfukinSensor){return;}
     eyeC2A.imAfukinSensor = true;
     eyeC2A.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeCInput.red += (them.gameObject.red);
-      me.gameObject.brain.eyeCInput.blue += (them.gameObject.blue);
-      me.gameObject.brain.eyeCInput.green += (them.gameObject.green);
+      me.gameObject.brain.eyeC2AInput.red += (them.gameObject.red);
+      me.gameObject.brain.eyeC2AInput.blue += (them.gameObject.blue);
+      me.gameObject.brain.eyeC2AInput.green += (them.gameObject.green);
     };
     let eyeC2B = Bodies.circle(position.x + eyeC2BOffset.x, position.y + eyeC2BOffset.y, eyeRadius, {
       collisionFilter: {
@@ -295,9 +309,9 @@ if(them.imAfukinSensor){return;}
     eyeC2B.imAfukinSensor = true;
     eyeC2B.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeCInput.red += (them.gameObject.red);
-      me.gameObject.brain.eyeCInput.blue += (them.gameObject.blue);
-      me.gameObject.brain.eyeCInput.green += (them.gameObject.green);
+      me.gameObject.brain.eyeC2BInput.red += (them.gameObject.red);
+      me.gameObject.brain.eyeC2BInput.blue += (them.gameObject.blue);
+      me.gameObject.brain.eyeC2BInput.green += (them.gameObject.green);
     };
     let eyeC3A = Bodies.circle(position.x + eyeC3AOffset.x, position.y + eyeC3AOffset.y, eyeRadius, {
       collisionFilter: {
@@ -312,9 +326,9 @@ if(them.imAfukinSensor){return;}
     eyeC3A.imAfukinSensor = true;
     eyeC3A.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeCInput.red += them.gameObject.red;
-      me.gameObject.brain.eyeCInput.blue += them.gameObject.blue;
-      me.gameObject.brain.eyeCInput.green += them.gameObject.green;
+      me.gameObject.brain.eyeC3AInput.red += them.gameObject.red;
+      me.gameObject.brain.eyeC3AInput.blue += them.gameObject.blue;
+      me.gameObject.brain.eyeC3AInput.green += them.gameObject.green;
     };
 
     let shitA = Matter.Constraint.create({
@@ -426,46 +440,58 @@ if(them.imAfukinSensor){return;}
   tick() {
 
 
-    this.brain.heat = Math.abs(Mathjs.distance([ this.body.position.x, this.body.position.y], [ this.world.bounds.max.x/2, this.world.bounds.max.y/2]));
+    this.heat = (Mathjs.distance([ this.body.position.x, this.body.position.y], [ this.world.bounds.max.x/2, this.world.bounds.max.y/2]));
+    this.brain.heat = this.heat;
     this.brain.life = this.life;
+
+    // set all brain inputs that arent from events
     this.brain.tick();
-
-
-
-      let thrust = this.brain.thrust;
-      let facing = this.body.angle;
-      let turn = this.brain.turn + facing;
-      let position = Vector.clone(this.body.position);
-      let butt = Vector.create(- this.radius * Math.cos(facing) + position.x, -this.radius * Math.sin(facing) + position.y);
-      Matter.Body.applyForce(this.body,
-        butt,
-        Vector.create(thrust * Math.cos(turn), thrust * Math.sin(turn)));
-
-
+    // get all brain outputs
       this.age = this.brain.age;
-      this.life -= (0.00005 * this.age + this.brain.heat * 0.000003 );
-
-
-
       this.red = this.brain.red;
       this.blue = this.brain.blue;
       this.green = this.brain.green;
 
+
+
+      let facing = this.body.angle;
+      let thrustLeftSide = this.brain.thrust1;
+      let turnLeftSide = (this.brain.turn1 + facing) ;
+      let thrustRightSide = this.brain.thrust2;
+      let turnRightSide = (this.brain.turn2 + facing) ;
+
+      let position = Vector.clone(this.body.position);
+      let leftButtcheek = Vector.create(-0.15 * Math.cos(facing- 1) + position.x, -0.15 * Math.sin(facing-1) + position.y);
+      let rightButtcheek = Vector.create(-0.15 * Math.cos(facing+1) + position.x, -0.15 * Math.sin(facing+1) + position.y);
+//      let butt = position;
+      Matter.Body.applyForce(this.body,
+        leftButtcheek,
+        Vector.create(thrustLeftSide * Math.cos(turnLeftSide), thrustLeftSide * Math.sin(turnLeftSide)));
+
+      Matter.Body.applyForce(this.body,
+        rightButtcheek,
+        Vector.create(thrustRightSide * Math.cos(turnRightSide), thrustRightSide * Math.sin(turnRightSide)));
+
+
+      this.life -= (0.00003 * this.age + this.heat * 0.0000002 );
+
       this.body.render.fillStyle = this.rgbToHex(this.brain.red * 255, this.brain.green * 255, this.brain.blue * 255);
-      if(this.age > 50 && this.life > 0.6){
-        if(this.gestationTimer <= 0){
-          this.spawn();
-          this.life *= 0.7;
-          console.log('natural birth');
-          this.gestationTimer = 400;
+      if(this.age > 65 && this.life > 0.8){
+        if(this.gestationTimer <= 0 && Math.random() > 0.9){
+          this.spawn(this.body.position);
+          this.spawn(this.body.position);
+          this.spawn(this.body.position);
+          this.life = 0.0;//this.life * 0.5;
+          //console.log('natural birth');
+          this.gestationTimer = 550;
         }
         this.gestationTimer--;
       }
   }
 
   eat(food){
-    this.life += 0.004;
-    food.life -= 0.005;
+    this.life += 0.002;
+    food.life -= 0.003;
     if(food.life <0.0){ food.destroy()}
 
     //console.log('nom' + food.class);
@@ -477,11 +503,14 @@ if(them.imAfukinSensor){return;}
     them.life +=toGive;
   }
 
-  spawn(){
+  spawn(placement){
     let child = new Bot();
-    child.kills = this.kills;
+    //child.kills = this.kills;
+    if(this.kills>1){
+      child.kills = this.kills - 1;
+    }
     child.brain = this.brain.mutate();
-    child.create(this.world, Vector.create(this.body.position.x +10, this.body.position.y +10));
+    child.create(this.world, Vector.create(placement.x +15*Math.random(), placement.y +15*Math.random()));
   }
 
   componentToHex(c) {

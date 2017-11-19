@@ -5,27 +5,63 @@ const Nerdamer = require('nerdamer/all');
 
 class Cppn {
   constructor() {
+
+
+          this.heat = 0.0;
+          this.turn = 0.0;
+          this.thrust = 0.0;
+          this.clock = 0;
+          this.red = 0.0;
+          this.green = 0.0;
+          this.blue = 0.0;
+          this.sound = 0.0;
+          this.soundInput = 1.0;
+          this.give = 0.0;
+          this.ouchie = 0.0;
+          this.age = 0;
+          this.eyeAInput = { red:0, green: 0, blue:0 };
+          this.eyeBInput = { red:0, green: 0, blue:0 };
+          this.eyeCInput = { red:0, green: 0, blue:0 };
   }
 
-  dothing() {
-    var e = Nerdamer('x^2+2*(cos(x)+x*x)');
-    console.log(e.text());
-    Nerdamer.clear('all');
+    tick(){
+      this.inputVector = Mathjs.matrix([
+        this.eyeAInput.red,
+        this.eyeBInput.red,
+        this.eyeCInput.red,
+        this.eyeAInput.blue,
+        this.eyeBInput.blue,
+        this.eyeCInput.blue,
+        this.eyeAInput.green,
+        this.eyeBInput.green,
+        this.eyeCInput.green,
+        this.heat,
+        this.turn,
+        this.thrust,
+        this.soundInput,
+        this.ouchie,
+        this.life
+        ]);
 
-    var e = Nerdamer('diff(x^2+2*(cos(x)+x*x),x)');
-    console.log(e.text());
-    Nerdamer.clear('all');
 
-    var sol = Nerdamer.solveEquations('0=x^2+4','x');
-    console.log(Nerdamer( sol[1].text()).evaluate().text());
+      this.turn = 0;
+      this.thrust = 0;
+      this.red = 0;
+      this.green = 0;
+      this.blue = 0;
+      this.spike = 0;
+      this.give = 0;
 
-    Nerdamer.clear('all');
-    var result = nerdamer('x^2').evaluate({x:'i'});
-    console.log(result.text());
+      this.soundInput = 0.0;
+      this.ouchie = 0.0;
+      this.heat = 0.0;
+      this.eyeAInput = { red:0, green: 0, blue:0 };
+      this.eyeBInput = { red:0, green: 0, blue:0 };
+      this.eyeCInput = { red:0, green: 0, blue:0 };
 
-    var e = Nerdamer.solveEquations('x^2+4-y', 'y');
-    console.log(e[0].text());
-  }
+    }
+
+    mutate(){}
 }
 
 

@@ -60,8 +60,11 @@ class Bot {
       collisionFilter: {
         group: group
       },
-      density: 0.2,
-      restitution: 0.1
+      density: 0.1,
+      restitution: 0.1,
+      friction:0.1,
+      frictionAir:1.5,
+      frictionStatic:0.5
 
     });
 
@@ -456,13 +459,13 @@ class Bot {
 
       let facing = this.body.angle;
       let thrustLeftSide = this.brain.thrust1;
-      let turnLeftSide = (this.brain.turn1 + facing) ;
+      let turnLeftSide =  (this.brain.turn1 + facing) ;
       let thrustRightSide = this.brain.thrust2;
-      let turnRightSide = (this.brain.turn2 + facing) ;
+      let turnRightSide =  (this.brain.turn2 + facing) ;
 
       let position = Vector.clone(this.body.position);
-      let leftButtcheek = Vector.create(-0.15 * Math.cos(facing- 1) + position.x, -0.15 * Math.sin(facing-1) + position.y);
-      let rightButtcheek = Vector.create(-0.15 * Math.cos(facing+1) + position.x, -0.15 * Math.sin(facing+1) + position.y);
+      let leftButtcheek = Vector.create(-1.5 * Math.cos(facing- 1.5) + position.x, -1.5 * Math.sin(facing-1.5) + position.y);
+      let rightButtcheek = Vector.create(-1.5 * Math.cos(facing+1.5) + position.x, -1.5 * Math.sin(facing+1.5) + position.y);
 //      let butt = position;
       Matter.Body.applyForce(this.body,
         leftButtcheek,
@@ -473,7 +476,7 @@ class Bot {
         Vector.create(thrustRightSide * Math.cos(turnRightSide), thrustRightSide * Math.sin(turnRightSide)));
 
 
-      this.life -= (0.00003 * this.age + this.heat * 0.0000002 );
+      this.life -= (0.00001 * this.age + this.heat * 0.000002 );
 
       this.body.render.fillStyle = this.rgbToHex(this.brain.red * 255, this.brain.green * 255, this.brain.blue * 255);
       if(this.age > 65 && this.life > 0.8){
@@ -481,7 +484,7 @@ class Bot {
           this.spawn(this.body.position);
           this.spawn(this.body.position);
           this.spawn(this.body.position);
-          this.life = 0.0;//this.life * 0.5;
+          this.life = this.life * 0.5;
           //console.log('natural birth');
           this.gestationTimer = 550;
         }
@@ -510,7 +513,7 @@ class Bot {
       child.kills = this.kills - 1;
     }
     child.brain = this.brain.mutate();
-    child.create(this.world, Vector.create(placement.x +15*Math.random(), placement.y +15*Math.random()));
+    child.create(this.world, Vector.create(placement.x -150*Math.random(), placement.y -150*Math.random()));
   }
 
   componentToHex(c) {

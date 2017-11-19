@@ -15,10 +15,10 @@ const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
 const    Meat = require('../common/Meat');
 
-const STARTING_BOTS = 10;
-const MIN_BOTS = 10;
-const MAX_BOTS = 30;
-const MIN_PLANTS = 1000;
+const STARTING_BOTS = 50;
+const MIN_BOTS = 20;
+const MAX_BOTS = 70;
+const MIN_PLANTS = 1500;
 const WALLS = 150;
 
 const WIDTH = 3000;
@@ -99,8 +99,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
           }
         }
         if(botCount < MIN_BOTS){
-          oldestBot.spawn({x:WIDTH/2 , y:HEIGHT/2 });
-          new Bot().create(engine.world,{x:WIDTH/2 , y:HEIGHT/2 } );
+          oldestBot.spawn({x:WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500});
+          new Bot().create(engine.world,{x:WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
         }else if(botCount > MAX_BOTS){
           oldestBot.life = -1;
         }
@@ -164,14 +164,14 @@ document.addEventListener('DOMContentLoaded', function(e) {
             engine.world.bounds.max.y = HEIGHT;
 
   // wrapping using matter-wrap plugin
-      var allBodies = Matter.Composite.allBodies(engine.world);
-
-      for (var i = 0; i < allBodies.length; i++) {
-          allBodies[i].plugin.wrap = {
-              min: { x: engine.world.bounds.min.x -100, y: engine.world.bounds.min.y -100},
-              max: { x: engine.world.bounds.max.x +100, y: engine.world.bounds.max.y +100 }
-          };
-      }
+      // var allBodies = Matter.Composite.allBodies(engine.world);
+      //
+      // for (var i = 0; i < allBodies.length; i++) {
+      //     allBodies[i].plugin.wrap = {
+      //         min: { x: engine.world.bounds.min.x -100, y: engine.world.bounds.min.y -100},
+      //         max: { x: engine.world.bounds.max.x +100, y: engine.world.bounds.max.y +100 }
+      //     };
+      // }
 
 
 

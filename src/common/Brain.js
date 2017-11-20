@@ -2,14 +2,15 @@
 
 const Mathjs = require('mathjs');
 
-const INPUT_SIZE = 25;
+const INPUT_SIZE = 30;
 
 class Brain{
 
 
 
     constructor(){
-
+      this.spike = 0.0;
+      this.voice = 0.0;
       this.heat = 0.0;
       this.turn = 0.0;
       this.thrust = 0.0;
@@ -21,8 +22,9 @@ class Brain{
       this.soundInput = 1.0;
       this.give = 0.0;
       this.ouchie = 0.0;
-      this.age = 0;
+      this.age = 1;
 
+      this.bodyInput = { red:0, green: 0, blue:0 };
       this.eyeAInput = { red:0, green: 0, blue:0 };
       this.eyeBInput = { red:0, green: 0, blue:0 };
       this.eyeCInput = { red:0, green: 0, blue:0 };
@@ -30,7 +32,7 @@ class Brain{
       this.eyeC2BInput = { red:0, green: 0, blue:0 };
       this.eyeC3AInput = { red:0, green: 0, blue:0 };
 
-      this.inputWeights = Mathjs.ones(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
+      this.inputWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
 
 
       this.hiddenBias = Mathjs.random([INPUT_SIZE], -1.5, 1.5);
@@ -45,12 +47,18 @@ class Brain{
 
       this.clock++;
       this.clock %= 60;
-      if(this.clock % 5 == 0 ){
+      if(this.clock  == 0 ){
         this.age++;
       }
       this.ccClock = (this.clock - 30)/60;
 
       this.inputVector = Mathjs.matrix([
+
+        this.bodyInput.red,
+        this.bodyInput.blue,
+        this.bodyInput.green,
+
+
         this.eyeAInput.red,
         this.eyeAInput.blue,
         this.eyeAInput.green,
@@ -74,7 +82,8 @@ class Brain{
         this.eyeC3AInput.red,
         this.eyeC3AInput.blue,
         this.eyeC3AInput.green,
-
+        this.spike,
+        this.voice,
         this.heat,
         this.turn1 - this.turn2,
         this.thrust1 - this.thrust2,
@@ -119,6 +128,7 @@ class Brain{
       this.eyeC2AInput = { red:0, green: 0, blue:0 };
       this.eyeC2BInput = { red:0, green: 0, blue:0 };
       this.eyeC3AInput = { red:0, green: 0, blue:0 };
+      this.bodyInput = { red:0, green: 0, blue:0 };
     }
 
     sigmoid(value){
@@ -132,7 +142,7 @@ class Brain{
 
       childBrain.inputWeights = this.inputWeights.map( function(value, index, matrix) {
         if(Math.random() > 0.8){
-          return  (Math.random() - 0.5)*(Math.random() - 0.5);
+          return  (Math.random() - 0.5)*(Math.random() - 0.5)+ value;
         }
         return value;
       });

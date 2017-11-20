@@ -15,11 +15,11 @@ const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
 const    Meat = require('../common/Meat');
 
-const STARTING_BOTS = 30;
-const MIN_BOTS = 10;
-const MAX_BOTS = 30;
-const MIN_PLANTS = 1500;
-const WALLS = 100;
+const STARTING_BOTS = 10;
+const MIN_BOTS = 5;
+const MAX_BOTS = 40;
+const MIN_PLANTS = 1300;
+const WALLS = 140;
 
 const WIDTH = 3000;
 const HEIGHT = 2000;
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
 
 
-  var engine = Matter.Engine.create({constraintIterations: 3});
+  var engine = Matter.Engine.create({constraintIterations: 5});
 
   // create a renderer
   var render = Matter.Render.create({
@@ -54,8 +54,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
         // let  k = (i % 3) - 1;
         // let  l = (i+2 % 3) - 1;
           new Wall().create(engine.world, {
-            x : Mathjs.round(Math.cos(i*3.14/60) * WIDTH/2 )+ i * 10 ,
-            y : Mathjs.round(Math.sin(i*3.14/60)* HEIGHT/2 )+ i * 10
+            x : Mathjs.round(Math.cos(i*3.14/60) * 500 )+WIDTH/2 +1  ,
+            y : Mathjs.round(Math.sin(i*3.14/60)* 500 )+HEIGHT/2
           });
     }
 
@@ -99,8 +99,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
           }
         }
         if(botCount < MIN_BOTS){
-          oldestBot.spawn({x:WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500});
-          new Bot().create(engine.world,{x:WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
+          //oldestBot.spawn({x:WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500});
+          //new Bot().create(engine.world,{x:WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
         }else if(botCount > MAX_BOTS){
           oldestBot.life = -1;
         }

@@ -13,7 +13,7 @@ class Wall {
       create(world, position){
 
 
-          this.body =  Bodies.rectangle(position.x, position.y, 50, 50, {
+          this.body =  Bodies.rectangle(position.x, position.y, 15, 15, {
             friction: 0.5,
             frictionStatic: 0.1,
             isStatic: true,

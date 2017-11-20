@@ -30,7 +30,7 @@ class Brain{
       this.eyeC2BInput = { red:0, green: 0, blue:0 };
       this.eyeC3AInput = { red:0, green: 0, blue:0 };
 
-      this.inputWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]), -1.5, 1.5);
+      this.inputWeights = Mathjs.ones(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
 
 
       this.hiddenBias = Mathjs.random([INPUT_SIZE], -1.5, 1.5);
@@ -107,6 +107,8 @@ class Brain{
       this.blue = Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(4)))  );
       this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
       this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5;
+      this.voice = this.sigmoid(this.outputVector.subset(Mathjs.index(10))) + this.sigmoid(this.outputVector.subset(Mathjs.index(9)));
+      this.farts = (this.sigmoid(this.outputVector.subset(Mathjs.index(12)))+this.sigmoid(this.outputVector.subset(Mathjs.index(11))))>1.5;
 
       this.soundInput = 0.0;
       this.ouchie = 0.0;
@@ -130,31 +132,31 @@ class Brain{
 
       childBrain.inputWeights = this.inputWeights.map( function(value, index, matrix) {
         if(Math.random() > 0.8){
-          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+          return  (Math.random() - 0.5)*(Math.random() - 0.5);
         }
         return value;
       });
 
-      if(Math.random()< 0.2){
+      if(Math.random()< 0.1){
         childBrain.inputWeights = Mathjs.transpose(childBrain.inputWeights);
       }
-      if(Math.random()< 0.2){
+      if(Math.random()< 0.1){
         childBrain.inputWeights = Mathjs.inv(childBrain.inputWeights);
       }
 
       childBrain.outputBias = this.outputBias.map( function(value, index, matrix) {
         if(Math.random() > 0.8){
-          return (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+          return (Math.random() - 0.5)*(Math.random() - 0.5) + value;
         }
         return value ;
       });
 
-      if(Math.random()< 0.2){
+      if(Math.random()< 0.1){
         childBrain.outputBias = Mathjs.transpose(childBrain.outputBias);
       }
-      if(Math.random()< 0.2){
-        childBrain.outputBias = Mathjs.inv(childBrain.outputBias);
-      }
+      // if(Math.random()< 0.2){
+      //   childBrain.outputBias = Mathjs.inv(childBrain.outputBias);
+      // }
 
       childBrain.hiddenBias = this.hiddenBias.map( function(value, index, matrix) {
         if(Math.random() > 0.8){
@@ -164,25 +166,25 @@ class Brain{
         return value;
         });
 
-        if(Math.random()< 0.2){
+        if(Math.random()< 0.1){
           childBrain.hiddenBias = Mathjs.transpose(childBrain.hiddenBias);
         }
-        if(Math.random()< 0.2){
-          childBrain.hiddenBias = Mathjs.inv(childBrain.hiddenBias);
-        }
+        // if(Math.random()< 0.2){
+        //   childBrain.hiddenBias = Mathjs.inv(childBrain.hiddenBias);
+        // }
 
       childBrain.hiddenWeights = this.hiddenWeights.map(function(value, index, matrix){
         if(Math.random() > 0.8){
-          let newValue = (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+          let newValue = (Math.random() - 0.5)*(Math.random() - 0.5)  + value;
           return newValue;
         }
         return value;
       });
 
-      if(Math.random()< 0.2){
+      if(Math.random()< 0.1){
         childBrain.hiddenWeights = Mathjs.transpose(childBrain.hiddenWeights);
       }
-      if(Math.random()< 0.2){
+      if(Math.random()< 0.1){
         childBrain.hiddenWeights = Mathjs.inv(childBrain.hiddenWeights);
       }
       return childBrain;

@@ -16,7 +16,7 @@ class Plant {
           label: 'Plant'
         });
 
-          this.body =  Bodies.rectangle(position.x, position.y, 25, 25, {
+          this.body =  Bodies.rectangle(position.x, position.y, 30, 30, {
             friction: 0.5,
             frictionStatic: 0.1,
             isStatic: true,

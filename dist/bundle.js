@@ -81958,9 +81958,9 @@ const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
 const    Meat = require('../common/Meat');
 
-const STARTING_BOTS = 40;
-const MIN_BOTS = 10;
-const MAX_BOTS = 50;
+const STARTING_BOTS = 20;
+const MIN_BOTS = 2;
+const MAX_BOTS = 30;
 const STARTING_PLANTS = 1200;
 const MIN_PLANTS = 800;
 const WALLS = 140;

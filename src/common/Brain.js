@@ -1,14 +1,18 @@
 'use strict';
 
 const Mathjs = require('mathjs');
+const Bot   = require('./Bot');
 
 const INPUT_SIZE = 30;
+
 
 class Brain{
 
 
 
     constructor(){
+      //this.body = body;
+
       if(Math.random()>0.5){
         this.hawk = 0.0;
         this.dove = 1.0;
@@ -124,25 +128,29 @@ class Brain{
       this.turn2 = (this.sigmoid(this.outputVector.subset(Mathjs.index(7)))-0.5);
       this.thrust2 = (this.sigmoid(this.outputVector.subset(Mathjs.index(8))) - 0.5)  ;
 
-      this.red = Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(2)))  );
-      this.green = Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(3))) );
-      this.blue = Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(4)))  );
 
       this.spike = (this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5 -0.2*this.dove +0.1*this.hawk);
 
       this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5 +0.1*this.dove -0.1*this.hawk;
+
       this.voice = this.sigmoid(this.outputVector.subset(Mathjs.index(10))) +this.sigmoid(this.outputVector.subset(Mathjs.index(13)));
+
       this.farts = (this.sigmoid(this.outputVector.subset(Mathjs.index(12)))+this.sigmoid(this.outputVector.subset(Mathjs.index(11))))>1.5;
 
-      this.eyeColorA.red =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(14)))  );
-      this.eyeColorA.blue =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(15)))  );
-      this.eyeColorA.green =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(16)))  );
-      this.eyeColorB.red =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(17)))  );
-      this.eyeColorB.green =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(18)))  );
-      this.eyeColorB.blue =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(19)))  );
-      this.eyeColorC.red =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(20)))  );
-      this.eyeColorC.blue =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(21)))  );
-      this.eyeColorC.green =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(22)))  );
+      this.red = (this.sigmoid(this.outputVector.subset(Mathjs.index(2)))  );
+      this.green = (this.sigmoid(this.outputVector.subset(Mathjs.index(3))) );
+      this.blue = (this.sigmoid(this.outputVector.subset(Mathjs.index(4)))  );
+
+      this.eyeColorA.red =(this.sigmoid(this.outputVector.subset(Mathjs.index(14)))  );
+      this.eyeColorA.blue =(this.sigmoid(this.outputVector.subset(Mathjs.index(15)))  );
+      this.eyeColorA.green =(this.sigmoid(this.outputVector.subset(Mathjs.index(16)))  );
+      this.eyeColorB.red =(this.sigmoid(this.outputVector.subset(Mathjs.index(17)))  );
+      this.eyeColorB.green =(this.sigmoid(this.outputVector.subset(Mathjs.index(18)))  );
+      this.eyeColorB.blue =(this.sigmoid(this.outputVector.subset(Mathjs.index(19)))  );
+      this.eyeColorC.red =(this.sigmoid(this.outputVector.subset(Mathjs.index(20)))  );
+      this.eyeColorC.blue =(this.sigmoid(this.outputVector.subset(Mathjs.index(21)))  );
+      this.eyeColorC.green =(this.sigmoid(this.outputVector.subset(Mathjs.index(22)))  );
+
       this.strategy = this.sigmoid(this.outputVector.subset(Mathjs.index(23)));
 
 

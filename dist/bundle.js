@@ -81961,9 +81961,9 @@ const    Meat = require('../common/Meat');
 const STARTING_BOTS = 20;
 const MIN_BOTS = 2;
 const MAX_BOTS = 30;
-const STARTING_PLANTS = 1200;
-const MIN_PLANTS = 800;
-const WALLS = 140;
+const STARTING_PLANTS = 1100;
+const MIN_PLANTS = 1000;
+const WALLS = 120;
 
 const WIDTH = 3000;
 const HEIGHT = 2000;
@@ -82060,9 +82060,9 @@ document.addEventListener('DOMContentLoaded', function(e) {
         if(plantCount < MIN_PLANTS){
           plantCount++;
           new Plant().create(engine.world, {
-            x : Mathjs.round(Math.cos((Math.random() -0.5)) * WIDTH/50) * 35 + WIDTH/2,
-            y : Mathjs.round(Math.sin((Math.random() -0.5)) * HEIGHT/50) * 35 + HEIGHT/2
-          });
+            x : Mathjs.round((Math.random() -0.5) * WIDTH/50) * 45 + WIDTH/2 +20,
+            y : Mathjs.round((Math.random() - 0.5) * HEIGHT/50) * 45 + HEIGHT/2 +20
+            });
         }
     });
 
@@ -82239,7 +82239,7 @@ class Bot {
             let theirMomentum = Vector.mult(them.velocity, 1.0);
             let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-            let damage = (0.0001 * Math.abs(Vector.magnitude(relativeMomentum)));
+            let damage = (0.000001 * Math.abs(Vector.magnitude(relativeMomentum)));
               me.gameObject.life -= damage;
               me.gameObject.brain.ouchie += 0.5;
           }else if(them.gameObject.class==Meat){
@@ -82264,10 +82264,10 @@ class Bot {
               let theirMomentum = Vector.mult(them.velocity, 1.0);
               let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-              let baseDamage = (0.00001  * Math.abs(Vector.magnitude(relativeMomentum)));
-              me.gameObject.life -= baseDamage + baseDamage *them.gameObject.brain.spike;
+              let baseDamage = (0.000001  * Math.abs(Vector.magnitude(relativeMomentum)));
+              me.gameObject.life -= baseDamage + 10*baseDamage *them.gameObject.brain.spike;
               me.gameObject.brain.ouchie += 0.5;
-              them.gameObject.life -= baseDamage/2 ;
+              them.gameObject.life -= baseDamage ;
               them.gameObject.brain.ouchie += 0.5;
 
               if(me.gameObject.life <= 0.0){
@@ -82285,7 +82285,7 @@ class Bot {
             let theirMomentum = Vector.mult(them.velocity, 1.0);
             let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-            let damage = (0.01 * Math.abs(Vector.magnitude(relativeMomentum)));
+            let damage = (0.000001 * Math.abs(Vector.magnitude(relativeMomentum)));
               me.gameObject.life -= damage;
               me.gameObject.brain.ouchie += 0.5;
         } else if(them.gameObject.class==Meat){
@@ -82315,13 +82315,12 @@ class Bot {
       if(them.imAfukinSensor){return;}
       if(them.gameObject){
         if(them.gameObject.class==Bot){
-              me.gameObject.brain.soundInput += them.gameObject.voice ;
+              //me.gameObject.brain.soundInput += them.gameObject.voice ;
               //console.log(them.gameObject.voice);
               if(me.gameObject.brain.give > 0.0 ){
                 me.gameObject.give(them.gameObject);
               }
         }else if(them.gameObject.class==Meat){
-
 
             // only the blood thirsty eat meat
             if(me.gameObject.brain.hawk > 0){
@@ -82329,7 +82328,6 @@ class Bot {
               this.gestationTimer-=5;
               me.gameObject.eat(them.gameObject);
               me.gameObject.eat(them.gameObject);
-
 
           }
         }
@@ -82762,14 +82760,18 @@ module.exports = Bot
 'use strict';
 
 const Mathjs = require('mathjs');
+const Bot   = require('./Bot');
 
 const INPUT_SIZE = 30;
+
 
 class Brain{
 
 
 
     constructor(){
+      //this.body = body;
+
       if(Math.random()>0.5){
         this.hawk = 0.0;
         this.dove = 1.0;
@@ -82885,25 +82887,29 @@ class Brain{
       this.turn2 = (this.sigmoid(this.outputVector.subset(Mathjs.index(7)))-0.5);
       this.thrust2 = (this.sigmoid(this.outputVector.subset(Mathjs.index(8))) - 0.5)  ;
 
-      this.red = Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(2)))  );
-      this.green = Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(3))) );
-      this.blue = Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(4)))  );
 
       this.spike = (this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5 -0.2*this.dove +0.1*this.hawk);
 
       this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5 +0.1*this.dove -0.1*this.hawk;
+
       this.voice = this.sigmoid(this.outputVector.subset(Mathjs.index(10))) +this.sigmoid(this.outputVector.subset(Mathjs.index(13)));
+
       this.farts = (this.sigmoid(this.outputVector.subset(Mathjs.index(12)))+this.sigmoid(this.outputVector.subset(Mathjs.index(11))))>1.5;
 
-      this.eyeColorA.red =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(14)))  );
-      this.eyeColorA.blue =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(15)))  );
-      this.eyeColorA.green =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(16)))  );
-      this.eyeColorB.red =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(17)))  );
-      this.eyeColorB.green =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(18)))  );
-      this.eyeColorB.blue =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(19)))  );
-      this.eyeColorC.red =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(20)))  );
-      this.eyeColorC.blue =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(21)))  );
-      this.eyeColorC.green =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(22)))  );
+      this.red = (this.sigmoid(this.outputVector.subset(Mathjs.index(2)))  );
+      this.green = (this.sigmoid(this.outputVector.subset(Mathjs.index(3))) );
+      this.blue = (this.sigmoid(this.outputVector.subset(Mathjs.index(4)))  );
+
+      this.eyeColorA.red =(this.sigmoid(this.outputVector.subset(Mathjs.index(14)))  );
+      this.eyeColorA.blue =(this.sigmoid(this.outputVector.subset(Mathjs.index(15)))  );
+      this.eyeColorA.green =(this.sigmoid(this.outputVector.subset(Mathjs.index(16)))  );
+      this.eyeColorB.red =(this.sigmoid(this.outputVector.subset(Mathjs.index(17)))  );
+      this.eyeColorB.green =(this.sigmoid(this.outputVector.subset(Mathjs.index(18)))  );
+      this.eyeColorB.blue =(this.sigmoid(this.outputVector.subset(Mathjs.index(19)))  );
+      this.eyeColorC.red =(this.sigmoid(this.outputVector.subset(Mathjs.index(20)))  );
+      this.eyeColorC.blue =(this.sigmoid(this.outputVector.subset(Mathjs.index(21)))  );
+      this.eyeColorC.green =(this.sigmoid(this.outputVector.subset(Mathjs.index(22)))  );
+
       this.strategy = this.sigmoid(this.outputVector.subset(Mathjs.index(23)));
 
 
@@ -82994,7 +83000,7 @@ class Brain{
 
 module.exports = Brain;
 
-},{"mathjs":6}],564:[function(require,module,exports){
+},{"./Bot":562,"mathjs":6}],564:[function(require,module,exports){
 'use strict';
 
 const Nerdamer = require('nerdamer');

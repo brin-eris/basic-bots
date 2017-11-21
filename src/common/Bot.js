@@ -100,7 +100,7 @@ class Bot {
             let theirMomentum = Vector.mult(them.velocity, 1.0);
             let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-            let damage = (0.0001 * Math.abs(Vector.magnitude(relativeMomentum)));
+            let damage = (0.000001 * Math.abs(Vector.magnitude(relativeMomentum)));
               me.gameObject.life -= damage;
               me.gameObject.brain.ouchie += 0.5;
           }else if(them.gameObject.class==Meat){
@@ -125,10 +125,10 @@ class Bot {
               let theirMomentum = Vector.mult(them.velocity, 1.0);
               let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-              let baseDamage = (0.00001  * Math.abs(Vector.magnitude(relativeMomentum)));
-              me.gameObject.life -= baseDamage + baseDamage *them.gameObject.brain.spike;
+              let baseDamage = (0.000001  * Math.abs(Vector.magnitude(relativeMomentum)));
+              me.gameObject.life -= baseDamage + 10*baseDamage *them.gameObject.brain.spike;
               me.gameObject.brain.ouchie += 0.5;
-              them.gameObject.life -= baseDamage/2 ;
+              them.gameObject.life -= baseDamage ;
               them.gameObject.brain.ouchie += 0.5;
 
               if(me.gameObject.life <= 0.0){
@@ -146,7 +146,7 @@ class Bot {
             let theirMomentum = Vector.mult(them.velocity, 1.0);
             let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-            let damage = (0.01 * Math.abs(Vector.magnitude(relativeMomentum)));
+            let damage = (0.000001 * Math.abs(Vector.magnitude(relativeMomentum)));
               me.gameObject.life -= damage;
               me.gameObject.brain.ouchie += 0.5;
         } else if(them.gameObject.class==Meat){
@@ -176,13 +176,12 @@ class Bot {
       if(them.imAfukinSensor){return;}
       if(them.gameObject){
         if(them.gameObject.class==Bot){
-              me.gameObject.brain.soundInput += them.gameObject.voice ;
+              //me.gameObject.brain.soundInput += them.gameObject.voice ;
               //console.log(them.gameObject.voice);
               if(me.gameObject.brain.give > 0.0 ){
                 me.gameObject.give(them.gameObject);
               }
         }else if(them.gameObject.class==Meat){
-
 
             // only the blood thirsty eat meat
             if(me.gameObject.brain.hawk > 0){
@@ -190,7 +189,6 @@ class Bot {
               this.gestationTimer-=5;
               me.gameObject.eat(them.gameObject);
               me.gameObject.eat(them.gameObject);
-
 
           }
         }

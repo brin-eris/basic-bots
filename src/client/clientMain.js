@@ -18,9 +18,9 @@ const    Meat = require('../common/Meat');
 const STARTING_BOTS = 20;
 const MIN_BOTS = 2;
 const MAX_BOTS = 30;
-const STARTING_PLANTS = 1200;
-const MIN_PLANTS = 800;
-const WALLS = 140;
+const STARTING_PLANTS = 1100;
+const MIN_PLANTS = 1000;
+const WALLS = 120;
 
 const WIDTH = 3000;
 const HEIGHT = 2000;
@@ -117,9 +117,9 @@ document.addEventListener('DOMContentLoaded', function(e) {
         if(plantCount < MIN_PLANTS){
           plantCount++;
           new Plant().create(engine.world, {
-            x : Mathjs.round(Math.cos((Math.random() -0.5)) * WIDTH/50) * 35 + WIDTH/2,
-            y : Mathjs.round(Math.sin((Math.random() -0.5)) * HEIGHT/50) * 35 + HEIGHT/2
-          });
+            x : Mathjs.round((Math.random() -0.5) * WIDTH/50) * 45 + WIDTH/2 +20,
+            y : Mathjs.round((Math.random() - 0.5) * HEIGHT/50) * 45 + HEIGHT/2 +20
+            });
         }
     });
 

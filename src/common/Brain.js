@@ -9,6 +9,14 @@ class Brain{
 
 
     constructor(){
+      if(Math.random()>0.5){
+        this.hawk = 0.0;
+        this.dove = 1.0;
+      }else{
+        this.hawk = 1.0;
+        this.dove = 0.0;
+      }
+
       this.spike = 0.0;
       this.voice = 0.0;
       this.heat = 0.0;
@@ -31,6 +39,10 @@ class Brain{
       this.eyeC2AInput = { red:0, green: 0, blue:0 };
       this.eyeC2BInput = { red:0, green: 0, blue:0 };
       this.eyeC3AInput = { red:0, green: 0, blue:0 };
+
+      this.eyeColorA = { red:0, green: 0, blue:0 };
+      this.eyeColorB = { red:0, green: 0, blue:0 };
+      this.eyeColorC = { red:0, green: 0, blue:0 };
 
       this.inputWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
 
@@ -82,6 +94,7 @@ class Brain{
         this.eyeC3AInput.red,
         this.eyeC3AInput.blue,
         this.eyeC3AInput.green,
+
         this.spike,
         this.voice,
         this.heat,
@@ -114,10 +127,24 @@ class Brain{
       this.red = Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(2)))  );
       this.green = Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(3))) );
       this.blue = Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(4)))  );
-      this.spike = this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5;
-      this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5;
-      this.voice = this.sigmoid(this.outputVector.subset(Mathjs.index(10))) + this.sigmoid(this.outputVector.subset(Mathjs.index(9)));
+
+      this.spike = (this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5 -0.2*this.dove +0.1*this.hawk);
+
+      this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5 +0.1*this.dove -0.1*this.hawk;
+      this.voice = this.sigmoid(this.outputVector.subset(Mathjs.index(10))) +this.sigmoid(this.outputVector.subset(Mathjs.index(13)));
       this.farts = (this.sigmoid(this.outputVector.subset(Mathjs.index(12)))+this.sigmoid(this.outputVector.subset(Mathjs.index(11))))>1.5;
+
+      this.eyeColorA.red =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(14)))  );
+      this.eyeColorA.blue =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(15)))  );
+      this.eyeColorA.green =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(16)))  );
+      this.eyeColorB.red =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(17)))  );
+      this.eyeColorB.green =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(18)))  );
+      this.eyeColorB.blue =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(19)))  );
+      this.eyeColorC.red =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(20)))  );
+      this.eyeColorC.blue =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(21)))  );
+      this.eyeColorC.green =Math.abs(this.sigmoid(this.outputVector.subset(Mathjs.index(22)))  );
+      this.strategy = this.sigmoid(this.outputVector.subset(Mathjs.index(23)));
+
 
       this.soundInput = 0.0;
       this.ouchie = 0.0;
@@ -139,6 +166,8 @@ class Brain{
 
     mutate(){
       let childBrain = new Brain();
+      childBrain.hawk = this.hawk + (Math.random()-0.5)*.1;
+      childBrain.dove = this.dove + (Math.random()-0.5)*.1;
 
       childBrain.inputWeights = this.inputWeights.map( function(value, index, matrix) {
         if(Math.random() > 0.8){

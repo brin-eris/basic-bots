@@ -15,10 +15,11 @@ const    Bot = require('../common/Bot');
 const    Plant = require('../common/Plant');
 const    Meat = require('../common/Meat');
 
-const STARTING_BOTS = 10;
-const MIN_BOTS = 5;
-const MAX_BOTS = 40;
-const MIN_PLANTS = 1300;
+const STARTING_BOTS = 40;
+const MIN_BOTS = 10;
+const MAX_BOTS = 50;
+const STARTING_PLANTS = 1200;
+const MIN_PLANTS = 800;
 const WALLS = 140;
 
 const WIDTH = 3000;
@@ -29,14 +30,18 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
 
   var engine = Matter.Engine.create({constraintIterations: 5});
+  engine.world.bounds.min.x = 0;
+  engine.world.bounds.min.y = 0;
+  engine.world.bounds.max.x = WIDTH;
+  engine.world.bounds.max.y = HEIGHT;
 
   // create a renderer
   var render = Matter.Render.create({
         element: document.body,
         engine: engine,
         options: {
-            width: WIDTH,
-            height: HEIGHT,
+            width: WIDTH*1.1,
+            height: HEIGHT*1.1,
             // showForce: true,
             // showAngleIndicator: true,
             // showCollisions: true,
@@ -66,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
       });
     }
 
-    for (let i = 0; i < MIN_PLANTS; i++){
+    for (let i = 0; i < STARTING_PLANTS; i++){
       new Plant().create(engine.world, {
         x : Mathjs.round((Math.random() -0.5) * WIDTH/50) * 45 + WIDTH/2 +20,
         y : Mathjs.round((Math.random() - 0.5) * HEIGHT/50) * 45 + HEIGHT/2 +20
@@ -99,16 +104,21 @@ document.addEventListener('DOMContentLoaded', function(e) {
           }
         }
         if(botCount < MIN_BOTS){
-          //oldestBot.spawn({x:WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500});
-          //new Bot().create(engine.world,{x:WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
+          if(Math.random() < 0.01){
+          oldestBot.spawn({x:WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500});
+          }
+        if(Math.random() <0.01){
+          new Bot().create(engine.world,{x:WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
+        }
+
         }else if(botCount > MAX_BOTS){
           oldestBot.life = -1;
         }
         if(plantCount < MIN_PLANTS){
           plantCount++;
           new Plant().create(engine.world, {
-            x : Mathjs.round((Math.random() -0.5) * WIDTH/50) * 25 + WIDTH/2,
-            y : Mathjs.round((Math.random() -0.5) * HEIGHT/50) * 25 + HEIGHT/2
+            x : Mathjs.round(Math.cos((Math.random() -0.5)) * WIDTH/50) * 35 + WIDTH/2,
+            y : Mathjs.round(Math.sin((Math.random() -0.5)) * HEIGHT/50) * 35 + HEIGHT/2
           });
         }
     });
@@ -158,10 +168,6 @@ document.addEventListener('DOMContentLoaded', function(e) {
         render.mouse = mouse;
 
 
-            engine.world.bounds.min.x = 0;
-            engine.world.bounds.min.y = 0;
-            engine.world.bounds.max.x = WIDTH;
-            engine.world.bounds.max.y = HEIGHT;
 
   // wrapping using matter-wrap plugin
       // var allBodies = Matter.Composite.allBodies(engine.world);

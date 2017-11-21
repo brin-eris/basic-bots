@@ -126,7 +126,7 @@ class Bot {
               let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
               let baseDamage = (0.00001  * Math.abs(Vector.magnitude(relativeMomentum)));
-              me.gameObject.life -= baseDamage *them.gameObject.brain.spike;
+              me.gameObject.life -= baseDamage + baseDamage *them.gameObject.brain.spike;
               me.gameObject.brain.ouchie += 0.5;
               them.gameObject.life -= baseDamage ;
               them.gameObject.brain.ouchie += 0.5;

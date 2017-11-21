@@ -61,7 +61,7 @@ class Bot {
     let eyeC3AOffset = Vector.create( offsetLayer2Radius * 1.5,0);
 
 
-    let soundRadius = offsetLayer2Radius * 3;
+    let soundRadius = offsetLayer2Radius * 2;
 
     let bot = Matter.Composite.create({
       label: 'Bot'
@@ -105,7 +105,7 @@ class Bot {
               me.gameObject.life -= damage;
               me.gameObject.brain.ouchie += 0.5;
           }else if(them.gameObject.class==Meat){
-
+            me.gameObject.brain.smellMeat += 1.0;
             // only the blood thirsty eat meat
             if(me.gameObject.brain.hawk > 0){
               //console.log('fresh meat!')
@@ -151,6 +151,7 @@ class Bot {
               me.gameObject.life -= damage;
               me.gameObject.brain.ouchie += 0.5;
         } else if(them.gameObject.class==Meat){
+          me.gameObject.brain.smellMeat += 1.0;
           // only the blood thirsty eat meat
             if(me.gameObject.brain.hawk > 0){
               //console.log('fresh meat!')
@@ -186,7 +187,7 @@ class Bot {
                 me.gameObject.give(them.gameObject);
               }
         }else if(them.gameObject.class==Meat){
-
+          me.gameObject.brain.smellMeat += 1.0;
             // only the blood thirsty eat meat
             if(me.gameObject.brain.hawk > 0){
               //console.log('fresh meat!')
@@ -206,7 +207,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -227,7 +228,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -247,7 +248,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -268,7 +269,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -288,7 +289,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -309,7 +310,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -330,7 +331,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -350,7 +351,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -370,7 +371,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -391,7 +392,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }

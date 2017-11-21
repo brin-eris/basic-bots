@@ -7,7 +7,7 @@ const    Bodies = require('matter-js').Bodies;
 
 class Meat {
   constructor(quantity) {
-    this.life = quantity * .05;
+    this.life = quantity * 0.5;
     this.class = Meat;
   }
 

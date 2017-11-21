@@ -15,6 +15,7 @@ const Bodies = require('matter-js').Bodies;
 const Body = require('matter-js').Body;
 
 const Mathjs = require('mathjs');
+const COLLISION_DAMAGE = 0.001
 
 class Bot {
   constructor() {
@@ -100,7 +101,7 @@ class Bot {
             let theirMomentum = Vector.mult(them.velocity, 1.0);
             let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-            let damage = (0.000001 * Math.abs(Vector.magnitude(relativeMomentum)));
+            let damage = (COLLISION_DAMAGE * Math.abs(Vector.magnitude(relativeMomentum)));
               me.gameObject.life -= damage;
               me.gameObject.brain.ouchie += 0.5;
           }else if(them.gameObject.class==Meat){
@@ -125,7 +126,7 @@ class Bot {
               let theirMomentum = Vector.mult(them.velocity, 1.0);
               let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-              let baseDamage = (0.000001  * Math.abs(Vector.magnitude(relativeMomentum)));
+              let baseDamage = (COLLISION_DAMAGE  * Math.abs(Vector.magnitude(relativeMomentum)));
               me.gameObject.life -= baseDamage + 10*baseDamage *them.gameObject.brain.spike;
               me.gameObject.brain.ouchie += 0.5;
               them.gameObject.life -= baseDamage ;
@@ -146,7 +147,7 @@ class Bot {
             let theirMomentum = Vector.mult(them.velocity, 1.0);
             let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-            let damage = (0.000001 * Math.abs(Vector.magnitude(relativeMomentum)));
+            let damage = (COLLISION_DAMAGE * Math.abs(Vector.magnitude(relativeMomentum)));
               me.gameObject.life -= damage;
               me.gameObject.brain.ouchie += 0.5;
         } else if(them.gameObject.class==Meat){
@@ -176,7 +177,10 @@ class Bot {
       if(them.imAfukinSensor){return;}
       if(them.gameObject){
         if(them.gameObject.class==Bot){
-              //me.gameObject.brain.soundInput += them.gameObject.voice ;
+          //if(me.gameObject.brain.hawk>0.5){
+              me.gameObject.brain.soundInput += them.gameObject.voice ;
+          //}
+
               //console.log(them.gameObject.voice);
               if(me.gameObject.brain.give > 0.0 ){
                 me.gameObject.give(them.gameObject);
@@ -591,7 +595,7 @@ class Bot {
   }
 
   give(them){
-    let toGive = this.brain.give *0.01;
+    let toGive = this.brain.give *0.01*them.brain.dove;
     this.life -=toGive*1.1;
     them.life +=toGive;
   }

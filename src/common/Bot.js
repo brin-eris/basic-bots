@@ -514,6 +514,7 @@ class Bot {
     //   return;
     // }
 
+
     this.heat = ( Mathjs.distance([
       this.body.position.x,
       this.body.position.y],
@@ -605,6 +606,7 @@ class Bot {
 
   componentToHex(c) {
     c = Math.floor(c);
+    c = Math.max(c,0);
     var hex = c.toString(16).substring(0,2);
     return hex.length == 1 ? "0" + hex : hex;
   }

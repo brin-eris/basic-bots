@@ -133,12 +133,12 @@ class Brain{
 
       this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5 +0.1*this.dove -0.1*this.hawk;
 
-      this.voice = this.sigmoid(this.outputVector.subset(Mathjs.index(10))) +this.sigmoid(this.outputVector.subset(Mathjs.index(13)));
+      this.voice = (this.sigmoid(this.outputVector.subset(Mathjs.index(10))) +this.sigmoid(this.outputVector.subset(Mathjs.index(13))))* Mathjs.compare(this.hawk-this.dove,this.dove-this.hawk);
 
       this.farts = (this.sigmoid(this.outputVector.subset(Mathjs.index(12)))+this.sigmoid(this.outputVector.subset(Mathjs.index(11))))>1.5;
 
-      this.red = (this.sigmoid(this.outputVector.subset(Mathjs.index(2)))  );
-      this.green = (this.sigmoid(this.outputVector.subset(Mathjs.index(3))) );
+      this.red = (this.sigmoid(this.outputVector.subset(Mathjs.index(2)))  )* (this.hawk-this.dove);
+      this.green = (this.sigmoid(this.outputVector.subset(Mathjs.index(3))) )* (this.dove - this.hawk);
       this.blue = (this.sigmoid(this.outputVector.subset(Mathjs.index(4)))  );
 
       this.eyeColorA.red =(this.sigmoid(this.outputVector.subset(Mathjs.index(14)))  );

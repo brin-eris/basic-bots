@@ -82200,7 +82200,7 @@ class Bot {
     let eyeC3AOffset = Vector.create( offsetLayer2Radius * 1.5,0);
 
 
-    let soundRadius = offsetLayer2Radius * 3;
+    let soundRadius = offsetLayer2Radius * 2;
 
     let bot = Matter.Composite.create({
       label: 'Bot'
@@ -82244,7 +82244,7 @@ class Bot {
               me.gameObject.life -= damage;
               me.gameObject.brain.ouchie += 0.5;
           }else if(them.gameObject.class==Meat){
-
+            me.gameObject.brain.smellMeat += 1.0;
             // only the blood thirsty eat meat
             if(me.gameObject.brain.hawk > 0){
               //console.log('fresh meat!')
@@ -82290,6 +82290,7 @@ class Bot {
               me.gameObject.life -= damage;
               me.gameObject.brain.ouchie += 0.5;
         } else if(them.gameObject.class==Meat){
+          me.gameObject.brain.smellMeat += 1.0;
           // only the blood thirsty eat meat
             if(me.gameObject.brain.hawk > 0){
               //console.log('fresh meat!')
@@ -82325,7 +82326,7 @@ class Bot {
                 me.gameObject.give(them.gameObject);
               }
         }else if(them.gameObject.class==Meat){
-
+          me.gameObject.brain.smellMeat += 1.0;
             // only the blood thirsty eat meat
             if(me.gameObject.brain.hawk > 0){
               //console.log('fresh meat!')
@@ -82345,7 +82346,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -82366,7 +82367,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -82386,7 +82387,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -82407,7 +82408,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -82427,7 +82428,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -82448,7 +82449,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -82469,7 +82470,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -82489,7 +82490,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -82509,7 +82510,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -82530,7 +82531,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: false,
+      isSensor: true,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -82768,7 +82769,7 @@ module.exports = Bot
 const Mathjs = require('mathjs');
 const Bot   = require('./Bot');
 
-const INPUT_SIZE = 32;
+const INPUT_SIZE = 33;
 
 
 class Brain{
@@ -82777,7 +82778,7 @@ class Brain{
 
     constructor(){
       //this.body = body;
-
+      this.smellMeat = 0.0;
       if(Math.random()>0.5){
         this.hawk = 0.0;
         this.dove = 1.0;
@@ -82816,11 +82817,11 @@ class Brain{
       this.inputWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
 
 
-      this.hiddenBias = Mathjs.random([INPUT_SIZE], -1.5, 1.5);
+      this.hiddenBias = Mathjs.random([INPUT_SIZE], -2.5, 2.5);
 
       this.hiddenWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]), -1.5, 1.5);
 
-      this.outputBias = Mathjs.random([INPUT_SIZE], -1.5, 1.5);
+      this.outputBias = Mathjs.random([INPUT_SIZE], -0.5, 0.5);
 
     }
 
@@ -82874,7 +82875,8 @@ class Brain{
         this.life,
         this.ccClock,
         this.give,
-        Math.random() -0.5
+        this.smellMeat,
+        this.dove - this.hawk
         ]);
 
 
@@ -82896,9 +82898,9 @@ class Brain{
       this.thrust2 = (this.sigmoid(this.outputVector.subset(Mathjs.index(8))) - 0.5)  ;
 
 
-      this.spike = (this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5 -0.2*this.dove +0.2*this.hawk);
+      this.spike = (this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5 -0.1*this.dove +0.3*this.hawk);
 
-      this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5 +0.2*this.dove -0.2*this.hawk;
+      this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5 +0.1*this.dove -0.3*this.hawk;
 
       this.voice = (this.sigmoid(this.outputVector.subset(Mathjs.index(10))) +this.sigmoid(this.outputVector.subset(Mathjs.index(13))))* Mathjs.compare(this.hawk-this.dove,this.dove-this.hawk);
 
@@ -83108,7 +83110,7 @@ const    Bodies = require('matter-js').Bodies;
 
 class Meat {
   constructor(quantity) {
-    this.life = quantity * .05;
+    this.life = quantity * 0.5;
     this.class = Meat;
   }
 

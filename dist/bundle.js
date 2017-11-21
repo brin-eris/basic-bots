@@ -82058,12 +82058,11 @@ document.addEventListener('DOMContentLoaded', function(e) {
           oldestBot.life = -1;
         }
         if(plantCount < MIN_PLANTS){
-          for (let i = 0; i < STARTING_PLANTS; i++){
-            new Plant().create(engine.world, {
-              x : Mathjs.round((Math.random() -0.5) * WIDTH/50) * 45 + WIDTH/2 +20,
-              y : Mathjs.round((Math.random() - 0.5) * HEIGHT/50) * 45 + HEIGHT/2 +20
-              });
-          }
+          plantCount++;
+          new Plant().create(engine.world, {
+            x : Mathjs.round(Math.cos((Math.random() -0.5)) * WIDTH/50) * 35 + WIDTH/2,
+            y : Mathjs.round(Math.sin((Math.random() -0.5)) * HEIGHT/50) * 35 + HEIGHT/2
+          });
         }
     });
 
@@ -82266,9 +82265,9 @@ class Bot {
               let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
               let baseDamage = (0.00001  * Math.abs(Vector.magnitude(relativeMomentum)));
-              me.gameObject.life -= baseDamage *them.gameObject.brain.spike;
+              me.gameObject.life -= baseDamage + baseDamage *them.gameObject.brain.spike;
               me.gameObject.brain.ouchie += 0.5;
-              them.gameObject.life -= baseDamage ;
+              them.gameObject.life -= baseDamage/2 ;
               them.gameObject.brain.ouchie += 0.5;
 
               if(me.gameObject.life <= 0.0){
@@ -82733,7 +82732,7 @@ class Bot {
   }
 
   give(them){
-    let toGive = this.brain.give *0.001;
+    let toGive = this.brain.give *0.01;
     this.life -=toGive*1.1;
     them.life +=toGive;
   }
@@ -82872,7 +82871,7 @@ class Brain{
       let inputsConnectVector = Mathjs.multiply(this.inputWeights, this.inputVector);
 
       let tempHiddenVector = Mathjs.add(inputsConnectVector, this.hiddenBias).map(function(value, index, matrix){
-        let result = 1.0/(1.0 + Mathjs.exp(-1 + value));
+        let result = ((Math.PI) * Mathjs.exp(-1 * value*value)/Math.PI);
 
         return isNaN(result) ? 1.0 : result;
         });

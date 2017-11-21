@@ -4,10 +4,14 @@ const Mathjs = require('mathjs');
 const Bot   = require('./Bot');
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 const INPUT_SIZE = 33;
 =======
 const INPUT_SIZE = 32;
 >>>>>>> made it less common to start being able to camo
+=======
+const INPUT_SIZE = 33;
+>>>>>>> tweeks
 
 
 class Brain{
@@ -59,7 +63,7 @@ class Brain{
 
       this.hiddenWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]), -1.5, 1.5);
 
-      this.outputBias = Mathjs.random([INPUT_SIZE], -1.5, 1.5);
+      this.outputBias = Mathjs.random([INPUT_SIZE], -0.5, 0.5);
 
     }
 
@@ -114,11 +118,16 @@ class Brain{
         this.ccClock,
         this.give,
 <<<<<<< HEAD
+<<<<<<< HEAD
         this.smellMeat,
         this.dove - this.hawk
 =======
         Math.random() -0.5
 >>>>>>> made it less common to start being able to camo
+=======
+        this.smellMeat,
+        this.dove - this.hawk
+>>>>>>> tweeks
         ]);
 
 
@@ -140,9 +149,9 @@ class Brain{
       this.thrust2 = (this.sigmoid(this.outputVector.subset(Mathjs.index(8))) - 0.5)  ;
 
 
-      this.spike = (this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5 -0.2*this.dove +0.2*this.hawk);
+      this.spike = (this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5 -0.1*this.dove +0.3*this.hawk);
 
-      this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5 +0.2*this.dove -0.2*this.hawk;
+      this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5 +0.1*this.dove -0.3*this.hawk;
 
       this.voice = (this.sigmoid(this.outputVector.subset(Mathjs.index(10))) +this.sigmoid(this.outputVector.subset(Mathjs.index(13))))* Mathjs.compare(this.hawk-this.dove,this.dove-this.hawk);
 

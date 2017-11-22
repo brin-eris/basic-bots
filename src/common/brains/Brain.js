@@ -6,7 +6,6 @@ const Bot   = require('../bot/Bot');
 
 const INPUT_SIZE = 36;
 
-const INPUT_SIZE = 33;
 
 class Brain{
 

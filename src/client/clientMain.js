@@ -17,12 +17,12 @@ const    Wall = require('../common/world/Wall');
 const STARTING_BOTS = 5;
 const MIN_BOTS = 5;
 const MAX_BOTS = 30;
-const STARTING_PLANTS = 1400;
-const MIN_PLANTS = 1000;
+const STARTING_PLANTS = 800;
+const MIN_PLANTS = 200;
 const WALLS = 120;
 
-const WIDTH = 3000;
-const HEIGHT = 2600;
+const WIDTH = 2100;
+const HEIGHT = 1800;
 
 document.addEventListener('DOMContentLoaded', function(e) {
 
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
     for (let i = 0; i < STARTING_PLANTS; i++){
       var angle = Math.random() * 2 * Math.PI;
       new Plant().create(engine.world, {
-        x : (Math.cos(angle)*(Math.random()+0.15) * WIDTH/2)+ WIDTH/2,// * 45 + WIDTH/2 +20,
+        x : (Math.cos(angle)*(Math.random()+0.25) * WIDTH/2)+ WIDTH/2,// * 45 + WIDTH/2 +20,
         y : (Math.sin(angle)*(Math.random()+0.15) * HEIGHT/2)+ HEIGHT/2 // * 45 + HEIGHT/2 +20
         });
     }

@@ -52,10 +52,10 @@ class Brain{
       this.eyeColorB = { red:0, green: 0, blue:0 };
       this.eyeColorC = { red:0, green: 0, blue:0 };
 
-      this.inputWeights = Mathjs.eye(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
+      this.inputWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
 
 
-      this.hiddenBias = Mathjs.ones([INPUT_SIZE]);
+      this.hiddenBias = Mathjs.random([INPUT_SIZE]);
 
       this.hiddenWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]), -0.5, 0.5);
 

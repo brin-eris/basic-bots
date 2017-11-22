@@ -635,9 +635,9 @@ let behindUs = this.body.angle+Math.PI
         Vector.create(thrustRightSide * Math.cos(turnRightSide), thrustRightSide * Math.sin(turnRightSide)));
 
 
-      this.life -= (0.000075 * this.brain.age + this.heat * 0.005 );// +   Math.abs(this.heat)
+      this.life -= (0.00009 * this.brain.age + this.heat * 0.005 );// +   Math.abs(this.heat)
       if(this.brain.farts){
-        this.life -= 0.0005;
+        this.life -= 0.0008;
       }
 
       this.eyeA.gameColor = this.eyeA2B.gameColor = this.eyeA2A.gameColor = this.brain.eyeColorA;
@@ -657,7 +657,7 @@ let behindUs = this.body.angle+Math.PI
 
           this.life = this.life * 0.8;
           //console.log('natural birth');
-          this.gestationTimer = 50;
+          this.gestationTimer = 40;
         }
 
       }
@@ -671,7 +671,7 @@ let behindUs = this.body.angle+Math.PI
         this.gestationTimer--;
     }
 
-    food.life -= 0.03;
+    food.life -= 0.02;
     if(food.life <0.0){ food.destroy()}
 
     //console.log('nom' + food.class);

@@ -4,18 +4,23 @@ const    Matter = require('matter-js');
 const    MatterWrap = require('matter-wrap');
 const    MatterAttractors = require('matter-attractors');
 
-const    Wall = require('./Wall');
-const    Brain = require('./Brain');
-const    Plant = require('./Plant');
-const    Meat = require('./Meat');
+const    Wall = require('../world/Wall');
+const    Plant = require('../world/Plant');
+const    Meat = require('../world/Meat');
+const    Brain = require('../brains/Brain');
+const    Dumber = require('../brains/Dumber');
+const    DeltaBrain = require('../brains/DeltaBrain');
+
+const    Eye = require('./Eye');
 
 const Vector = require('matter-js').Vector;
 const World = require('matter-js').World;
 const Bodies = require('matter-js').Bodies;
 const Body = require('matter-js').Body;
+const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
-const COLLISION_DAMAGE = 0.001
+const COLLISION_DAMAGE = 0.004
 
 class Bot {
   constructor() {
@@ -29,6 +34,7 @@ class Bot {
 
   create(world, position) {
 
+    this.scanner = new Eye();
 
     this.centerOfUniverse = {x: world.bounds.max.x/2, y: world.bounds.max.y/2};
     this.phantomZone = ( Mathjs.distance([
@@ -42,7 +48,7 @@ class Bot {
     this.gestationTimer = 50;
     let radius = 10;
     this.radius = radius;
-    let eyeRadius = 6;
+    let eyeRadius = 5;
     let offsetRadius = radius * 2 + eyeRadius;
     let offsetLayer2Radius = offsetRadius * 2;
 
@@ -61,7 +67,7 @@ class Bot {
     let eyeC3AOffset = Vector.create( offsetLayer2Radius * 1.5,0);
 
 
-    let soundRadius = offsetLayer2Radius * 2;
+    let soundRadius = offsetLayer2Radius;
 
     let bot = Matter.Composite.create({
       label: 'Bot'
@@ -83,9 +89,9 @@ class Bot {
     body.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
       if(them.gameObject){
-        me.gameObject.brain.bodyInput.red += (them.gameObject.red);
-        me.gameObject.brain.bodyInput.blue += (them.gameObject.blue);
-        me.gameObject.brain.bodyInput.green += (them.gameObject.green);
+        me.gameObject.brain.bodyInput.red += (them.gameColor.red);
+        me.gameObject.brain.bodyInput.blue += (them.gameColor.blue);
+        me.gameObject.brain.bodyInput.green += (them.gameColor.green);
 
         if( them.gameObject.class==Bot){
 
@@ -207,7 +213,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -216,9 +222,15 @@ class Bot {
     eyeA.imAfukinSensor = false;
     eyeA.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameObject.red*0.75);
-      me.gameObject.brain.eyeAInput.blue += (them.gameObject.blue*0.75);
-      me.gameObject.brain.eyeAInput.green += (them.gameObject.green*0.75);
+      me.gameObject.brain.eyeAInput.red += (them.gameColor.red*0.75);
+      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue*0.75);
+      me.gameObject.brain.eyeAInput.green += (them.gameColor.green*0.75);
+    };
+    eyeA.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeAInput.red += (them.gameColor.red*0.75);
+      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue*0.75);
+      me.gameObject.brain.eyeAInput.green += (them.gameColor.green*0.75);
     };
     this.eyeA = eyeA;
 
@@ -228,7 +240,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -237,9 +249,15 @@ class Bot {
     eyeA2A.imAfukinSensor = false;
     eyeA2A.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameObject.red*0.5);
-      me.gameObject.brain.eyeAInput.blue += (them.gameObject.blue*0.5);
-      me.gameObject.brain.eyeAInput.green += (them.gameObject.green*0.5);
+      me.gameObject.brain.eyeAInput.red += (them.gameColor.red*0.5);
+      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue*0.5);
+      me.gameObject.brain.eyeAInput.green += (them.gameColor.green*0.5);
+    };
+    eyeA2A.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeAInput.red += (them.gameColor.red*0.5);
+      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue*0.5);
+      me.gameObject.brain.eyeAInput.green += (them.gameColor.green*0.5);
     };
     this.eyeA2A = eyeA2A;
 
@@ -248,7 +266,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -257,10 +275,17 @@ class Bot {
     eyeA2B.imAfukinSensor = false;
     eyeA2B.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameObject.red*0.5);
-      me.gameObject.brain.eyeAInput.blue += (them.gameObject.blue*0.5);
-      me.gameObject.brain.eyeAInput.green += (them.gameObject.green*0.5);
+      me.gameObject.brain.eyeAInput.red += (them.gameColor.red*0.5);
+      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue*0.5);
+      me.gameObject.brain.eyeAInput.green += (them.gameColor.green*0.5);
     };
+    eyeA2B.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeAInput.red += (them.gameColor.red*0.5);
+      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue*0.5);
+      me.gameObject.brain.eyeAInput.green += (them.gameColor.green*0.5);
+    };
+
     this.eyeA2B = eyeA2B;
 
 
@@ -269,7 +294,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -278,9 +303,15 @@ class Bot {
     eyeB.imAfukinSensor = false;
     eyeB.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameObject.red*0.75);
-      me.gameObject.brain.eyeBInput.blue += (them.gameObject.blue*0.75);
-      me.gameObject.brain.eyeBInput.green += (them.gameObject.green*0.75);
+      me.gameObject.brain.eyeBInput.red += (them.gameColor.red*0.75);
+      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue*0.75);
+      me.gameObject.brain.eyeBInput.green += (them.gameColor.green*0.75);
+    };
+    eyeB.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeBInput.red += (them.gameColor.red*0.75);
+      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue*0.75);
+      me.gameObject.brain.eyeBInput.green += (them.gameColor.green*0.75);
     };
     this.eyeB = eyeB;
 
@@ -289,7 +320,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -298,9 +329,15 @@ class Bot {
     eyeB2A.imAfukinSensor = false;
     eyeB2A.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameObject.red*0.5);
-      me.gameObject.brain.eyeBInput.blue += (them.gameObject.blue*0.5);
-      me.gameObject.brain.eyeBInput.green += (them.gameObject.green*0.5);
+      me.gameObject.brain.eyeBInput.red += (them.gameColor.red*0.5);
+      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue*0.5);
+      me.gameObject.brain.eyeBInput.green += (them.gameColor.green*0.5);
+    };
+    eyeB2A.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeBInput.red += (them.gameColor.red*0.5);
+      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue*0.5);
+      me.gameObject.brain.eyeBInput.green += (them.gameColor.green*0.5);
     };
     this.eyeB2A = eyeB2A;
 
@@ -310,7 +347,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -319,9 +356,15 @@ class Bot {
     eyeB2B.imAfukinSensor = false;
     eyeB2B.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameObject.red*0.5);
-      me.gameObject.brain.eyeBInput.blue += (them.gameObject.blue*0.5);
-      me.gameObject.brain.eyeBInput.green += (them.gameObject.green*0.5);
+      me.gameObject.brain.eyeBInput.red += (them.gameColor.red*0.5);
+      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue*0.5);
+      me.gameObject.brain.eyeBInput.green += (them.gameColor.green*0.5);
+    };
+    eyeB2B.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeBInput.red += (them.gameColor.red*0.5);
+      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue*0.5);
+      me.gameObject.brain.eyeBInput.green += (them.gameColor.green*0.5);
     };
     this.eyeB2B = eyeB2B;
 
@@ -331,7 +374,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -340,9 +383,15 @@ class Bot {
     eyeC.imAfukinSensor = false;
     eyeC.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeCInput.red += (them.gameObject.red*0.8);
-      me.gameObject.brain.eyeCInput.blue += (them.gameObject.blue*0.8);
-      me.gameObject.brain.eyeCInput.green += (them.gameObject.green*0.8);
+      me.gameObject.brain.eyeCInput.red += (them.gameColor.red*0.8);
+      me.gameObject.brain.eyeCInput.blue += (them.gameColor.blue*0.8);
+      me.gameObject.brain.eyeCInput.green += (them.gameColor.green*0.8);
+    };
+    eyeC.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeCInput.red += (them.gameColor.red*0.8);
+      me.gameObject.brain.eyeCInput.blue += (them.gameColor.blue*0.8);
+      me.gameObject.brain.eyeCInput.green += (them.gameColor.green*0.8);
     };
     this.eyeC = eyeC;
 
@@ -351,7 +400,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -360,9 +409,15 @@ class Bot {
     eyeC2A.imAfukinSensor = false;
     eyeC2A.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC2AInput.red += (them.gameObject.red*0.9);
-      me.gameObject.brain.eyeC2AInput.blue += (them.gameObject.blue*0.9);
-      me.gameObject.brain.eyeC2AInput.green += (them.gameObject.green*0.9);
+      me.gameObject.brain.eyeC2AInput.red += (them.gameColor.red*0.9);
+      me.gameObject.brain.eyeC2AInput.blue += (them.gameColor.blue*0.9);
+      me.gameObject.brain.eyeC2AInput.green += (them.gameColor.green*0.9);
+    };
+    eyeC2A.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeC2AInput.red += (them.gameColor.red*0.9);
+      me.gameObject.brain.eyeC2AInput.blue += (them.gameColor.blue*0.9);
+      me.gameObject.brain.eyeC2AInput.green += (them.gameColor.green*0.9);
     };
     this.eyeC2A = eyeC2A;
 
@@ -371,7 +426,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -380,9 +435,15 @@ class Bot {
     eyeC2B.imAfukinSensor = false;
     eyeC2B.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC2BInput.red += (them.gameObject.red*0.9);
-      me.gameObject.brain.eyeC2BInput.blue += (them.gameObject.blue*0.9);
-      me.gameObject.brain.eyeC2BInput.green += (them.gameObject.green*0.9);
+      me.gameObject.brain.eyeC2BInput.red += (them.gameColor.red*0.9);
+      me.gameObject.brain.eyeC2BInput.blue += (them.gameColor.blue*0.9);
+      me.gameObject.brain.eyeC2BInput.green += (them.gameColor.green*0.9);
+    };
+    eyeC2B.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeC2BInput.red += (them.gameColor.red*0.9);
+      me.gameObject.brain.eyeC2BInput.blue += (them.gameColor.blue*0.9);
+      me.gameObject.brain.eyeC2BInput.green += (them.gameColor.green*0.9);
     };
     this.eyeC2B = eyeC2B;
 
@@ -392,7 +453,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -401,9 +462,15 @@ class Bot {
     eyeC3A.imAfukinSensor = false;
     eyeC3A.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC3AInput.red += (them.gameObject.red*0.9);
-      me.gameObject.brain.eyeC3AInput.blue += (them.gameObject.blue*0.9);
-      me.gameObject.brain.eyeC3AInput.green += (them.gameObject.green*0.9);
+      me.gameObject.brain.eyeC3AInput.red += (them.gameColor.red*0.9);
+      me.gameObject.brain.eyeC3AInput.blue += (them.gameColor.blue*0.9);
+      me.gameObject.brain.eyeC3AInput.green += (them.gameColor.green*0.9);
+    };
+    eyeC3A.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.eyeC3AInput.red += (them.gameColor.red*0.9);
+      me.gameObject.brain.eyeC3AInput.blue += (them.gameColor.blue*0.9);
+      me.gameObject.brain.eyeC3AInput.green += (them.gameColor.green*0.9);
     };
     this.eyeC3A = eyeC3A;
 
@@ -511,6 +578,12 @@ class Bot {
     this.soundSensor = soundSensor;
     this.world = world;
     World.add(world, bot);
+
+    this.eyeA.gameColor = this.eyeA2B.gameColor = this.eyeA2A.gameColor = { red:0, green: 0, blue:0 };
+    this.eyeB.gameColor = this.eyeB2B.gameColor = this.eyeB2A.gameColor = { red:0, green: 0, blue:0 };
+    this.eyeC.gameColor = this.eyeC2B.gameColor = this.eyeC2A.gameColor = this.eyeC3A.gameColor = { red:0, green: 0, blue:0 };
+    this.body.gameColor = { red:0, green: 0, blue:0 };
+
   }
 
   tick() {
@@ -528,6 +601,10 @@ class Bot {
 
     this.brain.heat = this.heat;
     this.brain.life = this.life;
+let behindUs = this.body.angle+Math.PI
+    let fususj = Vector.create(11 * Math.cos(behindUs) + this.body.position.x, 11 * Math.sin(behindUs) + this.body.position.y)
+    this.brain.vision = this.scanner.scan(Composite.allBodies(this.world), fususj, behindUs);
+
 
     // set all brain inputs that arent from events
     this.brain.tick();
@@ -535,9 +612,6 @@ class Bot {
 
     // get all brain outputs
       this.age = this.brain.age;
-      this.red = this.brain.red;
-      this.blue = this.brain.blue;
-      this.green = this.brain.green;
       this.voice = this.brain.voice;
       this.farts = this.brain.farts;
 
@@ -565,11 +639,17 @@ class Bot {
       if(this.brain.farts){
         this.life -= 0.0005;
       }
-      this.eyeA.render.fillStyle = this.eyeA2B.render.fillStyle =this.eyeA2A.render.fillStyle =this.rgbToHex(this.brain.eyeColorA.red* 255, this.brain.eyeColorA.blue* 255,this.brain.eyeColorA.green* 255);
+
+      this.eyeA.gameColor = this.eyeA2B.gameColor = this.eyeA2A.gameColor = this.brain.eyeColorA;
+      this.eyeB.gameColor = this.eyeB2B.gameColor = this.eyeB2A.gameColor = this.brain.eyeColorB;
+      this.eyeC.gameColor = this.eyeC2B.gameColor = this.eyeC2A.gameColor = this.eyeC3A.gameColor = this.brain.eyeColorA;
+      this.body.gameColor = this.brain.bodyColor;
+
+      this.body.render.fillStyle = this.rgbToHex(this.body.gameColor.red * 255, this.body.gameColor.green * 255, this.body.gameColor.blue * 255);
+      this.eyeA.render.fillStyle = this.eyeA2B.render.fillStyle = this.eyeA2A.render.fillStyle =this.rgbToHex(this.brain.eyeColorA.red* 255, this.brain.eyeColorA.blue* 255,this.brain.eyeColorA.green* 255);
       this.eyeB.render.fillStyle = this.eyeB2B.render.fillStyle = this.eyeB2A.render.fillStyle = this.rgbToHex(this.brain.eyeColorB.green* 255,this.brain.eyeColorB.red* 255,this.brain.eyeColorB.blue* 255);
       this.eyeC.render.fillStyle = this.eyeC2B.render.fillStyle = this.eyeC2A.render.fillStyle = this.eyeC3A.render.fillStyle = this.rgbToHex(this.brain.eyeColorC.red* 255,this.brain.eyeColorC.blue* 255,this.brain.eyeColorC.green* 255);
 
-      this.body.render.fillStyle = this.rgbToHex(this.brain.red * 255, this.brain.green * 255, this.brain.blue * 255);
       if(this.life > 0.9){
         if(this.gestationTimer < 0 && Math.random() > 0.9){
           this.spawn(this.body.position);
@@ -577,7 +657,7 @@ class Bot {
 
           this.life = this.life * 0.8;
           //console.log('natural birth');
-          this.gestationTimer = 30;
+          this.gestationTimer = 50;
         }
 
       }
@@ -585,26 +665,27 @@ class Bot {
 
   eat(food){
     if(this.life <= this.maxLife){
-      this.life += 0.02;
-      food.life -= 0.01;
+      var speedMod = 1.0 - (this.body.speed -20)/100;
+      this.life += (0.02 * speedMod);
+      food.life -= 0.02;
         this.gestationTimer--;
     }
 
-    food.life -= 0.02;
+    food.life -= 0.03;
     if(food.life <0.0){ food.destroy()}
 
     //console.log('nom' + food.class);
   }
 
   give(them){
-    let toGive = this.brain.give *0.01*them.brain.dove;
-    this.life -=toGive*1.1;
+    let toGive = Math.max(0.001 * (them.brain.dove - them.brain.hawk), 0);
+    this.life -=toGive;
     them.life +=toGive;
   }
 
   spawn(placement){
     let child = new Bot();
-
+    child.maxLife = this.maxLife;
     child.brain = this.brain.mutate();
     child.create(this.world, Vector.create(placement.x -150*Math.random(), placement.y -150*Math.random()));
   }

@@ -7,19 +7,18 @@ const    MatterCollisionEvents = require('matter-collision-events');
 
 Matter.use('matter-wrap', 'matter-attractors', 'matter-collision-events');
 
-const    Wall = require('../common/Wall');
-const    Cppn = require('../common/Cppn');
-const    Plotter = require('./Plotter');
-const    BrainVat = require('../common/BrainVat');
-const    Bot = require('../common/Bot');
-const    Plant = require('../common/Plant');
-const    Meat = require('../common/Meat');
 
-const STARTING_BOTS = 20;
-const MIN_BOTS = 2;
+
+const    Bot = require('../common/bot/Bot');
+const    Plant = require('../common/world/Plant');
+const    Meat = require('../common/world/Meat');
+const    Wall = require('../common/world/Wall');
+
+const STARTING_BOTS = 5;
+const MIN_BOTS = 5;
 const MAX_BOTS = 30;
 const STARTING_PLANTS = 1100;
-const MIN_PLANTS = 1000;
+const MIN_PLANTS = 900;
 const WALLS = 120;
 
 const WIDTH = 3000;
@@ -29,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
 
 
 
-  var engine = Matter.Engine.create({constraintIterations: 5});
+  var engine = Matter.Engine.create({constraintIterations: 100});
   engine.world.bounds.min.x = 0;
   engine.world.bounds.min.y = 0;
   engine.world.bounds.max.x = WIDTH;
@@ -43,10 +42,12 @@ document.addEventListener('DOMContentLoaded', function(e) {
             width: WIDTH*1.1,
             height: HEIGHT*1.1,
             // showForce: true,
-            // showAngleIndicator: true,
-            // showCollisions: true,
+            //  showAngleIndicator: true,
+            //  showCollisions: true,
             // showVelocity: true,
+            // showDebug: true,
             wireframes: false
+            // hasBounds: true
         }
     });
 

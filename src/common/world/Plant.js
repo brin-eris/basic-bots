@@ -22,15 +22,14 @@ class Plant {
             isStatic: true,
             isSensor: true,
             render: {
-              fillStyle: '#00FF00',
-              strokeStyle: '#00FF00',
+              fillStyle: '#11DD11',
+              strokeStyle: '#11DD11',
               lineWidth: 3
             }
           });
 
-          this.blue = 0.1;
-          this.red = 0.1;
-          this.green = 0.9;
+          this.body.gameColor = {red: 0.1, blue: 0.1, green: 0.9}
+
 
           plant.gameObject = this;
           this.parentComposite = plant;

@@ -7,7 +7,7 @@ const    Bodies = require('matter-js').Bodies;
 
 class Meat {
   constructor(quantity) {
-    this.life = quantity * 0.5;
+    this.life = quantity * .05;
     this.class = Meat;
   }
 
@@ -28,9 +28,8 @@ class Meat {
             }
           });
 
-          this.blue = 0.1;
-          this.red = 1.1;
-          this.green = 0.1;
+
+          this.body.gameColor = {red: 1.1, blue: 0.1, green: 0.1}
 
           meat.gameObject = this;
           this.parentComposite = meat;

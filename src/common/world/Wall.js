@@ -13,7 +13,7 @@ class Wall {
       create(world, position){
 
 
-          this.body =  Bodies.rectangle(position.x, position.y, 15, 15, {
+          this.body =  Bodies.rectangle(position.x, position.y, 14, 14, {
             friction: 0.5,
             frictionStatic: 0.1,
             isStatic: true,
@@ -24,9 +24,8 @@ class Wall {
             }
           });
 
-          this.blue = 1.0;
-          this.red = 0.2;
-          this.green = 0.0;
+          this.body.gameColor = {red: 0.2, blue: 1.0, green: 0.0}
+
 
           // this.body.onCollideActive = function(me, them){
           //

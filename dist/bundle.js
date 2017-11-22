@@ -68712,8 +68712,8 @@ const    Wall = require('../common/world/Wall');
 const STARTING_BOTS = 15;
 const MIN_BOTS = 5;
 const MAX_BOTS = 30;
-const STARTING_PLANTS = 750;
-const MIN_PLANTS = 450;
+const STARTING_PLANTS = 350;
+const MIN_PLANTS = 350;
 const WALLS = 120;
 
 const WIDTH = 2500;
@@ -68755,8 +68755,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
         // let  k = (i % 3) - 1;
         // let  l = (i+2 % 3) - 1;
           new Wall().create(engine.world, {
-            x : Mathjs.round(Math.cos(i*3.14/60) * 400 )+WIDTH/2 +1  ,
-            y : Mathjs.round(Math.sin(i*3.14/60)* 400 )+HEIGHT/2
+            x : Mathjs.round(Math.cos(i*3.14/60) * 500 )+WIDTH/2 +1  ,
+            y : Mathjs.round(Math.sin(i*3.14/60)* 500 )+HEIGHT/2
           });
     }
 
@@ -68913,7 +68913,7 @@ const Body = require('matter-js').Body;
 const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
-const COLLISION_DAMAGE = 0.004
+const COLLISION_DAMAGE = 0.0025
 
 class Bot {
   constructor() {
@@ -69756,14 +69756,14 @@ class Brain{
       this.eyeColorB = { red:0, green: 0, blue:0 };
       this.eyeColorC = { red:0, green: 0, blue:0 };
 
-      this.inputWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
+      this.inputWeights = Mathjs.ones(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
 
 
-      this.hiddenBias = Mathjs.random([INPUT_SIZE]);
+      this.hiddenBias = Mathjs.zeros([INPUT_SIZE]);
 
-      this.hiddenWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]), -0.5, 0.5);
+      this.hiddenWeights = Mathjs.ones(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
 
-      this.outputBias = Mathjs.random([INPUT_SIZE], -0.5, 0.5);
+      this.outputBias = Mathjs.zeros([INPUT_SIZE]);
 
     }
 
@@ -69830,7 +69830,7 @@ class Brain{
       let inputsConnectVector = Mathjs.multiply(this.inputWeights, this.inputVector);
 
       let tempHiddenVector = Mathjs.add(inputsConnectVector, this.hiddenBias).map(function(value, index, matrix){
-        let result = ((1/Math.PI) * Mathjs.exp(-1 * value*value/Math.PI));
+        let result = ( Mathjs.exp(-1 * value*value/Math.PI));
 
         return isNaN(result) ? 1.0 : result;
         });

@@ -20,7 +20,7 @@ const Body = require('matter-js').Body;
 const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
-const COLLISION_DAMAGE = 0.004
+const COLLISION_DAMAGE = 0.0025
 
 class Bot {
   constructor() {

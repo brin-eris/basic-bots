@@ -17,8 +17,8 @@ const    Wall = require('../common/world/Wall');
 const STARTING_BOTS = 15;
 const MIN_BOTS = 5;
 const MAX_BOTS = 30;
-const STARTING_PLANTS = 750;
-const MIN_PLANTS = 450;
+const STARTING_PLANTS = 350;
+const MIN_PLANTS = 350;
 const WALLS = 120;
 
 const WIDTH = 2500;
@@ -60,8 +60,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
         // let  k = (i % 3) - 1;
         // let  l = (i+2 % 3) - 1;
           new Wall().create(engine.world, {
-            x : Mathjs.round(Math.cos(i*3.14/60) * 400 )+WIDTH/2 +1  ,
-            y : Mathjs.round(Math.sin(i*3.14/60)* 400 )+HEIGHT/2
+            x : Mathjs.round(Math.cos(i*3.14/60) * 500 )+WIDTH/2 +1  ,
+            y : Mathjs.round(Math.sin(i*3.14/60)* 500 )+HEIGHT/2
           });
     }
 

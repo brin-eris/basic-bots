@@ -3,16 +3,8 @@
 const Mathjs = require('mathjs');
 const Bot   = require('./Bot');
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-const INPUT_SIZE = 33;
-=======
-const INPUT_SIZE = 32;
->>>>>>> made it less common to start being able to camo
-=======
-const INPUT_SIZE = 33;
->>>>>>> tweeks
 
+const INPUT_SIZE = 33;
 
 class Brain{
 
@@ -117,17 +109,10 @@ class Brain{
         this.life,
         this.ccClock,
         this.give,
-<<<<<<< HEAD
-<<<<<<< HEAD
+
         this.smellMeat,
         this.dove - this.hawk
-=======
-        Math.random() -0.5
->>>>>>> made it less common to start being able to camo
-=======
-        this.smellMeat,
-        this.dove - this.hawk
->>>>>>> tweeks
+
         ]);
 
 

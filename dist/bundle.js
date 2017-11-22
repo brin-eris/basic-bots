@@ -82771,6 +82771,7 @@ const Bot   = require('./Bot');
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 const INPUT_SIZE = 33;
 =======
 const INPUT_SIZE = 32;
@@ -82778,6 +82779,9 @@ const INPUT_SIZE = 32;
 =======
 const INPUT_SIZE = 33;
 >>>>>>> tweeks
+=======
+const INPUT_SIZE = 33;
+>>>>>>> 02230cd727af02cb06e6171143e9e4d3fb8031fb
 
 
 class Brain{
@@ -82885,6 +82889,7 @@ class Brain{
         this.give,
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         this.smellMeat,
         this.dove - this.hawk
 =======
@@ -82894,6 +82899,10 @@ class Brain{
         this.smellMeat,
         this.dove - this.hawk
 >>>>>>> tweeks
+=======
+        this.smellMeat,
+        this.dove - this.hawk
+>>>>>>> 02230cd727af02cb06e6171143e9e4d3fb8031fb
         ]);
 
 
@@ -82917,6 +82926,7 @@ class Brain{
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       this.spike = (this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5 -0.1*this.dove +0.3*this.hawk);
 
       this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5 +0.1*this.dove -0.3*this.hawk;
@@ -82930,6 +82940,11 @@ class Brain{
 
       this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5 +0.1*this.dove -0.3*this.hawk;
 >>>>>>> tweeks
+=======
+      this.spike = (this.sigmoid(this.outputVector.subset(Mathjs.index(5)))-0.5 -0.1*this.dove +0.3*this.hawk);
+
+      this.give = this.sigmoid(this.outputVector.subset(Mathjs.index(6))) - 0.5 +0.1*this.dove -0.3*this.hawk;
+>>>>>>> 02230cd727af02cb06e6171143e9e4d3fb8031fb
 
       this.voice = (this.sigmoid(this.outputVector.subset(Mathjs.index(10))) +this.sigmoid(this.outputVector.subset(Mathjs.index(13))))* Mathjs.compare(this.hawk-this.dove,this.dove-this.hawk);
 

@@ -635,7 +635,7 @@ let behindUs = this.body.angle+Math.PI
         Vector.create(thrustRightSide * Math.cos(turnRightSide), thrustRightSide * Math.sin(turnRightSide)));
 
 
-      this.life -= (0.000075 * this.brain.age + this.heat * 0.005 );// +   Math.abs(this.heat)
+      this.life -= (0.000175 * this.brain.age + this.heat * 0.005 );// +   Math.abs(this.heat)
       if(this.brain.farts){
         this.life -= 0.0005;
       }

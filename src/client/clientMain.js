@@ -17,8 +17,8 @@ const    Wall = require('../common/world/Wall');
 const STARTING_BOTS = 5;
 const MIN_BOTS = 5;
 const MAX_BOTS = 30;
-const STARTING_PLANTS = 800;
-const MIN_PLANTS = 200;
+const STARTING_PLANTS = 900;
+const MIN_PLANTS = 800;
 const WALLS = 120;
 
 const WIDTH = 2100;

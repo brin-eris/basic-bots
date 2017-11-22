@@ -4,7 +4,7 @@ const Mathjs = require('mathjs');
 const Bot   = require('../bot/Bot');
 
 
-const INPUT_SIZE = 36;
+const INPUT_SIZE = 37;
 
 
 class Brain{
@@ -21,7 +21,11 @@ class Brain{
         this.hawk = 1.0;
         this.dove = 0.0;
       }
-
+      this.ccClock = 0.0;
+      this.turn1 = 0.0;
+      this.turn2 = 0.0;
+      this.thrust1 = 0.0;
+      this.thrust2 = 0.0;
       this.spike = 0.0;
       this.voice = 0.0;
       this.heat = 0.0;
@@ -48,14 +52,14 @@ class Brain{
       this.eyeColorB = { red:0, green: 0, blue:0 };
       this.eyeColorC = { red:0, green: 0, blue:0 };
 
-      this.inputWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]), -1.1, 1.1);
+      this.inputWeights = Mathjs.eye(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
 
 
-      this.hiddenBias = Mathjs.random([INPUT_SIZE], -1.1, 1.1);
+      this.hiddenBias = Mathjs.ones([INPUT_SIZE]);
 
-      this.hiddenWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]), -1.1, 1.1);
+      this.hiddenWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]), -0.5, 0.5);
 
-      this.outputBias = Mathjs.random([INPUT_SIZE], -1.1, 1.1);
+      this.outputBias = Mathjs.random([INPUT_SIZE], -0.5, 0.5);
 
     }
 
@@ -111,9 +115,9 @@ class Brain{
         this.soundInput,
         this.ouchie,
         this.life,
-        this.ccClock,
+        Mathjs.sin(this.ccClock*Mathjs.PI/180),
         this.give,
-
+        Mathjs.random()-0.5,
         this.smellMeat,
         this.dove - this.hawk
         ]);
@@ -203,10 +207,10 @@ class Brain{
         return value;
       });
 
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.15){
         childBrain.inputWeights = Mathjs.transpose(childBrain.inputWeights);
       }
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.15){
         childBrain.inputWeights = Mathjs.inv(childBrain.inputWeights);
       }
 
@@ -214,10 +218,10 @@ class Brain{
         if(Math.random() > 0.8){
           return 0.1*(Math.random() - 0.5)*value +0.1*(Math.random()-0.5) + value;
         }
-        return value ;
+        return value;
       });
 
-      if(Math.random()< 0.1){
+      if(Math.random()< 0.15){
         childBrain.outputBias = Mathjs.transpose(childBrain.outputBias);
       }
       // if(Math.random()< 0.2){
@@ -232,7 +236,7 @@ class Brain{
         return value;
         });
 
-        if(Math.random()< 0.1){
+        if(Math.random()< 0.15){
           childBrain.hiddenBias = Mathjs.transpose(childBrain.hiddenBias);
         }
         // if(Math.random()< 0.2){
@@ -247,10 +251,10 @@ class Brain{
         return value;
       });
 
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.15){
         childBrain.hiddenWeights = Mathjs.transpose(childBrain.hiddenWeights);
       }
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.15){
         childBrain.hiddenWeights = Mathjs.inv(childBrain.hiddenWeights);
       }
       return childBrain;

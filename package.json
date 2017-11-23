@@ -4,28 +4,41 @@
   "description": "making brains",
   "main": "index.js",
   "dependencies": {
-    "babelify": "^8.0.0",
+    "async": "^2.6.0",
+    "babel-cli": "^6.26.0",
+    "babel-preset-react": "^6.24.1",
     "browserify": "^14.5.0",
+    "bufferutil": "^3.0.3",
     "csvtojson": "^1.1.9",
+    "dat.gui": "^0.6.1",
     "express": "^4.16.2",
+    "lance-gg": "^1.0.10",
     "mathjs": "^3.16.5",
     "matter-attractors": "^0.1.6",
     "matter-collision-events": "^0.1.7",
     "matter-js": "^0.12.0",
-    "matter-tools": "^0.11.1",
     "matter-wrap": "^0.2.0",
     "nerdamer": "^0.7.11",
-    "socket.io": "^2.0.4"
+    "react": "^16.1.1",
+    "react-dom": "^16.1.1",
+    "socket.io": "^2.0.4",
+    "utf-8-validate": "^3.0.4"
   },
   "devDependencies": {
     "babelify": "^8.0.0",
     "browserify": "^14.5.0",
+    "browserify-css": "^0.14.0",
     "watchify": "^3.9.0"
+  },
+  "browserify-css": {
+    "autoInject": true,
+    "minify": true,
+    "rootDir": "."
   },
   "scripts": {
     "start": "node index.js",
-    "postinstall": "browserify -e src/client/clientMain.js  -o dist/bundle.js ",
-    "build": "browserify -e src/client/clientMain.js   -o dist/bundle.js ",
+    "postinstall": "browserify -t [ babelify --presets [ react ] ] -t [ browserify-css --minify=true -o dist/bundle.css ] -e src/client/clientMain.js   -o dist/bundle.js ",
+    "build": "browserify -t [ babelify --presets [ react ] ] -t [ browserify-css --minify=true -o dist/bundle.css ] -e src/client/clientMain.js   -o dist/bundle.js ",
     "watchify": "watchify  src/client/clientMain.js  -o dist/bundle.js -v -d"
   },
   "author": "brian leahy",

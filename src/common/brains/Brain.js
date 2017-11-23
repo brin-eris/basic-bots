@@ -126,7 +126,7 @@ class Brain{
       let inputsConnectVector = Mathjs.multiply(this.inputWeights, this.inputVector);
 
       let tempHiddenVector = Mathjs.add(inputsConnectVector, this.hiddenBias).map(function(value, index, matrix){
-        let result = ( Mathjs.exp(-1 * value*value/Math.PI));
+      let result = ( Mathjs.exp(-1 * value*value/Math.PI));
 
         return isNaN(result) ? 1.0 : result;
         });

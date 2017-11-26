@@ -43,7 +43,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "postinstall": "browserify -t [ babelify --presets [ react ] ] -t [ browserify-css --minify=true -o dist/bundle.css ] -e src/client/clientMain.js   -o dist/bundle.js ",
+    
     "build": "browserify -t [ babelify --presets [ react ] ] -t [ browserify-css --minify=true -o dist/bundle.css ] -e src/client/clientMain.js   -o dist/bundle.js ",
     "watchify": "watchify  src/client/clientMain.js  -o dist/bundle.js -v -d"
   },

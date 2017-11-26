@@ -20,7 +20,7 @@ const Body = require('matter-js').Body;
 const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
-const COLLISION_DAMAGE = 0.0025
+const COLLISION_DAMAGE = 0.0015
 
 class Bot {
   constructor() {
@@ -67,7 +67,7 @@ class Bot {
     let eyeC3AOffset = Vector.create( offsetLayer2Radius * 1.5,0);
 
 
-    let soundRadius = offsetLayer2Radius;
+    let soundRadius = offsetLayer2Radius *2;
 
     let bot = Matter.Composite.create({
       label: 'Bot'

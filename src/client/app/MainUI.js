@@ -1,12 +1,15 @@
 'use strict';
-const io = require('socket.io')(80);
+const io = require('socket.io');
 const React = require('react');
-
+const BotViewer = require('./BotViewer');
 
 
 class MainUI extends React.Component {
   constructor(props) {
     super(props);
+  }
+  render(){
+    return <BotViewer  />;
   }
 
   renderBot(bot){

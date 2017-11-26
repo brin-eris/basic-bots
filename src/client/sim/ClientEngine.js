@@ -4,7 +4,7 @@ const    Matter = require('matter-js');
 const    MatterWrap = require('matter-wrap');
 const    MatterAttractors = require('matter-attractors');
 const    Events = require('matter-js').Events;
-const    io = require('socket.io')(80);
+const    io = require('socket.io');
 
 
 

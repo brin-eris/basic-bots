@@ -12,12 +12,12 @@ const    Wall = require('./world/Wall');
 const STARTING_BOTS = 5;
 const MIN_BOTS = 5;
 const MAX_BOTS = 30;
-const STARTING_PLANTS = 500;
+const STARTING_PLANTS =350;
 const MIN_PLANTS = 350;
-const WALLS = 120;
+const WALLS = 0;//120;
 
-const WIDTH = 2500;
-const HEIGHT = 2000;
+const WIDTH = 2100;
+const HEIGHT = 1800;
 
 // soak the brains in here to get juicy
 class SimEngine {
@@ -43,12 +43,32 @@ class SimEngine {
   start(){
     let engine = this.physicsEngine;
 
-      for (let i = 0; i < WALLS; i++){
-            new Wall().create(engine.world, {
-              x : Mathjs.round(Math.cos(i*3.14/60) * 500 )+WIDTH/2 ,
-              y : Mathjs.round(Math.sin(i*3.14/60)* 500 )+HEIGHT/2
-            });
-      }
+      // for (let i = 0; i < WALLS; i++){
+      //       new Wall().create(engine.world, {
+      //         x : Mathjs.round(Math.cos(i*3.14/60) * 500 )+WIDTH/2 ,
+      //         y : Mathjs.round(Math.sin(i*3.14/60)* 500 )+HEIGHT/2
+      //       });
+      // }
+      // for (let i = 0; i <= HEIGHT; i++){
+      //   new Wall().create(engine.world, {
+      //           x : WIDTH,
+      //           y : i
+      //         });
+      //   new Wall().create(engine.world, {
+      //                 x : 0,
+      //                 y : i
+      //     });
+      // }
+      // for (let i = 0; i <= WIDTH; i++){
+      //   new Wall().create(engine.world, {
+      //           x : i,
+      //           y : 0
+      //         });
+      //   new Wall().create(engine.world, {
+      //                 x : i,
+      //                 y : HEIGHT
+      //     });
+      //   }
 
       for (let i = 0; i < STARTING_BOTS; i++ ){
         new  Bot().create(engine.world, {
@@ -91,7 +111,7 @@ class SimEngine {
             }
           }
           if(botCount < MIN_BOTS){
-            if(Math.random() < 0.01){
+            if(Math.random() < 0.05){
             oldestBot.spawn({x:WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500});
             }
           if(Math.random() <0.01){
@@ -103,9 +123,10 @@ class SimEngine {
           }
           if(plantCount < MIN_PLANTS){
             plantCount++;
+            var angle = Math.random() * 2 * Math.PI;
             new Plant().create(engine.world, {
-              x : Mathjs.round((Math.random() -0.5) * WIDTH/50) * 45 + WIDTH/2 +20,
-              y : Mathjs.round((Math.random() - 0.5) * HEIGHT/50) * 45 + HEIGHT/2 +20
+              x : (Math.cos(angle)*(Math.random()+0.25) * WIDTH/2)+ WIDTH/2,// * 45 + WIDTH/2 +20,
+              y : (Math.sin(angle)*(Math.random()+0.15) * HEIGHT/2)+ HEIGHT/2 // * 45 + HEIGHT/2 +20
               });
           }
       });

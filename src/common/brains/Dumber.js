@@ -2,71 +2,97 @@
 
 const Mathjs = require('mathjs');
 const Bot   = require('../bot/Bot');
+const BaseBrain = require('./BaseBrain');
 
-
-const INPUT_SIZE = 36;
-
-
-class Dumber{
-
-
+class Dumber extends BaseBrain{
 
     constructor(){
-      //this.body = body;
-      this.smellMeat = 0.0;
-      if(Math.random()>0.5){
-        this.hawk = 0.0;
-        this.dove = 1.0;
-      }else{
-        this.hawk = 1.0;
-        this.dove = 0.0;
+      super();
+
+      this.inputWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.5){
+          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+        }
+        return value;
+      });
+
+      this.inputBias = Mathjs.ones([this.inputSize]).map( function(value, index, matrix) {
+        if(Math.random() < 0.5){
+          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+        }
+        return value;
+      });
+
+      this.hiddenLayerWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.5){
+          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+        }
+        return value;
+      });
+      this.hiddenLayerBias = Mathjs.ones([this.inputSize]).map( function(value, index, matrix) {
+        if(Math.random() < 0.5){
+          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+        }
+        return value;
+      });
+
+      this.funkyWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.5){
+          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+        }
+        return value;
+      });
+
+      this.funkyBias = Mathjs.random([this.inputSize]);
+      this.functions = this.buildFunctionsArray();
+      this.numLayers = 3;
+
+
+      this.buildLayers();
+    }
+
+    buildLayers(){
+
+      this.functionMap  = new Array(this.numLayers);
+      for(var i=0; i<this.functionMap.length; i++){
+        this.functionMap[i] = Mathjs.pickRandom(this.functions);
       }
+      this.functionMapY  = new Array(this.numLayers);
+      for(var i=0; i<this.functionMapY.length; i++){
+        this.functionMapY[i] = Mathjs.pickRandom(this.functions);
+      }
+      this.XBounds = new Array(this.inputSize);
+      for(var i=0; i<this.XBounds.length; i++){
+          this.XBounds[i] = (i)* 2 * Math.PI / this.inputSize - Math.PI;
+      }
+      this.YBounds = new Array(this.inputSize);
+      for(var i=0; i<this.YBounds.length; i++){
+          this.YBounds[i] = (i)* 2 / this.inputSize - 1;
+      }
+      this.layers = new Array(this.numLayers);
+      for(let i=0; i<this.layers.length; i++){
+          let func = this.functionMap[i];
+          let funY = this.functionMapY[i];
+          let layerColumns = new Array(this.inputSize);
+          for(let j = 0; j<layerColumns.length; j++){
+            let layerRow = layerColumns[j] = new Array(this.inputSize);
+            for (var k = 0; k < layerRow.length; k++) {
+              layerRow[k] = func(this.XBounds[j]) * funY(this.YBounds[k]);
+            }
+          }
 
-      this.spike = 0.0;
-      this.voice = 0.0;
-      this.heat = 0.0;
-      this.turn = 0.0;
-      this.thrust = 0.0;
-      this.clock = 0;
-      //this.sound = 0.0;
-      this.soundInput = 0.0;
-      this.give = 0.0;
-      this.ouchie = 0.0;
-      this.age = 1;
+          let temp = Mathjs.multiply(Mathjs.matrix(layerColumns), this.funkyWeights);
+          temp = temp.map(function(value, index, matrix){
+              let result = 1.0/(1.0 + Mathjs.exp(-1 + value));
+              result-=0.5;
+              return isNaN(result) ? 0.5 : result;
+            });
 
-      this.vision = { red:0, green: 0, blue:0 };
-      this.bodyInput = { red:0, green: 0, blue:0 };
-      this.eyeAInput = { red:0, green: 0, blue:0 };
-      this.eyeBInput = { red:0, green: 0, blue:0 };
-      this.eyeCInput = { red:0, green: 0, blue:0 };
-      this.eyeC2AInput = { red:0, green: 0, blue:0 };
-      this.eyeC2BInput = { red:0, green: 0, blue:0 };
-      this.eyeC3AInput = { red:0, green: 0, blue:0 };
+              this.layers[i] = temp;
+      }
+    }
 
-      this.bodyColor = { red:0, green: 0, blue:0 };
-      this.eyeColorA = { red:0, green: 0, blue:0 };
-      this.eyeColorB = { red:0, green: 0, blue:0 };
-      this.eyeColorC = { red:0, green: 0, blue:0 };
-      this.turn1 =0.0;
-      this.turn2=0.0;
-      this.thrust1=0.0;
-      this.thrust2=0.0;
-
-      this.inputWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
-
-
-      this.hiddenBias = Mathjs.random([INPUT_SIZE]);
-
-      this.hiddenWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
-
-      this.funkyWeights = Mathjs.random(Mathjs.matrix([INPUT_SIZE, INPUT_SIZE]));
-
-      this.outputBias = Mathjs.random([INPUT_SIZE]);
-
-      this.funkyBias = Mathjs.random([INPUT_SIZE]);
-
-
-
+    buildFunctionsArray(){
       let sin = function(x){
         return Mathjs.sin(x);
       }
@@ -79,7 +105,7 @@ class Dumber{
         return isNaN(result) ? 1.0 : result;
       }
       let gausSuck = function(x){
-        let result = ((Mathjs.PI) * Mathjs.exp((-1 * x*x)/Mathjs.PI));
+        let result = (1/(Mathjs.PI) * Mathjs.exp((-1 * x*x)/Mathjs.PI));
 
         return isNaN(result) ? 1.0 : result;
       }
@@ -122,259 +148,140 @@ class Dumber{
         return Mathjs.erf(x);
       }
 
-      let functions = [ erf, atanh, atan, acoth, minus, square, sin, cos, sigmoidSuck, gausSuck, sqrRoot, gausMoarSuck, cube];
-      this.functions = functions;
-      let meharray = new Array(INPUT_SIZE);
-      for(var i=0;i<meharray.length;i++){
-        meharray[i] = Mathjs.pickRandom(functions);
-      }
-      this.functionMap = meharray;
-
-      this.gothVector = Mathjs.ones(Mathjs.matrix([INPUT_SIZE]))
-      this.idgaf = Mathjs.matrix([
-        [Mathjs.complex(1, 1)],
-        [Mathjs.complex(1, -1)],
-        [Mathjs.complex(-1, -1)],
-        [Mathjs.complex(-1, 1)]
-      ]);
-      this.tonyAwards = Mathjs.matrix([
-          Mathjs.pickRandom(functions),
-          Mathjs.pickRandom(functions),
-          Mathjs.pickRandom(functions),
-          Mathjs.pickRandom(functions)
-      ]);
+      let functions = [atan, square, minus, cube, erf, sin, cos, sigmoidSuck, gausSuck, gausMoarSuck];
+      return functions
     }
 
-    tick(){
+    doMagic(inputVector){
 
-      this.clock++;
-      this.clock %= 60;
-      if(this.clock  == 0 ){
-        this.age++;
-      }
-      this.ccClock = (this.clock - 30)/60;
+      let postInputsWeightsVector = Mathjs.multiply(this.inputWeights, inputVector);
 
-      this.inputVector = Mathjs.matrix([
+      let postInputsBiasVector = Mathjs.add(postInputsWeightsVector, this.inputBias);
 
-        this.vision.red,
-        this.vision.blue,
-        this.vision.green,
-
-        this.bodyInput.red,
-        this.bodyInput.blue,
-        this.bodyInput.green,
-
-
-        this.eyeAInput.red,
-        this.eyeAInput.blue,
-        this.eyeAInput.green,
-
-        this.eyeBInput.red,
-        this.eyeBInput.blue,
-        this.eyeBInput.green,
-
-        this.eyeCInput.red,
-        this.eyeCInput.blue,
-        this.eyeCInput.green,
-
-        this.eyeC2AInput.red,
-        this.eyeC2AInput.blue,
-        this.eyeC2AInput.green,
-
-        this.eyeC2BInput.red,
-        this.eyeC2BInput.blue,
-        this.eyeC2BInput.green,
-
-        this.eyeC3AInput.red,
-        this.eyeC3AInput.blue,
-        this.eyeC3AInput.green,
-
-        this.spike,
-        this.voice,
-        this.heat,
-        this.turn1 - this.turn2,
-        this.thrust1 - this.thrust2,
-        this.soundInput,
-        this.ouchie,
-        this.life,
-        this.ccClock,
-        this.give,
-
-        this.smellMeat,
-        this.dove - this.hawk
-
-        ]);
-
-
-
-      let inputsConnectVector = Mathjs.multiply(this.inputWeights, this.inputVector);
-
-      let tempHiddenVector = Mathjs.add(inputsConnectVector, this.hiddenBias);
-      var values = tempHiddenVector.clone().valueOf();
-      for(var i=0; i<this.functionMap.length;i++){
-        var func = this.functionMap[i];
-        values[i] = func(values[i]);
-      }
-      let funkyVector =  Mathjs.matrix(values);
-
-      let discoTech = Mathjs.kron(funkyVector, this.idgaf);
-      let gothbar = (Mathjs.transpose(discoTech));
-      let christ = Mathjs.kron(this.gothVector, this.idgaf);
-      let shitLands = Mathjs.multiply(gothbar, christ );
-      let funkyTown = Mathjs.multiply(shitLands, this.funkyWeights);
-
-      let hiddenVector = funkyTown.map(function(value, index, matrix){
-        let magnitude =  Math.sqrt(Mathjs.multiply(Mathjs.conj(value), value));
-        let angle = Mathjs.arg(value);
-
-        let result = Mathjs.atan2(magnitude*Mathjs.cos(angle), magnitude*Math.sin(angle));
-
-        return isNaN(result) ? 1.0 : result;
-      });
-      // let tempHiddenVector = Mathjs.add(inputsConnectVector, this.hiddenBias).map(function(value, index, matrix){
-      //   let result = ((Math.PI) * Mathjs.exp(-1 * value*value)/Math.PI);
-      //
-      //   return isNaN(result) ? 1.0 : result;
-      //   });
-
-      let tempOutputMatrix = Mathjs.multiply(hiddenVector, this.hiddenWeights);
-      let thisShitIsOutOfHand = Mathjs.multiply(tempOutputMatrix, this.inputVector);
-      this.outputVector = Mathjs.add(thisShitIsOutOfHand, this.outputBias).map(function(value, index, matrix){
-        let temp = Mathjs.exp((-1 * value*value));
-        let result = Mathjs.erf(temp);
+      let hiddenLayerInputVector =  postInputsBiasVector.map(function(value, index, matrix){
+      let result = ((1/(Math.PI)) *Mathjs.exp(-1 * value*value));
+        result = result < 0.0005 ? 0.0 : result;
         return isNaN(result) ? 1.0 : result;
         });
 
-      this.turn1 = (this.outputVector.subset(Mathjs.index(0))-0.5);
-      this.thrust1 = (this.outputVector.subset(Mathjs.index(1)) -0.5)  ;
-      this.turn2 = (this.outputVector.subset(Mathjs.index(7))-0.5);
-      this.thrust2 = (this.outputVector.subset(Mathjs.index(8)) -0.5)  ;
+        for(var i=0; i<this.layers.length;i++){
+           let layer =  this.layers[i];
+           hiddenLayerInputVector = Mathjs.multiply(layer, inputVector).map(function(value, index, matrix){
+               let result = Mathjs.exp(-1 * value*value);
+               result = result < 0.0005 ? 0.0 : result;
+               return isNaN(result) ? 1.0 : result;
+             });
+        }
 
 
-      this.spike = (this.outputVector.subset(Mathjs.index(5))-0.5 -0.1*this.dove +0.1*this.hawk);
+      let postHiddenLayerWeightsVector = Mathjs.multiply(hiddenLayerInputVector, this.hiddenLayerWeights);
+      let postHiddenLayerBaisVector = Mathjs.add(postHiddenLayerWeightsVector, this.hiddenLayerBias)
 
-      this.give = (this.outputVector.subset(Mathjs.index(6))  -0.5);//+0.2*this.dove -0.2*this.hawk;
+      let outputVector = postHiddenLayerBaisVector.map(function(value, index, matrix){
+        let result = 1.0/(1.0 + Mathjs.exp(-1 + value));
+        result = result < 0.0005 ? 0.0 : result;
+        return isNaN(result) ? 1.0 : result;
+        });
 
-      this.voice = (this.outputVector.subset(Mathjs.index(10)) +
-      (this.outputVector.subset(Mathjs.index(13))));//* Mathjs.compare(this.hawk-this.dove,this.dove-this.hawk);
-
-      this.farts = (this.outputVector.subset(Mathjs.index(12))+
-      (this.outputVector.subset(Mathjs.index(11))))>1.5;
-
-      this.bodyColor.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(2)));//* (this.hawk-this.dove);
-      this.bodyColor.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(3)));
-      this.bodyColor.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(4)));//* (this.dove - this.hawk);
-
-      this.eyeColorA.red =Mathjs.abs(this.outputVector.subset(Mathjs.index(14)));
-      this.eyeColorA.blue =Mathjs.abs(this.outputVector.subset(Mathjs.index(15)));
-      this.eyeColorA.green =Mathjs.abs(this.outputVector.subset(Mathjs.index(16)));
-      this.eyeColorB.red =Mathjs.abs(this.outputVector.subset(Mathjs.index(17)));
-      this.eyeColorB.green =Mathjs.abs(this.outputVector.subset(Mathjs.index(18)));
-      this.eyeColorB.blue =Mathjs.abs(this.outputVector.subset(Mathjs.index(19)));
-      this.eyeColorC.red =Mathjs.abs(this.outputVector.subset(Mathjs.index(20)));
-      this.eyeColorC.blue =Mathjs.abs(this.outputVector.subset(Mathjs.index(21)));
-      this.eyeColorC.green =Mathjs.abs(this.outputVector.subset(Mathjs.index(22)));
-
-      this.strategy = (this.outputVector.subset(Mathjs.index(23)));
-
-
-      this.soundInput = 0.0;
-      this.ouchie = 0.0;
-      this.heat = 0.0;
-      this.vision = { red:0, green: 0, blue:0 };
-      this.eyeAInput = { red:0, green: 0, blue:0 };
-      this.eyeBInput = { red:0, green: 0, blue:0 };
-      this.eyeCInput = { red:0, green: 0, blue:0 };
-      this.eyeC2AInput = { red:0, green: 0, blue:0 };
-      this.eyeC2BInput = { red:0, green: 0, blue:0 };
-      this.eyeC3AInput = { red:0, green: 0, blue:0 };
-      this.bodyInput = { red:0, green: 0, blue:0 };
-    }
-
-    sigmoid(value){
-      let result = 1.0/(1.0 + Mathjs.exp(-1 + value));
-
-      return isNaN(result) ? 1.0 : result;
-    }
+        return outputVector;
+      }
 
     mutate(){
       let childBrain = new Dumber();
       childBrain.hawk = this.hawk + (Math.random()-0.5)*.1;
       childBrain.dove = this.dove + (Math.random()-0.5)*.1;
-      if(Math.random() > 0.5){
+      if(Math.random() > 0.01){
         childBrain.hawk*=-1;
         childBrain.dove*=-1;
       }
 
-      childBrain.functionMap = this.functionMap;
-      if(Math.random() < 0.9){
-        var index = Mathjs.randomInt(this.functionMap.length);
-        childBrain.functionMap[index] = Mathjs.pickRandom(this.functions);
+      for(let i = 0; i< this.functionMap.length; i++){
+        childBrain.functionMap[i] = this.functionMap[i];
       }
 
+      if(Math.random() < 0.05){
+        var index = Mathjs.randomInt(childBrain.functionMap.length);
+        childBrain.functionMap[index] = Mathjs.pickRandom(this.functions);
+      }
+      for(let i = 0; i< this.functionMapY.length; i++){
+        childBrain.functionMapY[i] = this.functionMapY[i];
+      }
+
+      if(Math.random() < 0.05){
+        var index = Mathjs.randomInt(childBrain.functionMapY.length);
+        childBrain.functionMapY[index] = Mathjs.pickRandom(this.functions);
+      }
+
+      childBrain.numLayers = this.numLayers;
+      if(Math.random() < 0.1){
+        childBrain.numLayers++;
+        childBrain.functionMap.push(Mathjs.pickRandom(this.functions));
+        childBrain.functionMapY.push(Mathjs.pickRandom(this.functions));
+      }
+
+
+
       childBrain.inputWeights = this.inputWeights.map( function(value, index, matrix) {
-        if(Math.random() > 0.8){
-          return  (Math.random() - 0.5)*(Math.random() - 0.5)+ value;
+        if(Math.random() < 0.05){
+          return (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
         }
         return value;
       });
 
-      if(Math.random()< 0.1){
+      if(Math.random()< 0.05){
         childBrain.inputWeights = Mathjs.transpose(childBrain.inputWeights);
       }
-      if(Math.random()< 0.1){
+      if(Math.random()< 0.05){
         childBrain.inputWeights = Mathjs.inv(childBrain.inputWeights);
       }
 
-      childBrain.outputBias = this.outputBias.map( function(value, index, matrix) {
-        if(Math.random() > 0.8){
-          return (Math.random() - 0.5)*(Math.random() - 0.5) + value;
+      childBrain.inputBias = this.inputBias.map( function(value, index, matrix) {
+        if(Math.random() < 0.05){
+          return (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
         }
         return value ;
       });
 
-      if(Math.random()< 0.1){
-        childBrain.outputBias = Mathjs.transpose(childBrain.outputBias);
-      }
-      // if(Math.random()< 0.2){
-      //   childBrain.outputBias = Mathjs.inv(childBrain.outputBias);
+      // if(Math.random()< 0.1){
+      //   childBrain.inputBias = Mathjs.transpose(childBrain.inputBias);
       // }
+      //
 
-      childBrain.hiddenBias = this.hiddenBias.map( function(value, index, matrix) {
-        if(Math.random() > 0.8){
+      childBrain.hiddenLayerBias = this.hiddenLayerBias.map( function(value, index, matrix) {
+        if(Math.random() < 0.05){
           let newValue =  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
           return newValue;
         }
         return value;
         });
 
-        if(Math.random()< 0.1){
-          childBrain.hiddenBias = Mathjs.transpose(childBrain.hiddenBias);
-        }
-        // if(Math.random()< 0.2){
-        //   childBrain.hiddenBias = Mathjs.inv(childBrain.hiddenBias);
-        // }
-
-      childBrain.hiddenWeights = this.hiddenWeights.map(function(value, index, matrix){
-        if(Math.random() > 0.8){
-          let newValue = (Math.random() - 0.5)*(Math.random() - 0.5)  + value;
+      childBrain.hiddenLayerWeights = this.hiddenLayerWeights.map(function(value, index, matrix){
+        if(Math.random() > 0.05){
+          let newValue = (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
           return newValue;
         }
 
         return value;
       });
 
-      if(Math.random()< 0.1){
-        childBrain.hiddenWeights = Mathjs.transpose(childBrain.hiddenWeights);
+      if(Math.random()< 0.05){
+        childBrain.hiddenLayerWeights = Mathjs.transpose(childBrain.hiddenLayerWeights);
       }
-      if(Math.random()< 0.1){
-        childBrain.hiddenWeights = Mathjs.inv(childBrain.hiddenWeights);
+      if(Math.random()< 0.05){
+        childBrain.hiddenLayerWeights = Mathjs.inv(childBrain.hiddenLayerWeights);
       }
 
+      childBrain.funkyBias = this.funkyBias.map( function(value, index, matrix) {
+        if(Math.random() < 0.05){
+          let newValue =  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+          return newValue;
+        }
+        return value;
+        });
 
       childBrain.funkyWeights = this.funkyWeights.map( function(value, index, matrix) {
-        if(Math.random() > 0.8){
-          return  (Math.random() - 0.5)*(Math.random() - 0.5)+ value;
+        if(Math.random() < 0.1){
+          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
         }
         return value;
       });
@@ -385,7 +292,7 @@ class Dumber{
       if(Math.random()< 0.1){
         childBrain.funkyWeights = Mathjs.inv(childBrain.funkyWeights);
       }
-
+      childBrain.buildLayers();
       return childBrain;
     }
 }

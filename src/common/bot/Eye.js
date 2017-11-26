@@ -10,8 +10,8 @@ const Bot = require('./Bot');
 const Plant = require('../world/Plant');
 const Brain = require('../brains/Brain');
 
-const VIEW_ANGLE = 0.2;
-const VIEW_DEPTH = 80;
+const VIEW_ANGLE = 0.25;
+const VIEW_DEPTH = 90;
 
 class Eye {
 
@@ -53,9 +53,9 @@ class Eye {
             var modifier =  (VIEW_DEPTH- Mathjs.distance([startPoint.x, startPoint.y],
               [collision.bodyA.position.x, collision.bodyA.position.y]))/VIEW_DEPTH;
               //modifier*=modifier;
-            outputs.red  +=  (collision.bodyA.gameColor.red * 1/collisions.length * modifier);
-            outputs.blue  +=  (collision.bodyA.gameColor.blue * 1/collisions.length * modifier);
-            outputs.green  +=  (collision.bodyA.gameColor.green * 1/collisions.length * modifier);
+            outputs.red  +=  (collision.bodyA.gameColor.red  * modifier);
+            outputs.blue  +=  (collision.bodyA.gameColor.blue * modifier);
+            outputs.green  +=  (collision.bodyA.gameColor.green * modifier);
           }
 
           collisions = Query.ray(bodies, startPoint, Vector.add(midVec, startPoint));
@@ -71,9 +71,9 @@ class Eye {
             var modifier =  (VIEW_DEPTH- Mathjs.distance([startPoint.x, startPoint.y],
               [collision.bodyA.position.x, collision.bodyA.position.y]))/VIEW_DEPTH;
               // modifier*=modifier;
-            outputs.red  +=  (collision.bodyA.gameColor.red * 1/collisions.length * modifier);
-            outputs.blue  +=  (collision.bodyA.gameColor.blue * 1/collisions.length * modifier);
-            outputs.green  +=  (collision.bodyA.gameColor.green * 1/collisions.length * modifier);
+            outputs.red  +=  (collision.bodyA.gameColor.red  * modifier);
+            outputs.blue  +=  (collision.bodyA.gameColor.blue * modifier);
+            outputs.green  +=  (collision.bodyA.gameColor.green * modifier);
           }
 
           collisions = Query.ray(bodies, startPoint, Vector.add(minVec, startPoint));
@@ -89,9 +89,9 @@ class Eye {
             var modifier =  (VIEW_DEPTH- Mathjs.distance([startPoint.x, startPoint.y],
               [collision.bodyA.position.x, collision.bodyA.position.y]))/VIEW_DEPTH;
             //  modifier*=modifier;
-            outputs.red  +=  (collision.bodyA.gameColor.red * 1/collisions.length* modifier);
-            outputs.blue  +=  (collision.bodyA.gameColor.blue * 1/collisions.length * modifier);
-            outputs.green  +=  (collision.bodyA.gameColor.green * 1/collisions.length * modifier);
+            outputs.red  +=  (collision.bodyA.gameColor.red* modifier);
+            outputs.blue  +=  (collision.bodyA.gameColor.blue * modifier);
+            outputs.green  +=  (collision.bodyA.gameColor.green * modifier);
           }
           return outputs;
       }

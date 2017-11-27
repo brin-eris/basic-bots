@@ -12,13 +12,33 @@ class Brain extends BaseBrain{
     constructor(){
       super();
 
-      this.inputWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize]));
+      this.inputWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.3){
+          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+        }
+        return value;
+      });
 
-      this.inputBias = Mathjs.zeros([this.inputSize]);
+      this.inputBias = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
+        if(Math.random() < 0.3){
+          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+        }
+        return value;
+      });
 
-      this.hiddenLayerWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize]));
+      this.hiddenLayerWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.3){
+          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+        }
+        return value;
+      });
 
-      this.hiddenLayerBias = Mathjs.zeros([this.inputSize]);
+      this.hiddenLayerBias = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
+        if(Math.random() < 0.3){
+          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+        }
+        return value;
+      });
 
     }
 
@@ -40,7 +60,7 @@ class Brain extends BaseBrain{
 
       let outputVector = postHiddenLayerBaisVector.map(function(value, index, matrix){
         let result = 1.0/(1.0 + Mathjs.exp(-1 + value));
-        result = result < 0.0005 ? 0.0 : result;
+
         return isNaN(result) ? 1.0 : result;
         });
         return outputVector;

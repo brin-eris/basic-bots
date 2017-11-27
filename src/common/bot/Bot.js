@@ -33,7 +33,7 @@ class Bot {
   constructor() {
     this.kills = 0.0;
     this.class = Bot;
-    this.brain = new Dumber();
+    this.brain = new Brain();
     this.life = 1.0;
     this.maxLife = 1.0;
     this.heat = 0.0;

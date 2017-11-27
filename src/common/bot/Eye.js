@@ -10,7 +10,7 @@ const Bot = require('./Bot');
 const Plant = require('../world/Plant');
 const Brain = require('../brains/Brain');
 
-const VIEW_ANGLE = 0.25;
+const VIEW_ANGLE =  Math.PI/12;
 const VIEW_DEPTH = 90;
 
 class Eye {

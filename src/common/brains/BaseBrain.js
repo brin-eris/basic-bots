@@ -132,9 +132,9 @@ class BaseBrain{
       this.farts = (this.outputVector.subset(Mathjs.index(12))+
       (this.outputVector.subset(Mathjs.index(11))))/2>0.75;
 
-      this.bodyColor.red = (this.outputVector.subset(Mathjs.index(24)));//* (this.hawk-this.dove);
-      this.bodyColor.green = (this.outputVector.subset(Mathjs.index(25)));
-      this.bodyColor.blue = (this.outputVector.subset(Mathjs.index(26)));//* (this.dove - this.hawk);
+      this.bodyColor.red = (this.outputVector.subset(Mathjs.index(2)));//* (this.hawk-this.dove);
+      this.bodyColor.green = (this.outputVector.subset(Mathjs.index(3)));
+      this.bodyColor.blue = (this.outputVector.subset(Mathjs.index(4)));//* (this.dove - this.hawk);
 
       this.eyeColorA.red =(this.outputVector.subset(Mathjs.index(14)));
       this.eyeColorA.blue =(this.outputVector.subset(Mathjs.index(15)));
@@ -146,7 +146,12 @@ class BaseBrain{
       this.eyeColorC.blue =(this.outputVector.subset(Mathjs.index(21)));
       this.eyeColorC.green =(this.outputVector.subset(Mathjs.index(22)));
 
-      this.strategy = (this.outputVector.subset(Mathjs.index(23)));
+      this.interestedInMating = ((this.outputVector.subset(Mathjs.index(23))-0.5)+
+      (this.outputVector.subset(Mathjs.index(24))-0.5)+
+      (this.outputVector.subset(Mathjs.index(25))-0.5))>0.0;
+
+      this.wantEat = (this.outputVector.subset(Mathjs.index(26))-0.5);
+      //this.strategy = (this.outputVector.subset(Mathjs.index(23)));
 
     }
 

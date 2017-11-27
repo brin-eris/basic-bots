@@ -10,34 +10,34 @@ class Dumber extends BaseBrain{
       super();
 
       this.inputWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.5){
+        if(Math.random() < 0.3){
           return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
         }
         return value;
       });
 
-      this.inputBias = Mathjs.ones([this.inputSize]).map( function(value, index, matrix) {
-        if(Math.random() < 0.5){
+      this.inputBias = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
+        if(Math.random() < 0.3){
           return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
         }
         return value;
       });
 
       this.hiddenLayerWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.5){
+        if(Math.random() < 0.3){
           return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
         }
         return value;
       });
-      this.hiddenLayerBias = Mathjs.ones([this.inputSize]).map( function(value, index, matrix) {
-        if(Math.random() < 0.5){
+      this.hiddenLayerBias = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
+        if(Math.random() < 0.3){
           return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
         }
         return value;
       });
 
       this.funkyWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.5){
+        if(Math.random() < 0.3){
           return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
         }
         return value;
@@ -45,7 +45,7 @@ class Dumber extends BaseBrain{
 
       this.funkyBias = Mathjs.random([this.inputSize]);
       this.functions = this.buildFunctionsArray();
-      this.numLayers = 3;
+      this.numLayers = 1;
 
 
       this.buildLayers();
@@ -166,11 +166,11 @@ class Dumber extends BaseBrain{
 
         for(var i=0; i<this.layers.length;i++){
            let layer =  this.layers[i];
-           hiddenLayerInputVector = Mathjs.multiply(layer, inputVector).map(function(value, index, matrix){
-               let result = Mathjs.exp(-1 * value*value);
-               result = result < 0.0005 ? 0.0 : result;
-               return isNaN(result) ? 1.0 : result;
-             });
+           hiddenLayerInputVector = Mathjs.multiply(layer, inputVector);//.map(function(value, index, matrix){
+            //    let result = Mathjs.exp(-1 * value*value);
+            //    result = result < 0.0005 ? 0.0 : result;
+            //    return isNaN(result) ? 1.0 : result;
+            //  });
         }
 
 
@@ -213,10 +213,14 @@ class Dumber extends BaseBrain{
       }
 
       childBrain.numLayers = this.numLayers;
-      if(Math.random() < 0.1){
+      if(Math.random() < 0.05){
         childBrain.numLayers++;
         childBrain.functionMap.push(Mathjs.pickRandom(this.functions));
         childBrain.functionMapY.push(Mathjs.pickRandom(this.functions));
+      }else if (Math.random() < 0.05 && childBrain.numLayers > 1) {
+        childBrain.numLayers--;
+        childBrain.functionMap.splice(0,1);
+        childBrain.functionMapY.splice(0,1);
       }
 
 

@@ -20,8 +20,13 @@ const Body = require('matter-js').Body;
 const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
-const COLLISION_DAMAGE = 0.001
-
+const COLLISION_DAMAGE = 0.005
+const SPIKE_DAMAGE = 0.01;
+const AGE_DAMAGE = 0.00001;
+const HEAT_DAMAGE = 0.003;
+const OVEREAT_PENALTY = 0.005;
+const BOOST_COST = 0.0008;
+const GESTATION_TIMER = 100;
 
 
 class Bot {
@@ -31,7 +36,8 @@ class Bot {
     this.brain = new Dumber();
     this.life = 1.0;
     this.maxLife = 1.0;
-    this.heat = 0.0
+    this.heat = 0.0;
+    this.gluttony = 0.0;
   }
 
   create(world, position) {
@@ -47,7 +53,7 @@ class Bot {
 
 
     let group = Body.nextGroup(true);
-    this.gestationTimer = 50;
+    this.gestationTimer = GESTATION_TIMER;
     let radius = 10;
     this.radius = radius;
     let eyeRadius = 5;
@@ -113,7 +119,7 @@ class Bot {
               me.gameObject.life -= damage;
               me.gameObject.brain.ouchie += 0.5;
           }else if(them.gameObject.class==Meat){
-            me.gameObject.brain.smellMeat += 1.0;
+            me.gameObject.brain.smellMeat = 1.0;
             // only the blood thirsty eat meat
             if(me.gameObject.brain.hawk > 0){
               //console.log('fresh meat!')
@@ -135,7 +141,7 @@ class Bot {
               let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
               let baseDamage = (COLLISION_DAMAGE  * Math.abs(Vector.magnitude(relativeMomentum)));
-              me.gameObject.life -= baseDamage + 10*baseDamage *them.gameObject.brain.spike;
+              me.gameObject.life -= baseDamage + ((1 + them.gameObject.brain.spike) * SPIKE_DAMAGE);
               me.gameObject.brain.ouchie += 0.5;
               them.gameObject.life -= baseDamage ;
               them.gameObject.brain.ouchie += 0.5;
@@ -147,9 +153,9 @@ class Bot {
               }
           }
         } else if(them.gameObject && them.gameObject.class==Plant){
-//if(me.speed < 100){
+
                   me.gameObject.eat(them.gameObject);
-  //            }
+
           } else if(them.gameObject && them.gameObject.class==Wall){
             let myMomentum = Vector.mult(me.velocity, 1.0);
             let theirMomentum = Vector.mult(them.velocity, 1.0);
@@ -159,7 +165,7 @@ class Bot {
               me.gameObject.life -= damage;
               me.gameObject.brain.ouchie += 0.5;
         } else if(them.gameObject.class==Meat){
-          me.gameObject.brain.smellMeat += 0.95;
+          me.gameObject.brain.smellMeat += 0.5;
           // only the blood thirsty eat meat
             if(me.gameObject.brain.hawk > 0){
               //console.log('fresh meat!')
@@ -186,16 +192,15 @@ class Bot {
       if(them.imAfukinSensor){return;}
       if(them.gameObject){
         if(them.gameObject.class==Bot){
-          //if(me.gameObject.brain.hawk>0.5){
-              me.gameObject.brain.soundInput += them.gameObject.voice ;
-          //}
+
+              me.gameObject.brain.soundInput += 0.1*them.gameObject.voice ;
 
               //console.log(them.gameObject.voice);
               if(me.gameObject.brain.give > 0.0 ){
                 me.gameObject.give(them.gameObject);
               }
         }else if(them.gameObject.class==Meat){
-          me.gameObject.brain.smellMeat += 0.5;
+          me.gameObject.brain.smellMeat += 0.1;
             // only the blood thirsty eat meat
             // if(me.gameObject.brain.hawk > 0){
             //   //console.log('fresh meat!')
@@ -610,7 +615,7 @@ class Bot {
 
     // set all brain inputs that arent from events
     this.brain.tick();
-
+      let gluttonPenalty = this.gluttony+1;//OVEREAT_PENALTY *
 
     // get all brain outputs
       this.age = this.brain.age;
@@ -624,6 +629,11 @@ class Bot {
       let thrustRightSide = this.brain.farts == true ? this.brain.thrust2*3:this.brain.thrust2;
       let turnRightSide =  (this.brain.turn2 + facing) ;
 
+      thrustLeftSide = thrustLeftSide/gluttonPenalty;
+      thrustRightSide = thrustRightSide/gluttonPenalty;
+      if(this.gluttony>0){
+        this.gluttony--;
+      }
       let position = Vector.clone(this.body.position);
       let leftButtcheek = Vector.create(-1.5 * Math.cos(facing- 1.5) + position.x, -1.5 * Math.sin(facing-1.5) + position.y);
       let rightButtcheek = Vector.create(-1.5 * Math.cos(facing+1.5) + position.x, -1.5 * Math.sin(facing+1.5) + position.y);
@@ -637,9 +647,9 @@ class Bot {
         Vector.create(thrustRightSide * Math.cos(turnRightSide), thrustRightSide * Math.sin(turnRightSide)));
 
 
-      this.life -= (0.00001 * this.brain.age + this.heat * 0.003 );// +   Math.abs(this.heat)
+      this.life -= (AGE_DAMAGE * this.brain.age + this.heat * HEAT_DAMAGE );// +   Math.abs(this.heat)
       if(this.brain.farts){
-        this.life -= 0.0008;
+        this.life -= BOOST_COST;
       }
 
       this.eyeA.gameColor = this.eyeA2B.gameColor = this.eyeA2A.gameColor = this.brain.eyeColorA;
@@ -652,28 +662,41 @@ class Bot {
       this.eyeB.render.fillStyle = this.eyeB2B.render.fillStyle = this.eyeB2A.render.fillStyle = this.rgbToHex(this.brain.eyeColorB.green* 255,this.brain.eyeColorB.red* 255,this.brain.eyeColorB.blue* 255);
       this.eyeC.render.fillStyle = this.eyeC2B.render.fillStyle = this.eyeC2A.render.fillStyle = this.eyeC3A.render.fillStyle = this.rgbToHex(this.brain.eyeColorC.red* 255,this.brain.eyeColorC.blue* 255,this.brain.eyeColorC.green* 255);
 
-      if(this.life > 0.9){
-        if(this.gestationTimer < 0 && Math.random() > 0.9){
+      if(this.life > 0.7){
+        if(this.gestationTimer < 0 && this.brain.interestedInMating){
           this.spawn(this.body.position);
-          //this.spawn(this.body.position);
+          this.spawn(this.body.position);
 
-          this.life = this.life * 0.8;
+          this.life = this.life * 0.5;
           //console.log('natural birth');
-          this.gestationTimer = 40;
+          this.gestationTimer = GESTATION_TIMER;
         }
 
       }
   }
 
   eat(food){
-    if(this.life <= this.maxLife){
+    // will only eat if wants to
+    // less life the body will make it
+    if(this.brain.wantEat +(1-this.life) > 0.0){
+      // the amount eaten
+      food.life -= 0.02;
+
+      // if eating food bot still only gains life up to max
+      if(this.life <= this.maxLife ){
       var speedMod = 1.0 - (this.body.speed -20)/100;
       this.life += (0.02 * speedMod);
-      food.life -= 0.02;
-        this.gestationTimer--;
+    }else {
+      // glutton will take a penalty over time
+      // otherwise it will take damage and then eat to full having no purpose
+      this.gluttony++;
     }
 
-    food.life -= 0.02;
+        // eating, full or not ... could be a bad idea lol
+        this.gestationTimer--;
+    }
+    // sitting on food ruins it
+    food.life -= 0.008;
     if(food.life <0.0){ food.destroy()}
 
     //console.log('nom' + food.class);

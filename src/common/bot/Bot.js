@@ -220,7 +220,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -247,7 +247,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -273,7 +273,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -301,7 +301,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -327,7 +327,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -354,7 +354,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -381,7 +381,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -407,7 +407,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -433,7 +433,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }
@@ -460,7 +460,7 @@ class Bot {
         group: group
       },
       restitution: 0.3,
-      isSensor: true,
+      isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
       }

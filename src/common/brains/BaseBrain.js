@@ -119,7 +119,7 @@ class BaseBrain{
         this.life,
         Mathjs.sin(this.ccClock*Mathjs.PI/180),
         this.give,
-        Mathjs.random()-0.5,
+        Mathjs.PI,
         this.smellMeat,
         this.dove - this.hawk
         ]);
@@ -128,10 +128,10 @@ class BaseBrain{
 
 
     getOutputs(){
-      this.turn1 = (this.outputVector.subset(Mathjs.index(0))-0.5);
-      this.thrust1 = (this.outputVector.subset(Mathjs.index(1)) - 0.5)  ;
-      this.turn2 = (this.outputVector.subset(Mathjs.index(7))-0.5);
-      this.thrust2 = (this.outputVector.subset(Mathjs.index(8)) - 0.5)  ;
+      this.turn1 = (this.outputVector.subset(Mathjs.index(30))-0.5);
+      this.thrust1 = (this.outputVector.subset(Mathjs.index(31)) - 0.5)  ;
+      this.turn2 = (this.outputVector.subset(Mathjs.index(40))-0.5);
+      this.thrust2 = (this.outputVector.subset(Mathjs.index(41)) - 0.5)  ;
 
 
       this.spike = (this.outputVector.subset(Mathjs.index(5))-0.5 -0.1*this.dove +0.1*this.hawk);//-0.2*this.dove +0.2*this.hawk);

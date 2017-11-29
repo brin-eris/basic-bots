@@ -13,29 +13,29 @@ class Brain extends BaseBrain{
       super();
 
       this.inputWeights = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          return  (Math.random() )*value +2*(Math.random()-0.5) + value;
+        if(Math.random() < 0.3){
+          return  (Math.random() -0.5)*value +(Math.random()-0.5) + value;
         }
         return value;
       });
 
       this.inputBias = Mathjs.random([this.inputSize],-0.01,0.01).map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          return  (Math.random() )*value + 2*(Math.random()-0.5) + value;
+        if(Math.random() < 0.3){
+          return  (Math.random() )*value + (Math.random()-0.5) + value;
         }
         return value;
       });
 
       this.hiddenLayerWeights = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          return  (Math.random() )*value +2*(Math.random()-0.5) + value;
+        if(Math.random() < 0.3){
+          return  (Math.random() -0.5)*value +(Math.random()-0.5) + value;
         }
         return value;
       });
 
       this.hiddenLayerBias = Mathjs.random([this.inputSize],-0.01,0.01).map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          return  (Math.random())*value +2*(Math.random()-0.5) + value;
+        if(Math.random() < 0.3){
+          return  (Math.random())*value +(Math.random()-0.5) + value;
         }
         return value;
       });
@@ -84,7 +84,7 @@ class Brain extends BaseBrain{
           value+= 0.2*(Math.random()-0.5);
         }
         if(Math.random() < 0.001){
-          value+= 0.3*(Math.random()-0.5);
+          value+= 0.8*(Math.random()-0.5);
         }
 
         return value;
@@ -105,7 +105,7 @@ class Brain extends BaseBrain{
           value+= 0.2*(Math.random()-0.5);
         }
         if(Math.random() < 0.001){
-          value+= 0.3*(Math.random()-0.5);
+          value+= 0.8*(Math.random()-0.5);
         }
         return value;
       });
@@ -122,7 +122,7 @@ class Brain extends BaseBrain{
           value+= 0.2*(Math.random()-0.5);
         }
         if(Math.random() < 0.001){
-          value+= 0.3*(Math.random()-0.5);
+          value+= 0.8*(Math.random()-0.5);
         }
         return value;
         });
@@ -139,7 +139,7 @@ class Brain extends BaseBrain{
           value+= 0.2*(Math.random()-0.5);
         }
         if(Math.random() < 0.001){
-          value+= 0.3*(Math.random()-0.5);
+          value+= 0.8*(Math.random()-0.5);
         }
         return value;
       });

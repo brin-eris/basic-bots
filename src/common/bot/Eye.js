@@ -10,8 +10,8 @@ const Bot = require('./Bot');
 const Plant = require('../world/Plant');
 const Brain = require('../brains/Brain');
 
-const VIEW_ANGLE =  Math.PI/12;
-const VIEW_DEPTH = 150;
+const VIEW_ANGLE =  Math.PI/8;
+const VIEW_DEPTH = 500;
 
 class Eye {
 
@@ -91,7 +91,7 @@ class Eye {
           //(note anything 0<x<1 will be greater than one, is desired)
         var modifier = -1 * Mathjs.log((distance/VIEW_DEPTH), VIEW_DEPTH);
           // divide by number of ray traces
-          return modifier/3;
+          return modifier;///3;
       }
 }
 

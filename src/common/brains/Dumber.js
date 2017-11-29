@@ -10,40 +10,40 @@ class Dumber extends BaseBrain{
       super();
 
       this.inputWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.3){
-          return  (2*Math.random() - 1)*value +(Math.random()-0.5) + value;
+        if(Math.random() < 0.1){
+          return  (Math.random() )*value +2*(Math.random()-0.5) + value;
         }
         return value;
       });
 
-      this.inputBias = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
-        if(Math.random() < 0.3){
-          return  (2*Math.random() - 1)*value +(Math.random()-0.5) + value;
+      this.inputBias = Mathjs.random([this.inputSize],-0.01, 0.01).map( function(value, index, matrix) {
+        if(Math.random() < 0.1){
+          return  (Math.random() )*value +2*(Math.random()-0.5) + value;
         }
         return value;
       });
 
-      this.hiddenLayerWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.3){
-          return  (2*Math.random() - 1)*value +(Math.random()-0.5) + value;
+      this.hiddenLayerWeights = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.1){
+          return  (Math.random() )*value +2*(Math.random()-0.5) + value;
         }
         return value;
       });
-      this.hiddenLayerBias = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
-        if(Math.random() < 0.3){
-          return  (2*Math.random() - 1)*value +(Math.random()-0.5) + value;
-        }
-        return value;
-      });
-
-      this.funkyWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.3){
-          return  (2*Math.random() - 1)*value +(Math.random()-0.5) + value;
+      this.hiddenLayerBias = Mathjs.random([this.inputSize],-0.01, 0.01).map( function(value, index, matrix) {
+        if(Math.random() < 0.1){
+          return  (Math.random() )*value +2*(Math.random()-0.5) + value;
         }
         return value;
       });
 
-      this.funkyBias = Mathjs.random([this.inputSize]);
+      this.funkyWeights = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.1){
+          return  (Math.random() )*value +2*(Math.random()-0.5) + value;
+        }
+        return value;
+      });
+
+      this.funkyBias = Mathjs.random([this.inputSize],-0.01,0.01);
       this.functions = this.buildFunctionsArray();
       this.numLayers = 1;
 
@@ -231,10 +231,17 @@ class Dumber extends BaseBrain{
 
 
       childBrain.inputWeights = this.inputWeights.map( function(value, index, matrix) {
+        if(Math.random() < 0.1){
+          value = 0.01*(Math.random() - 0.5)*value +0.1*(Math.random()-0.5) + value;
+        }
         if(Math.random() < 0.01){
-          return   0.1 * (Math.random() - 0.5) * value + 0.1 * (Math.random()-0.5) + value;
+          value+= 0.2*(Math.random()-0.5);
+        }
+        if(Math.random() < 0.001){
+          value+= 0.8*(Math.random()-0.5);
         }
         return value;
+
       });
 
       if(Math.random()< 0.01){
@@ -245,26 +252,46 @@ class Dumber extends BaseBrain{
       }
 
       childBrain.inputBias = this.inputBias.map( function(value, index, matrix) {
-        if(Math.random() < 0.01){
-          return   0.1 * (Math.random() - 0.5) * value + 0.1 * (Math.random()-0.5) + value;
+        if(Math.random() < 0.1){
+          value = 0.01*(Math.random() - 0.5)*value +0.1*(Math.random()-0.5) + value;
         }
-        return value ;
+        if(Math.random() < 0.01){
+          value+= 0.2*(Math.random()-0.5);
+        }
+        if(Math.random() < 0.001){
+          value+= 0.8*(Math.random()-0.5);
+        }
+        return value;
+
       });
 
 
       childBrain.hiddenLayerBias = this.hiddenLayerBias.map( function(value, index, matrix) {
+        if(Math.random() < 0.1){
+          value = 0.01*(Math.random() - 0.5)*value +0.1*(Math.random()-0.5) + value;
+        }
         if(Math.random() < 0.01){
-          return   0.1 * (Math.random() - 0.5) * value + 0.1 * (Math.random()-0.5) + value;
+          value+= 0.2*(Math.random()-0.5);
+        }
+        if(Math.random() < 0.001){
+          value+= 0.8*(Math.random()-0.5);
         }
         return value;
+
         });
 
       childBrain.hiddenLayerWeights = this.hiddenLayerWeights.map(function(value, index, matrix){
-        if(Math.random() > 0.01){
-          return   0.1 * (Math.random() - 0.5) * value + 0.1 * (Math.random()-0.5) + value;
+        if(Math.random() < 0.1){
+          value = 0.01*(Math.random() - 0.5)*value +0.1*(Math.random()-0.5) + value;
         }
-
+        if(Math.random() < 0.01){
+          value+= 0.2*(Math.random()-0.5);
+        }
+        if(Math.random() < 0.001){
+          value+= 0.8*(Math.random()-0.5);
+        }
         return value;
+
       });
 
       if(Math.random()< 0.01){
@@ -275,17 +302,31 @@ class Dumber extends BaseBrain{
       }
 
       childBrain.funkyBias = this.funkyBias.map( function(value, index, matrix) {
-        if(Math.random() < 0.5){
-          return   0.1 * (Math.random() - 0.5) * value + 0.1 * (Math.random()-0.5) + value;
-          }
+        if(Math.random() < 0.1){
+          value = 0.01*(Math.random() - 0.5)*value +0.1*(Math.random()-0.5) + value;
+        }
+        if(Math.random() < 0.01){
+          value+= 0.2*(Math.random()-0.5);
+        }
+        if(Math.random() < 0.001){
+          value+= 0.8*(Math.random()-0.5);
+        }
         return value;
+
         });
 
       childBrain.funkyWeights = this.funkyWeights.map( function(value, index, matrix) {
-        if(Math.random() < 0.5){
-          return   0.1 * (Math.random() - 0.5) * value + 0.1 * (Math.random()-0.5) + value;
+        if(Math.random() < 0.1){
+          value = 0.01*(Math.random() - 0.5)*value +0.1*(Math.random()-0.5) + value;
+        }
+        if(Math.random() < 0.01){
+          value+= 0.2*(Math.random()-0.5);
+        }
+        if(Math.random() < 0.001){
+          value+= 0.8*(Math.random()-0.5);
         }
         return value;
+
       });
 
       if(Math.random()< 0.01){

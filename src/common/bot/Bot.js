@@ -21,7 +21,7 @@ const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
 const COLLISION_DAMAGE = 0.005
-const SPIKE_DAMAGE = 0.01;
+const SPIKE_DAMAGE = 0.03;
 const AGE_DAMAGE = 0.000005;
 const HEAT_DAMAGE = 0.0015;
 const OVEREAT_PENALTY = 0.005;
@@ -33,7 +33,7 @@ class Bot {
   constructor() {
     this.kills = 0.0;
     this.class = Bot;
-    this.brain = new Brain();
+    this.brain = new Dumber();
     this.brain.bot = this;
     this.life = 1.0;
     this.maxLife = 1.0;
@@ -239,15 +239,15 @@ class Bot {
     eyeA.imAfukinSensor = false;
     eyeA.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeAInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeAInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeAInput.green += (them.gameColor.green);
     };
     eyeA.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeAInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeAInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeAInput.green += (them.gameColor.green);
     };
     this.eyeA = eyeA;
 
@@ -266,15 +266,15 @@ class Bot {
     eyeA2A.imAfukinSensor = false;
     eyeA2A.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeAInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeAInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeAInput.green += (them.gameColor.green);
     };
     eyeA2A.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeAInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeAInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeAInput.green += (them.gameColor.green);
     };
     this.eyeA2A = eyeA2A;
 
@@ -292,15 +292,15 @@ class Bot {
     eyeA2B.imAfukinSensor = false;
     eyeA2B.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeAInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeAInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeAInput.green += (them.gameColor.green);
     };
     eyeA2B.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeAInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeAInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeAInput.green += (them.gameColor.green);
     };
 
     this.eyeA2B = eyeA2B;
@@ -320,15 +320,15 @@ class Bot {
     eyeB.imAfukinSensor = false;
     eyeB.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeBInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeBInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeBInput.green += (them.gameColor.green);
     };
     eyeB.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeBInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeBInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeBInput.green += (them.gameColor.green);
     };
     this.eyeB = eyeB;
 
@@ -346,15 +346,15 @@ class Bot {
     eyeB2A.imAfukinSensor = false;
     eyeB2A.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeBInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeBInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeBInput.green += (them.gameColor.green);
     };
     eyeB2A.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeBInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeBInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeBInput.green += (them.gameColor.green);
     };
     this.eyeB2A = eyeB2A;
 
@@ -373,15 +373,15 @@ class Bot {
     eyeB2B.imAfukinSensor = false;
     eyeB2B.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeBInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeBInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeBInput.green += (them.gameColor.green);
     };
     eyeB2B.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeBInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeBInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeBInput.green += (them.gameColor.green);
     };
     this.eyeB2B = eyeB2B;
 
@@ -426,15 +426,15 @@ class Bot {
     eyeC2A.imAfukinSensor = false;
     eyeC2A.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC2AInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeC2AInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeC2AInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeC2AInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeC2AInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeC2AInput.green += (them.gameColor.green);
     };
     eyeC2A.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC2AInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeC2AInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeC2AInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeC2AInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeC2AInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeC2AInput.green += (them.gameColor.green);
     };
     this.eyeC2A = eyeC2A;
 
@@ -452,15 +452,15 @@ class Bot {
     eyeC2B.imAfukinSensor = false;
     eyeC2B.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC2BInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeC2BInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeC2BInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeC2BInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeC2BInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeC2BInput.green += (them.gameColor.green);
     };
     eyeC2B.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC2BInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeC2BInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeC2BInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeC2BInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeC2BInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeC2BInput.green += (them.gameColor.green);
     };
     this.eyeC2B = eyeC2B;
 
@@ -479,32 +479,20 @@ class Bot {
     eyeC3A.imAfukinSensor = false;
     eyeC3A.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC3AInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeC3AInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeC3AInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeC3AInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeC3AInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeC3AInput.green += (them.gameColor.green);
     };
     eyeC3A.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC3AInput.red += (them.gameColor.red*0.1);
-      me.gameObject.brain.eyeC3AInput.blue += (them.gameColor.blue*0.1);
-      me.gameObject.brain.eyeC3AInput.green += (them.gameColor.green*0.1);
+      me.gameObject.brain.eyeC3AInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeC3AInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeC3AInput.green += (them.gameColor.green);
     };
     this.eyeC3A = eyeC3A;
 
 
 
-    let left_eye_indicator = Bodies.circle(position.x + eyeC3AOffset.x, position.y + eyeC3AOffset.y, eyeRadius, {
-      collisionFilter: {
-        group: group
-      },
-      restitution: 0.3,
-      isSensor: true,
-      render: {
-        fillStyle: '#aaaaaa'
-      }
-    });
-    left_eye_indicator.gameObject = this;
-    left_eye_indicator.imAfukinSensor = true;
 
 
     let shitA = Matter.Constraint.create({
@@ -639,11 +627,11 @@ class Bot {
     let center_eye_position = Vector.create(11 * Math.cos(behindUs) + this.body.position.x, 11 * Math.sin(behindUs) + this.body.position.y)
     this.brain.center_eye_vision = this.center_eye.scan(Composite.allBodies(this.world), center_eye_position, behindUs);
 
-    let left_eye_angle = behindUs - Math.PI/8;
+    let left_eye_angle = behindUs - Math.PI/12;
     let left_eye_position = Vector.create(11 * Math.cos(left_eye_angle) + this.body.position.x, 11 * Math.sin(left_eye_angle) + this.body.position.y)
     this.brain.left_eye_vision = this.left_eye.scan(Composite.allBodies(this.world), left_eye_position, left_eye_angle);
 
-    let right_eye_angle = behindUs + Math.PI/8;
+    let right_eye_angle = behindUs + Math.PI/12;
     let right_eye_position = Vector.create(11 * Math.cos(right_eye_angle) + this.body.position.x, 11 * Math.sin(right_eye_angle) + this.body.position.y)
     this.brain.right_eye_vision = this.right_eye.scan(Composite.allBodies(this.world), right_eye_position, right_eye_angle);
 
@@ -664,14 +652,14 @@ class Bot {
       let thrustRightSide = this.brain.farts == true ? this.brain.thrust2*3:this.brain.thrust2;
       let turnRightSide =  (this.brain.turn2 + facing) ;
 
-      thrustLeftSide = thrustLeftSide/gluttonPenalty;
-      thrustRightSide = thrustRightSide/gluttonPenalty;
-      if(this.gluttony>0){
-        this.gluttony--;
-      }
+      // thrustLeftSide = thrustLeftSide/gluttonPenalty;
+      // thrustRightSide = thrustRightSide/gluttonPenalty;
+      // if(this.gluttony>0){
+      //   this.gluttony--;
+      // }
       let position = Vector.clone(this.body.position);
-      let leftButtcheek = Vector.create(-1.5 * Math.cos(facing- 1.5) + position.x, -1.5 * Math.sin(facing-1.5) + position.y);
-      let rightButtcheek = Vector.create(-1.5 * Math.cos(facing+1.5) + position.x, -1.5 * Math.sin(facing+1.5) + position.y);
+      let leftButtcheek = Vector.create(-1.5 * Math.cos(facing- 1.5) + position.x, 1.5 * Math.sin(facing-1.5) + position.y);
+      let rightButtcheek = Vector.create(-1.5 * Math.cos(facing+1.5) + position.x, 1.5 * Math.sin(facing+1.5) + position.y);
 //      let butt = position;
       Matter.Body.applyForce(this.body,
         leftButtcheek,
@@ -712,8 +700,8 @@ class Bot {
 
   eat(food){
     // will only eat if wants to
-    // less life the body will make it
-    if(this.brain.wantEat +(1-this.life) > 0.0){
+
+    if(this.brain.wantEat  > 0.0){
       // the amount eaten
       food.life -= 0.02;
 
@@ -722,18 +710,19 @@ class Bot {
       var speedMod = 1.0 - (this.body.speed -20)/100;
       this.life += (0.02 * speedMod);
     }else {
+
       // glutton will take a penalty over time
-      // otherwise it will take damage and then eat to full having no purpose
+      // otherwise it could take damage and then eat to full having no purpose
       this.gluttony++;
     }
 
         // eating, full or not ... could be a bad idea lol
-        this.gestationTimer--;
+
+      this.gestationTimer--;
     }
     // sitting on food ruins it
     food.life -= 0.008;
     if(food.life <0.0){ food.destroy()}
-
     //console.log('nom' + food.class);
   }
 

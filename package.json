@@ -3,12 +3,11 @@
   "version": "0.0.1",
   "description": "making brains",
   "main": "index.js",
-  "bin":"./dist/bundle.js",
-  "repository":{
-    "type":"git",
-    "url":"https://github.com/FelixInglewood/basic-bots.git"
+  "bin": "./dist/bundle.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FelixInglewood/basic-bots.git"
   },
-
   "dependencies": {
     "async": "^2.6.0",
     "babel-cli": "^6.26.0",

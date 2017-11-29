@@ -491,6 +491,22 @@ class Bot {
     };
     this.eyeC3A = eyeC3A;
 
+
+
+    let left_eye_indicator = Bodies.circle(position.x + eyeC3AOffset.x, position.y + eyeC3AOffset.y, eyeRadius, {
+      collisionFilter: {
+        group: group
+      },
+      restitution: 0.3,
+      isSensor: true,
+      render: {
+        fillStyle: '#aaaaaa'
+      }
+    });
+    left_eye_indicator.gameObject = this;
+    left_eye_indicator.imAfukinSensor = true;
+
+
     let shitA = Matter.Constraint.create({
       bodyB: body,
       pointB: eyeAOffset,

@@ -14,7 +14,7 @@ const MIN_BOTS = 5;
 const MAX_BOTS = 30;
 const STARTING_PLANTS = 350;
 const MIN_PLANTS = 250;
-const WALLS = 0;//120;
+const WALLS = 120;
 
 const WIDTH = 2100;
 const HEIGHT = 1800;
@@ -43,12 +43,12 @@ class SimEngine {
   start(){
     let engine = this.physicsEngine;
 
-      // for (let i = 0; i < WALLS; i++){
-      //       new Wall().create(engine.world, {
-      //         x : Mathjs.round(Math.cos(i*3.14/60) * 500 )+WIDTH/2 ,
-      //         y : Mathjs.round(Math.sin(i*3.14/60)* 500 )+HEIGHT/2
-      //       });
-      // }
+      for (let i = 0; i < WALLS; i++){
+            new Wall().create(engine.world, {
+              x : Mathjs.round(Math.cos(i*3.14/60) * 500 )+WIDTH/2 ,
+              y : Mathjs.round(Math.sin(i*3.14/60)* 500 )+HEIGHT/2
+            });
+      }
       // for (let i = 0; i <= HEIGHT; i++){
       //   new Wall().create(engine.world, {
       //           x : WIDTH,
@@ -151,12 +151,12 @@ class SimEngine {
                 }
             }
           }
-          if(botCount < MIN_BOTS && Math.random()>0.999){
+          if(botCount < MIN_BOTS && Math.random()>0.9){
 
             let child = new Bot( );
             if(oldest_brain.age > 0
               && second_oldest_brain.age > 0
-              && third_brain.age > 0
+              && third_oldest_brain.age > 0
               && fourth_oldest_brain.age > 0
               && fifth_oldest_brain.age > 0 ){
               if( Math.random() < 0.25) {

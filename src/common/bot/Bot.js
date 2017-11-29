@@ -140,23 +140,28 @@ class Bot {
     body.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
         if(them.gameObject && them.gameObject.class==Bot){
-          if(them.gameObject.brain.spike > 0.0){
-              let myMomentum = Vector.mult(me.velocity, 1.0);
-              let theirMomentum = Vector.mult(them.velocity, 1.0);
-              let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
+          let myMomentum = Vector.mult(me.velocity, 1.0);
+          let theirMomentum = Vector.mult(them.velocity, 1.0);
+          let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-              let baseDamage = (COLLISION_DAMAGE  * Math.abs(Vector.magnitude(relativeMomentum)));
+          let baseDamage = (COLLISION_DAMAGE  * Math.abs(Vector.magnitude(relativeMomentum)));
+
+          if(them.gameObject.brain.spike > 0.0){
+            //one of thier body parts spiked me
               me.gameObject.life -= baseDamage + ((1 + them.gameObject.brain.spike) * SPIKE_DAMAGE);
               me.gameObject.brain.ouchie += 0.5;
-              them.gameObject.life -= baseDamage ;
-              them.gameObject.brain.ouchie += 0.5;
 
               if(me.gameObject.life <= 0.0){
                 // tell my wife i loved her
                 them.gameObject.kills++
                 them.gameObject.maxLife++;
               }
+          }else{
+            // they didnt spike me, but i still got hit
+            me.gameObject.life -= baseDamage ;
+            me.gameObject.brain.ouchie += 0.5;
           }
+
         } else if(them.gameObject && them.gameObject.class==Plant){
 
                   me.gameObject.eat(them.gameObject);

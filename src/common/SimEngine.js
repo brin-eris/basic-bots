@@ -150,8 +150,8 @@ class SimEngine {
           if(plantCount < MIN_PLANTS){
             plantCount++;
             new Plant().create(engine.world, {
-              x : Mathjs.randomInt(50) * 200,
-              y : Mathjs.randomInt(50) * 200
+              x : Mathjs.randomInt(50) * 20,
+              y : Mathjs.randomInt(50) * 20
               });
 
           }

@@ -12,7 +12,7 @@ const    Wall = require('./world/Wall');
 const STARTING_BOTS = 5;
 const MIN_BOTS = 5;
 const MAX_BOTS = 30;
-const STARTING_PLANTS =250;
+const STARTING_PLANTS = 350;
 const MIN_PLANTS = 250;
 const WALLS = 0;//120;
 
@@ -29,8 +29,8 @@ class SimEngine {
   init(){
     this.physicsEngine = Matter.Engine.create({constraintIterations: 100});
     let engine = this.physicsEngine;
-    engine.world.bounds.min.x = 100;
-    engine.world.bounds.min.y = 100;
+    engine.world.bounds.min.x = 0;
+    engine.world.bounds.min.y = 0;
     engine.world.bounds.max.x = WIDTH;
     engine.world.bounds.max.y = HEIGHT;
 
@@ -77,11 +77,27 @@ class SimEngine {
         });
       }
 
+      let spacer = 2;
+
+      let food_cell_width = 2 * spacer + Plant.get_width();
+      let food_cell_height = 2 * spacer + Plant.get_height();
+
+      let horizontal_center_points = this.horizontal_center_points = Array(Math.floor(WIDTH/food_cell_width));
+      let vertical_center_points = this.vertical_center_points = Array(Math.floor(HEIGHT/food_cell_height));
+
+      for (let i = 0; i < horizontal_center_points.length; i++){
+        horizontal_center_points[i] = i * food_cell_width + 0.5 * food_cell_width;
+      }
+
+      for (let i = 0; i < vertical_center_points.length; i++){
+        vertical_center_points[i] = i * food_cell_height + 0.5 * food_cell_height;
+      }
+
       for (let i = 0; i < STARTING_PLANTS; i++){
-        var angle = Math.random() * 2 * Math.PI;
+
         new Plant().create(engine.world, {
-          x : (Math.cos(angle)*(Math.random()+0.25) * WIDTH/2)+ WIDTH/2,// * 45 + WIDTH/2 +20,
-          y : (Math.sin(angle)*(Math.random()+0.15) * HEIGHT/2)+ HEIGHT/2 // * 45 + HEIGHT/2 +20
+          x : Mathjs.pickRandom(horizontal_center_points),
+          y : Mathjs.pickRandom(vertical_center_points)
           });
       }
 
@@ -89,45 +105,55 @@ class SimEngine {
       Matter.Events.on(engine, "beforeUpdate", function(e){
         let botCount = 0;
         let plantCount = 0;
-        let oldestBot = null;
+        let oldest_brain = {brain: null, age: 0};
+        let second_oldest_brain = {brain: null, age: 0};;
           for (var i = 0; i < engine.world.composites.length; i++) {
             let urmom = engine.world.composites[i];
             if(urmom.gameObject != null ){
               if( urmom.gameObject.class == Bot){
                 urmom.gameObject.tick();
-                if(urmom.gameObject.life <=0){
+                if(urmom.gameObject.life <=0 || urmom.gameObject.age < 0){
                     new Meat(urmom.gameObject.maxLife).create(engine.world, urmom.gameObject.body.position);
                     urmom.gameObject = null;
                     Matter.Composite.remove(engine.world, urmom, true);
                     continue;
                 }
                 botCount++;
-                  if(oldestBot == null || oldestBot.age < urmom.gameObject.age){
-                    oldestBot = urmom.gameObject;
+                  if( oldest_brain.age < urmom.gameObject.age){
+                    second_oldest_brain = oldest_brain;
+                    oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
                   }
                 }else if ( urmom.gameObject.class == Plant){
                   plantCount++;
                 }
             }
           }
-          if(botCount < MIN_BOTS){
-            if(Math.random() < 0.05){
-            oldestBot.spawn({x:WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500});
+          if(botCount < MIN_BOTS && Math.random()>0.999){
+
+            let child = new Bot( );
+            if(oldest_brain.age > 0 && second_oldest_brain.age > 0){
+              if( Math.random() < 0.75) {
+                child.brain = oldest_brain.brain.mutate();
+
+              } else {
+                child.brain = second_oldest_brain.brain.mutate();
+              }
             }
-          if(Math.random() <0.01){
-            new Bot().create(engine.world,{x:WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
+            child.create(engine.world, {x: WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
+
+          } else if(botCount > MAX_BOTS){
+            oldest_brain.brain.age = -100000;
           }
 
-          }else if(botCount > MAX_BOTS){
-            oldestBot.life = -1;
-          }
+
+
           if(plantCount < MIN_PLANTS){
             plantCount++;
-            var angle = Math.random() * 2 * Math.PI;
             new Plant().create(engine.world, {
-              x : (Math.cos(angle)*(Math.random()+0.25) * WIDTH/2)+ WIDTH/2,// * 45 + WIDTH/2 +20,
-              y : (Math.sin(angle)*(Math.random()+0.15) * HEIGHT/2)+ HEIGHT/2 // * 45 + HEIGHT/2 +20
+              x : Mathjs.randomInt(50) * 200,
+              y : Mathjs.randomInt(50) * 200
               });
+
           }
       });
 

@@ -22,27 +22,32 @@ const Composite = require('matter-js').Composite;
 const Mathjs = require('mathjs');
 const COLLISION_DAMAGE = 0.005
 const SPIKE_DAMAGE = 0.01;
-const AGE_DAMAGE = 0.00001;
-const HEAT_DAMAGE = 0.003;
+const AGE_DAMAGE = 0.000005;
+const HEAT_DAMAGE = 0.0015;
 const OVEREAT_PENALTY = 0.005;
-const BOOST_COST = 0.0008;
+const BOOST_COST = 0.0004;
 const GESTATION_TIMER = 100;
-
+const GIVE_AMOUNT = 0.005
 
 class Bot {
   constructor() {
     this.kills = 0.0;
     this.class = Bot;
     this.brain = new Brain();
+    this.brain.bot = this;
     this.life = 1.0;
     this.maxLife = 1.0;
     this.heat = 0.0;
     this.gluttony = 0.0;
+
+    this.center_eye = new Eye();
+    this.left_eye = new Eye();
+    this.right_eye = new Eye();
+
   }
 
   create(world, position) {
 
-    this.scanner = new Eye();
 
     this.centerOfUniverse = {x: world.bounds.max.x/2, y: world.bounds.max.y/2};
     this.phantomZone = ( Mathjs.distance([
@@ -60,13 +65,13 @@ class Bot {
     let offsetRadius = radius * 1.5 + eyeRadius;
     let offsetLayer2Radius = offsetRadius * 2;
 
-    let eyeAOffset = Vector.create( offsetRadius * Math.cos(0.9), offsetRadius * Math.sin(0.9));
-    let eyeA2AOffset = Vector.create( offsetLayer2Radius * Math.cos(2.1), offsetLayer2Radius * Math.sin(2.1));
-    let eyeA2BOffset = Vector.create( offsetLayer2Radius * Math.cos(1.6), offsetLayer2Radius * Math.sin(1.6));
+    let eyeAOffset = Vector.create( offsetRadius * Math.cos(1.1), offsetRadius * Math.sin(1.1));
+    let eyeA2AOffset = Vector.create( offsetRadius * Math.cos(2.1), offsetRadius * Math.sin(2.1));
+    let eyeA2BOffset = Vector.create( offsetRadius * Math.cos(1.6), offsetRadius * Math.sin(1.6));
 
-    let eyeBOffset = Vector.create( offsetRadius * Math.cos(-0.9),  offsetRadius * Math.sin(-0.9));
-    let eyeB2AOffset = Vector.create( offsetLayer2Radius * Math.cos(-2.1),  offsetLayer2Radius * Math.sin(-2.1));
-    let eyeB2BOffset = Vector.create( offsetLayer2Radius * Math.cos(-1.6),  offsetLayer2Radius * Math.sin(-1.6));
+    let eyeBOffset = Vector.create( offsetRadius * Math.cos(-1.1),  offsetRadius * Math.sin(-1.1));
+    let eyeB2AOffset = Vector.create( offsetRadius * Math.cos(-2.1),  offsetRadius * Math.sin(-2.1));
+    let eyeB2BOffset = Vector.create( offsetRadius * Math.cos(-1.6),  offsetRadius * Math.sin(-1.6));
 
 
     let eyeCOffset = Vector.create( offsetRadius * 1.5, 0 );
@@ -609,8 +614,17 @@ class Bot {
     this.brain.heat = this.heat;
     this.brain.life = this.life;
     let behindUs = this.body.angle+Math.PI;
-    let fususj = Vector.create(11 * Math.cos(behindUs) + this.body.position.x, 11 * Math.sin(behindUs) + this.body.position.y)
-    this.brain.vision = this.scanner.scan(Composite.allBodies(this.world), fususj, behindUs);
+
+    let center_eye_position = Vector.create(11 * Math.cos(behindUs) + this.body.position.x, 11 * Math.sin(behindUs) + this.body.position.y)
+    this.brain.center_eye_vision = this.center_eye.scan(Composite.allBodies(this.world), center_eye_position, behindUs);
+
+    let left_eye_angle = behindUs - Math.PI/8;
+    let left_eye_position = Vector.create(11 * Math.cos(left_eye_angle) + this.body.position.x, 11 * Math.sin(left_eye_angle) + this.body.position.y)
+    this.brain.left_eye_vision = this.left_eye.scan(Composite.allBodies(this.world), left_eye_position, left_eye_angle);
+
+    let right_eye_angle = behindUs + Math.PI/8;
+    let right_eye_position = Vector.create(11 * Math.cos(right_eye_angle) + this.body.position.x, 11 * Math.sin(right_eye_angle) + this.body.position.y)
+    this.brain.right_eye_vision = this.right_eye.scan(Composite.allBodies(this.world), right_eye_position, right_eye_angle);
 
 
     // set all brain inputs that arent from events
@@ -703,9 +717,12 @@ class Bot {
   }
 
   give(them){
-    let toGive = 0.01 * this.brain.give;
-    this.life -=toGive;
-    them.life +=toGive;
+    if(them.life<them.maxLife ){
+      let toGive = GIVE_AMOUNT * this.brain.give;
+      this.life -=toGive;
+      them.life +=toGive;
+    }
+
   }
 
   spawn(placement){

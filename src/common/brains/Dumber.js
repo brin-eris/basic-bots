@@ -11,34 +11,34 @@ class Dumber extends BaseBrain{
 
       this.inputWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < 0.3){
-          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+          return  (2*Math.random() - 1)*value +(Math.random()-0.5) + value;
         }
         return value;
       });
 
       this.inputBias = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < 0.3){
-          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+          return  (2*Math.random() - 1)*value +(Math.random()-0.5) + value;
         }
         return value;
       });
 
       this.hiddenLayerWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < 0.3){
-          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+          return  (2*Math.random() - 1)*value +(Math.random()-0.5) + value;
         }
         return value;
       });
       this.hiddenLayerBias = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < 0.3){
-          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+          return  (2*Math.random() - 1)*value +(Math.random()-0.5) + value;
         }
         return value;
       });
 
       this.funkyWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < 0.3){
-          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+          return  (2*Math.random() - 1)*value +(Math.random()-0.5) + value;
         }
         return value;
       });
@@ -190,34 +190,39 @@ class Dumber extends BaseBrain{
       let childBrain = new Dumber();
       childBrain.hawk = this.hawk + (Math.random()-0.5)*.1;
       childBrain.dove = this.dove + (Math.random()-0.5)*.1;
-      if(Math.random() > 0.01){
+      if(Math.random() > 0.1){
         childBrain.hawk*=-1;
         childBrain.dove*=-1;
       }
+
+      childBrain.functionMap = new Array(this.functionMap.length);
 
       for(let i = 0; i< this.functionMap.length; i++){
         childBrain.functionMap[i] = this.functionMap[i];
       }
 
-      if(Math.random() < 0.05){
+      if(Math.random() < 0.01){
         var index = Mathjs.randomInt(childBrain.functionMap.length);
         childBrain.functionMap[index] = Mathjs.pickRandom(this.functions);
       }
+
+      childBrain.functionMap = new Array(this.functionMapY.length);
+
       for(let i = 0; i< this.functionMapY.length; i++){
         childBrain.functionMapY[i] = this.functionMapY[i];
       }
 
-      if(Math.random() < 0.05){
+      if(Math.random() < 0.01){
         var index = Mathjs.randomInt(childBrain.functionMapY.length);
         childBrain.functionMapY[index] = Mathjs.pickRandom(this.functions);
       }
 
       childBrain.numLayers = this.numLayers;
-      if(Math.random() < 0.05){
+      if(Math.random() < 0.01){
         childBrain.numLayers++;
         childBrain.functionMap.push(Mathjs.pickRandom(this.functions));
         childBrain.functionMapY.push(Mathjs.pickRandom(this.functions));
-      }else if (Math.random() < 0.05 && childBrain.numLayers > 1) {
+      }else if (Math.random() < 0.01 && childBrain.numLayers > 1) {
         childBrain.numLayers--;
         childBrain.functionMap.splice(0,1);
         childBrain.functionMapY.splice(0,1);
@@ -226,74 +231,67 @@ class Dumber extends BaseBrain{
 
 
       childBrain.inputWeights = this.inputWeights.map( function(value, index, matrix) {
-        if(Math.random() < 0.05){
-          return (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+        if(Math.random() < 0.01){
+          return   0.1 * (Math.random() - 0.5) * value + 0.1 * (Math.random()-0.5) + value;
         }
         return value;
       });
 
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.01){
         childBrain.inputWeights = Mathjs.transpose(childBrain.inputWeights);
       }
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.01){
         childBrain.inputWeights = Mathjs.inv(childBrain.inputWeights);
       }
 
       childBrain.inputBias = this.inputBias.map( function(value, index, matrix) {
-        if(Math.random() < 0.05){
-          return (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+        if(Math.random() < 0.01){
+          return   0.1 * (Math.random() - 0.5) * value + 0.1 * (Math.random()-0.5) + value;
         }
         return value ;
       });
 
-      // if(Math.random()< 0.1){
-      //   childBrain.inputBias = Mathjs.transpose(childBrain.inputBias);
-      // }
-      //
 
       childBrain.hiddenLayerBias = this.hiddenLayerBias.map( function(value, index, matrix) {
-        if(Math.random() < 0.05){
-          let newValue =  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
-          return newValue;
+        if(Math.random() < 0.01){
+          return   0.1 * (Math.random() - 0.5) * value + 0.1 * (Math.random()-0.5) + value;
         }
         return value;
         });
 
       childBrain.hiddenLayerWeights = this.hiddenLayerWeights.map(function(value, index, matrix){
-        if(Math.random() > 0.05){
-          let newValue = (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
-          return newValue;
+        if(Math.random() > 0.01){
+          return   0.1 * (Math.random() - 0.5) * value + 0.1 * (Math.random()-0.5) + value;
         }
 
         return value;
       });
 
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.01){
         childBrain.hiddenLayerWeights = Mathjs.transpose(childBrain.hiddenLayerWeights);
       }
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.01){
         childBrain.hiddenLayerWeights = Mathjs.inv(childBrain.hiddenLayerWeights);
       }
 
       childBrain.funkyBias = this.funkyBias.map( function(value, index, matrix) {
-        if(Math.random() < 0.05){
-          let newValue =  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
-          return newValue;
-        }
+        if(Math.random() < 0.5){
+          return   0.1 * (Math.random() - 0.5) * value + 0.1 * (Math.random()-0.5) + value;
+          }
         return value;
         });
 
       childBrain.funkyWeights = this.funkyWeights.map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          return  (Math.random() - 0.5)*value +(Math.random()-0.5) + value;
+        if(Math.random() < 0.5){
+          return   0.1 * (Math.random() - 0.5) * value + 0.1 * (Math.random()-0.5) + value;
         }
         return value;
       });
 
-      if(Math.random()< 0.1){
+      if(Math.random()< 0.01){
         childBrain.funkyWeights = Mathjs.transpose(childBrain.funkyWeights);
       }
-      if(Math.random()< 0.1){
+      if(Math.random()< 0.01){
         childBrain.funkyWeights = Mathjs.inv(childBrain.funkyWeights);
       }
       childBrain.buildLayers();

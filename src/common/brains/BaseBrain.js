@@ -2,7 +2,7 @@
 
 const Mathjs = require('mathjs');
 
-const INPUT_SIZE = 37;
+const INPUT_SIZE = 43;
 
 
 class BaseBrain{
@@ -36,8 +36,11 @@ class BaseBrain{
       this.give = 0.0;
       this.ouchie = 0.0;
       this.age = 1;
+      this.life = 1.0
 
-      this.vision = { red:0, green: 0, blue:0 };
+      this.center_eye_vision = { red:0, green: 0, blue:0 };
+      this.left_eye_vision = { red:0, green: 0, blue:0 };
+      this.right_eye_vision = { red:0, green: 0, blue:0 };
 
       this.bodyInput = { red:0, green: 0, blue:0 };
       this.eyeAInput = { red:0, green: 0, blue:0 };
@@ -64,9 +67,17 @@ class BaseBrain{
 
       this.inputVector = Mathjs.matrix([
 
-        this.vision.red,
-        this.vision.blue,
-        this.vision.green,
+        this.center_eye_vision.red,
+        this.center_eye_vision.blue,
+        this.center_eye_vision.green,
+
+        this.left_eye_vision.red,
+        this.left_eye_vision.blue,
+        this.left_eye_vision.green,
+
+        this.right_eye_vision.red,
+        this.right_eye_vision.blue,
+        this.right_eye_vision.green,
 
         this.bodyInput.red,
         this.bodyInput.blue,
@@ -96,6 +107,7 @@ class BaseBrain{
         this.eyeC3AInput.red,
         this.eyeC3AInput.blue,
         this.eyeC3AInput.green,
+
 
         this.spike,
         this.voice,
@@ -160,7 +172,9 @@ class BaseBrain{
       this.soundInput = 0.0;
       this.ouchie = 0.0;
       this.heat = 0.0;
-      this.vision = { red:0, green: 0, blue:0 };
+      this.center_eye_vision = { red:0, green: 0, blue:0 };
+      this.left_eye_vision = { red:0, green: 0, blue:0 };
+      this.right_eye_vision = { red:0, green: 0, blue:0 };
       this.eyeAInput = { red:0, green: 0, blue:0 };
       this.eyeBInput = { red:0, green: 0, blue:0 };
       this.eyeCInput = { red:0, green: 0, blue:0 };

@@ -6,6 +6,15 @@ const    Bodies = require('matter-js').Bodies;
 
 
 class Plant {
+
+  static get_height(){
+    return 30;
+  }
+
+  static get_width(){
+    return 30;
+  }
+
   constructor() {
     this.life = 1.0;
     this.class = Plant;
@@ -16,7 +25,7 @@ class Plant {
           label: 'Plant'
         });
 
-          this.body =  Bodies.rectangle(position.x, position.y, 30, 30, {
+          this.body =  Bodies.rectangle(position.x, position.y, Plant.get_width(), Plant.get_height(), {
             friction: 0.5,
             frictionStatic: 0.1,
             isStatic: true,

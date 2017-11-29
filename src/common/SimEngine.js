@@ -14,7 +14,7 @@ const MIN_BOTS = 5;
 const MAX_BOTS = 30;
 const STARTING_PLANTS = 350;
 const MIN_PLANTS = 250;
-const WALLS = 120;
+const WALLS = 60;
 
 const WIDTH = 2100;
 const HEIGHT = 1800;
@@ -109,7 +109,7 @@ class SimEngine {
         let second_oldest_brain = {brain: null, age: 0};
         let third_oldest_brain = {brain: null, age: 0};
         let fourth_oldest_brain = {brain: null, age: 0};
-        let fith_oldest_brain = {brain: null, age: 0};
+        let fifth_oldest_brain = {brain: null, age: 0};
 
 
           for (var i = 0; i < engine.world.composites.length; i++) {
@@ -125,25 +125,25 @@ class SimEngine {
                 }
                 botCount++;
                   if( oldest_brain.age < urmom.gameObject.age){
-                    fith_oldest_brain = fourth_oldest_brain;
+                    fifth_oldest_brain = fourth_oldest_brain;
                     fourth_oldest_brain = third_oldest_brain;
                     third_oldest_brain = second_oldest_brain;
                     second_oldest_brain = oldest_brain;
                     oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
                   }else if(second_oldest_brain.age < urmom.gameObject.age){
-                    fith_oldest_brain = fourth_oldest_brain;
+                    fifth_oldest_brain = fourth_oldest_brain;
                     fourth_oldest_brain = third_oldest_brain;
                     third_oldest_brain = second_oldest_brain;
                     second_oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
                   }else if(third_oldest_brain.age < urmom.gameObject.age){
-                    fith_oldest_brain = fourth_oldest_brain;
+                    fifth_oldest_brain = fourth_oldest_brain;
                     fourth_oldest_brain = third_oldest_brain;
                     third_oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
                   }else if(fourth_oldest_brain.age < urmom.gameObject.age){
-                    fith_oldest_brain = fourth_oldest_brain;
+                    fifth_oldest_brain = fourth_oldest_brain;
                     fourth_oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
-                  }else if(fith_oldest_brain.age < urmom.gameObject.age){
-                    fith_oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
+                  }else if(fifth_oldest_brain.age < urmom.gameObject.age){
+                    fifth_oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
                   }
                 }
                 if ( urmom.gameObject.class == Plant){

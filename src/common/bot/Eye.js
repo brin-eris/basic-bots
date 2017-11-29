@@ -11,7 +11,7 @@ const Plant = require('../world/Plant');
 const Brain = require('../brains/Brain');
 
 const VIEW_ANGLE =  Math.PI/12;
-const VIEW_DEPTH = 200;
+const VIEW_DEPTH = 150;
 
 class Eye {
 

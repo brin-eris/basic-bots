@@ -80,7 +80,7 @@ class Bot {
     let eyeC3AOffset = Vector.create( offsetLayer2Radius * 1.5,0);
 
 
-    let soundRadius = offsetLayer2Radius *3;
+    let soundRadius = 100;
 
     let bot = Matter.Composite.create({
       label: 'Bot'

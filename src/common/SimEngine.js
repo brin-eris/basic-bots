@@ -135,7 +135,7 @@ class SimEngine {
               if( Math.random() < 0.75) {
                 child.brain = oldest_brain.brain.mutate();
 
-              } else {
+              } else if( Math.random() < 0.75){
                 child.brain = second_oldest_brain.brain.mutate();
               }
             }

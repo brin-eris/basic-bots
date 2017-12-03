@@ -33,7 +33,7 @@ class Bot {
   constructor() {
     this.kills = 0.0;
     this.class = Bot;
-    this.brain = new Dumber();
+    this.brain = new Brain();
     this.brain.bot = this;
     this.life = 1.0;
     this.maxLife = 1.0;
@@ -43,7 +43,8 @@ class Bot {
     this.center_eye = new Eye();
     this.left_eye = new Eye();
     this.right_eye = new Eye();
-
+    this.is_ui_selected = false;
+    this.ui_selection_counter=0;
   }
 
   create(world, position) {
@@ -62,7 +63,7 @@ class Bot {
     let radius = 10;
     this.radius = radius;
     let eyeRadius = 5;
-    let offsetRadius = radius * 1.5 + eyeRadius;
+    let offsetRadius = radius * 1.6 + eyeRadius;
     let offsetLayer2Radius = offsetRadius * 2;
 
     let eyeAOffset = Vector.create( offsetRadius * Math.cos(1.1), offsetRadius * Math.sin(1.1));
@@ -75,8 +76,8 @@ class Bot {
 
 
     let eyeCOffset = Vector.create( offsetRadius * 1.5, 0 );
-    let eyeC2AOffset = Vector.create( offsetLayer2Radius  ,  offsetLayer2Radius * Math.sin(-0.5));
-    let eyeC2BOffset = Vector.create( offsetLayer2Radius , offsetLayer2Radius * Math.sin(0.5));
+    let eyeC2AOffset = Vector.create( offsetLayer2Radius  ,  offsetLayer2Radius * Math.sin(-0.3));
+    let eyeC2BOffset = Vector.create( offsetLayer2Radius , offsetLayer2Radius * Math.sin(0.3));
     let eyeC3AOffset = Vector.create( offsetLayer2Radius * 1.5,0);
 
 
@@ -684,6 +685,24 @@ class Bot {
       this.eyeA.render.fillStyle = this.eyeA2B.render.fillStyle = this.eyeA2A.render.fillStyle =this.rgbToHex(this.brain.eyeColorA.red* 255, this.brain.eyeColorA.blue* 255,this.brain.eyeColorA.green* 255);
       this.eyeB.render.fillStyle = this.eyeB2B.render.fillStyle = this.eyeB2A.render.fillStyle = this.rgbToHex(this.brain.eyeColorB.green* 255,this.brain.eyeColorB.red* 255,this.brain.eyeColorB.blue* 255);
       this.eyeC.render.fillStyle = this.eyeC2B.render.fillStyle = this.eyeC2A.render.fillStyle = this.eyeC3A.render.fillStyle = this.rgbToHex(this.brain.eyeColorC.red* 255,this.brain.eyeColorC.blue* 255,this.brain.eyeColorC.green* 255);
+      if(this.is_ui_selected){
+        this.body.render.strokeStyle =  this.rgbToHex(150,50,0);
+        this.eyeA.render.strokeStyle =  this.rgbToHex(150,50,0);
+        this.eyeB.render.strokeStyle =  this.rgbToHex(150,50,0);
+        this.eyeC.render.strokeStyle =  this.rgbToHex(150,50,0);
+
+        this.body.render.lineWidth = 8;
+        this.eyeA.render.lineWidth = 8;
+        this.eyeB.render.lineWidth = 8;
+        this.eyeC.render.lineWidth = 8;
+      }else{
+        this.ui_selection_counter=0;
+
+        this.body.render.lineWidth = 0;
+        this.eyeA.render.lineWidth = 0;
+        this.eyeB.render.lineWidth = 0;
+        this.eyeC.render.lineWidth = 0;
+      }
 
       if(this.life > 0.7){
         if(this.gestationTimer < 0 && this.brain.interestedInMating){

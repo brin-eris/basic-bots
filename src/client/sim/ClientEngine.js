@@ -7,13 +7,32 @@ const    Events = require('matter-js').Events;
 const    io = require('socket.io');
 
 
-
+const  Bot = require('../../common/bot/Bot');
 const SimEngine = require('../../common/SimEngine')
+
+const selection_holder = {selected: new Bot() };
 
 class ClientEngine extends SimEngine{
   constructor() {
       super();
     }
+
+
+static  up_date_ui_fool(closure){
+
+}
+
+static set_selected_bot(value){
+  selection_holder.selected = value;
+
+      ClientEngine.up_date_ui_fool(value);
+
+
+}
+static get_selected_bot(){
+  return selection_holder.selected;
+}
+
     init(rendererElement){
       super.init();
 
@@ -51,7 +70,24 @@ class ClientEngine extends SimEngine{
                 Matter.World.add(this.physicsEngine.world, mouseConstraint);
 
                 Events.on(mouseConstraint, "mousedown", function(event){
-                  let urmom = event;
+
+                  var bot = ClientEngine.get_selected_bot();
+                  if(bot!=null){
+                    bot.is_ui_selected = false;
+                    ClientEngine.set_selected_bot(null);
+
+                  }
+
+                  if(this.gameObject!=null && this.gameObject.class == Bot){
+
+                    this.gameObject.is_ui_selected = true;
+                    ClientEngine.set_selected_bot(this.gameObject);
+                  }else if(this.body!=null && this.body.gameObject!=null && this.body.gameObject.class == Bot) {
+
+                    this.body.gameObject.is_ui_selected = true;
+                    ClientEngine.set_selected_bot(this.body.gameObject);
+                  }
+
                 });
     }
 

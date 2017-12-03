@@ -11,7 +11,7 @@ class BotViewer extends React.Component {
 
     render(){
       return (
-        <h2>{this.props.value}</h2>
+        <h2>{this.props.age}</h2>
       );
     }
 

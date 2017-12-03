@@ -54,7 +54,7 @@ class BaseBrain{
       this.eyeColorA = { red:0, green: 0, blue:0 };
       this.eyeColorB = { red:0, green: 0, blue:0 };
       this.eyeColorC = { red:0, green: 0, blue:0 };
-
+      this.tailForce = 0;
     }
 
     getInputs(){
@@ -133,10 +133,14 @@ class BaseBrain{
       this.turn2 = (this.outputVector.subset(Mathjs.index(40))-0.5);
       this.thrust2 = (this.outputVector.subset(Mathjs.index(41)) - 0.5)  ;
 
+      this.bodyColor.red = (this.outputVector.subset(Mathjs.index(2)));//* (this.hawk-this.dove);
+      this.bodyColor.green = (this.outputVector.subset(Mathjs.index(3)));
+      this.bodyColor.blue = (this.outputVector.subset(Mathjs.index(4)));//* (this.dove - this.hawk);
+
 
       this.spike = (this.outputVector.subset(Mathjs.index(5))-0.5 -0.1*this.dove +0.1*this.hawk);//-0.2*this.dove +0.2*this.hawk);
 
-      this.give = 0;//(this.outputVector.subset(Mathjs.index(6)) - 0.5 +0.1*this.dove -0.1*this.hawk);//+0.2*this.dove -0.2*this.hawk;
+      this.give = (this.outputVector.subset(Mathjs.index(6)) - 0.5 +0.1*this.dove -0.1*this.hawk);//+0.2*this.dove -0.2*this.hawk;
 
       this.voice = (this.outputVector.subset(Mathjs.index(10)) +
       (this.outputVector.subset(Mathjs.index(13))))/2;//* Mathjs.compare(this.hawk-this.dove,this.dove-this.hawk);
@@ -144,9 +148,6 @@ class BaseBrain{
       this.farts = (this.outputVector.subset(Mathjs.index(12))+
       (this.outputVector.subset(Mathjs.index(11))))/2>0.75;
 
-      this.bodyColor.red = (this.outputVector.subset(Mathjs.index(2)));//* (this.hawk-this.dove);
-      this.bodyColor.green = (this.outputVector.subset(Mathjs.index(3)));
-      this.bodyColor.blue = (this.outputVector.subset(Mathjs.index(4)));//* (this.dove - this.hawk);
 
       this.eyeColorA.red =(this.outputVector.subset(Mathjs.index(14)));
       this.eyeColorA.blue =(this.outputVector.subset(Mathjs.index(15)));
@@ -164,6 +165,9 @@ class BaseBrain{
 
       this.wantEat = (this.outputVector.subset(Mathjs.index(26))-0.5);
       //this.strategy = (this.outputVector.subset(Mathjs.index(23)));
+      this.turn1 = (this.outputVector.subset(Mathjs.index(27))-0.5);
+      this.thrust1 = (this.outputVector.subset(Mathjs.index(28)) - 0.5)  ;
+
 
     }
 

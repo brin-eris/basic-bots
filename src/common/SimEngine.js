@@ -9,10 +9,10 @@ const    Plant = require('./world/Plant');
 const    Meat = require('./world/Meat');
 const    Wall = require('./world/Wall');
 
-const STARTING_BOTS = 5;
-const MIN_BOTS = 5;
-const MAX_BOTS = 30;
-const STARTING_PLANTS = 400;
+const STARTING_BOTS = 7;
+const MIN_BOTS = 7;
+const MAX_BOTS = 20;
+const STARTING_PLANTS = 250;
 const MIN_PLANTS = 250;
 const WALLS = 0;
 

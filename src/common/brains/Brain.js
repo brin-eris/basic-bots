@@ -152,6 +152,16 @@ class Brain extends BaseBrain{
       }
       return childBrain;
     }
+
+    clone(){
+      let neo = new Brain();
+      neo.hiddenLayerWeights = Mathjs.clone(this.hiddenLayerWeights);
+      neo.hiddenLayerBias = Mathjs.clone(this.hiddenLayerBias);
+      neo.inputWeights = Mathjs.clone(this.inputWeights);
+      neo.inputBias = Mathjs.clone(this.inputBias);
+      neo.hawk = this.hawk;
+      neo.dove = this.dove;
+    }
 }
 
 

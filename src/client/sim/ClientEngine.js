@@ -17,18 +17,21 @@ class ClientEngine extends SimEngine{
     }
 
 static save_current_bot(){
-
-  io.emit('save_bot',JSON.stringify( selection_holder.selected.brain));
+  if(selection_holder.selected !=null && selection_holder.selected.body !=null){
+     io.emit('save_bot',JSON.stringify( selection_holder.selected.brain));
+  }
 }
 
  copy_current_bot(){
-let brain = selection_holder.selected.brain;
- let dude = new  Bot();
- dude.brain = brain;
- dude.create(this.physicsEngine.world, {
-  x : (Math.random() -0.5) * 150 + selection_holder.selected.body.position.x+50,
-  y : (Math.random() - 0.5) * 150 + selection_holder.selected.body.position.y+50
-});
+   if(selection_holder.selected !=null&& selection_holder.selected.body !=null){
+     let brain = selection_holder.selected.brain;
+      let dude = new  Bot();
+      dude.brain = brain;
+      dude.create(this.physicsEngine.world, {
+       x : (Math.random() -0.5) * 150 + selection_holder.selected.body.position.x+50,
+       y : (Math.random() - 0.5) * 150 + selection_holder.selected.body.position.y+50
+     });
+   }
 }
 
 static set_selected_bot(value){

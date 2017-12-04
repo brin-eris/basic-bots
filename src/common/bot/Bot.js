@@ -84,7 +84,19 @@ class Bot {
     let soundRadius = 100;
 
     let bot = Matter.Composite.create({
-      label: 'Bot'
+      label: 'Bot',
+      plugin: {
+        wrap: {
+          min: {
+            x: 0,
+            y: 0
+          },
+          max: {
+            x: world.bounds.max.x,
+            y: world.bounds.max.y
+          }
+        }
+      }
     });
 
     let body = Bodies.circle(position.x, position.y, radius, {

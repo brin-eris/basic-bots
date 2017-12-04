@@ -31,44 +31,22 @@ class SimEngine {
     let engine = this.physicsEngine;
     engine.world.bounds.min.x = 0;
     engine.world.bounds.min.y = 0;
-    engine.world.bounds.max.x = WIDTH;
-    engine.world.bounds.max.y = HEIGHT;
-
-
-      engine.world.gravity.y = 0;
-      engine.world.gravity.x = 0;
-
-  }
+    engine.world.bounds.max.x = this.width;
+    engine.world.bounds.max.y = this.height;
+    engine.world.gravity.y = 0;
+    engine.world.gravity.x = 0;
+}
 
   start(){
     let engine = this.physicsEngine;
 
-      for (let i = 0; i < WALLS; i++){
+      for( let i = 0; i < WALLS; i++){
             new Wall().create(engine.world, {
               x : Mathjs.round(Math.cos(i*3.14/60) * 500 )+WIDTH/2 ,
               y : Mathjs.round(Math.sin(i*3.14/60)* 500 )+HEIGHT/2
             });
       }
-      // for (let i = 0; i <= HEIGHT; i++){
-      //   new Wall().create(engine.world, {
-      //           x : WIDTH,
-      //           y : i
-      //         });
-      //   new Wall().create(engine.world, {
-      //                 x : 0,
-      //                 y : i
-      //     });
-      // }
-      // for (let i = 0; i <= WIDTH; i++){
-      //   new Wall().create(engine.world, {
-      //           x : i,
-      //           y : 0
-      //         });
-      //   new Wall().create(engine.world, {
-      //                 x : i,
-      //                 y : HEIGHT
-      //     });
-      //   }
+
 
       for (let i = 0; i < STARTING_BOTS; i++ ){
         new  Bot().create(engine.world, {
@@ -102,17 +80,13 @@ class SimEngine {
       }
 
       let oldest_brain = {brain: null, age: 0};
-      let second_oldest_brain = {brain: null, age: 0};
-      let third_oldest_brain = {brain: null, age: 0};
-      let fourth_oldest_brain = {brain: null, age: 0};
-      let fifth_oldest_brain = {brain: null, age: 0};
 
 
       Matter.Events.on(engine, "beforeUpdate", function(e){
         let botCount = 0;
         let plantCount = 0;
 
-          for (var i = 0; i < engine.world.composites.length; i++) {
+        for (var i = 0; i < engine.world.composites.length; i++) {
             let urmom = engine.world.composites[i];
             if(urmom.gameObject != null ){
               if( urmom.gameObject.class == Bot){
@@ -126,61 +100,22 @@ class SimEngine {
                 botCount++;
                 // lol not so trivial
                   if( oldest_brain.age < urmom.gameObject.age){
-                    fifth_oldest_brain = fourth_oldest_brain;
-                    fourth_oldest_brain = third_oldest_brain;
-                    third_oldest_brain = second_oldest_brain;
-                    second_oldest_brain = oldest_brain;
                     oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
-                  }else if(second_oldest_brain.age < urmom.gameObject.age){
-                    fifth_oldest_brain = fourth_oldest_brain;
-                    fourth_oldest_brain = third_oldest_brain;
-                    third_oldest_brain = second_oldest_brain;
-                    second_oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
-                  }else if(third_oldest_brain.age < urmom.gameObject.age){
-                    fifth_oldest_brain = fourth_oldest_brain;
-                    fourth_oldest_brain = third_oldest_brain;
-                    third_oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
-                  }else if(fourth_oldest_brain.age < urmom.gameObject.age){
-                    fifth_oldest_brain = fourth_oldest_brain;
-                    fourth_oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
-                  }else if(fifth_oldest_brain.age < urmom.gameObject.age){
-                    fifth_oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
                   }
                 }
                 if ( urmom.gameObject.class == Plant){
-                  plantCount++;
+                    plantCount++;
                 }
             }
           }
           if(botCount < MIN_BOTS && Math.random()>0.9){
 
             let child = new Bot( );
-            if(oldest_brain.age > 0
-              && second_oldest_brain.age > 0
-              && third_oldest_brain.age > 0
-              && fourth_oldest_brain.age > 0
-              && fifth_oldest_brain.age > 0 ){
-              if( Math.random() < 0.2) {
-                child.brain = oldest_brain.brain.mutate();
-
-              } //else if( Math.random() < 0.2){
-              //   child.brain = second_oldest_brain.brain.mutate();
-              // }else if( Math.random() < 0.2){
-              //   child.brain = third_oldest_brain.brain.mutate();
-              // }else if( Math.random() < 0.2){
-              //   child.brain = fourth_oldest_brain.brain.mutate();
-              // }else if( Math.random() < 0.2){
-              //   child.brain = fifth_oldest_brain.brain.mutate();
-              // }
+            if(oldest_brain.age > 0){
+              child.brain = oldest_brain.brain.mutate();
             }
             child.create(engine.world, {x: WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
-
           }
-          // else if(botCount > MAX_BOTS){
-          //   oldest_brain.brain.age = -100000;
-          // }
-
-
 
           if(plantCount < MIN_PLANTS){
             plantCount++;

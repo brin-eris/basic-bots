@@ -13,17 +13,14 @@ const Engine = new ClientEngine();
 
 document.addEventListener('DOMContentLoaded', function(e) {
 
-
-  var wut = ReactDOM.render(
-    <MainUI />,
-    document.getElementById('ui')
-  );
-
-
       Engine.init(document.getElementById('sim'));
       Engine.start();
-      ClientEngine.up_date_ui_fool = function(bot){
-        wut.renderBot(bot);
-      }
 
+      document.getElementById("save").addEventListener("click", function( event ) {
+        ClientEngine.save_current_bot();
+      }, false);
+
+      document.getElementById("copy").addEventListener("click", function( event ) {
+        Engine.copy_current_bot();
+      }, false);
 });

@@ -1,10 +1,31 @@
 
 .sim {
+  left: 0;
+  top: 0;
   width: 80%;
   height: 100%;
+  overflow: scroll;
 }
 
-.ui {
-  width: 20%;
-  height: 100%;
+.btn{
+  width: 100px;
+  height: 40px;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+
+
+
+ui {
+    background-color: orange;
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 20%;
+    overflow:hidden;
 }

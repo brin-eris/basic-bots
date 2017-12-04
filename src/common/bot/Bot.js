@@ -33,8 +33,8 @@ class Bot {
   constructor() {
     this.kills = 0.0;
     this.class = Bot;
-    this.brain = new Brain();
-    this.brain.bot = this;
+    this.brain = new Dumber();
+
     this.life = 1.0;
     this.maxLife = 1.0;
     this.heat = 0.0;
@@ -44,7 +44,7 @@ class Bot {
     this.left_eye = new Eye();
     this.right_eye = new Eye();
     this.is_ui_selected = false;
-    this.ui_selection_counter=0;
+
   }
 
   create(world, position) {

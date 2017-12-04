@@ -4,8 +4,7 @@ const    Matter = require('matter-js');
 const    MatterWrap = require('matter-wrap');
 const    MatterAttractors = require('matter-attractors');
 const    Events = require('matter-js').Events;
-const    io = require('socket.io');
-
+const    io = require('socket.io-client')('http://localhost:3000/');
 
 const  Bot = require('../../common/bot/Bot');
 const SimEngine = require('../../common/SimEngine')
@@ -17,18 +16,25 @@ class ClientEngine extends SimEngine{
       super();
     }
 
+static save_current_bot(){
 
-static  up_date_ui_fool(closure){
+  io.emit('save_bot',JSON.stringify( selection_holder.selected.brain));
+}
 
+ copy_current_bot(){
+let brain = selection_holder.selected.brain;
+ let dude = new  Bot();
+ dude.brain = brain;
+ dude.create(this.physicsEngine.world, {
+  x : (Math.random() -0.5) * 150 + selection_holder.selected.body.position.x+50,
+  y : (Math.random() - 0.5) * 150 + selection_holder.selected.body.position.y+50
+});
 }
 
 static set_selected_bot(value){
   selection_holder.selected = value;
-
-      ClientEngine.up_date_ui_fool(value);
-
-
 }
+
 static get_selected_bot(){
   return selection_holder.selected;
 }

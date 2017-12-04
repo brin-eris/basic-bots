@@ -23,4 +23,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
       document.getElementById("copy").addEventListener("click", function( event ) {
         Engine.copy_current_bot();
       }, false);
+
+      document.getElementById("mutate").addEventListener("click", function( event ) {
+        Engine.mutate_current_bot();
+      }, false);
 });

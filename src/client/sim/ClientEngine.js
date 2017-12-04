@@ -32,7 +32,19 @@ static save_current_bot(){
        y : (Math.random() - 0.5) * 150 + selection_holder.selected.body.position.y+50
      });
    }
-}
+ }
+
+ mutate_current_bot(){
+   if(selection_holder.selected !=null&& selection_holder.selected.body !=null){
+     let brain = selection_holder.selected.brain.mutate();
+      let dude = new  Bot();
+      dude.brain = brain;
+      dude.create(this.physicsEngine.world, {
+       x : (Math.random() -0.5) * 150 + selection_holder.selected.body.position.x+50,
+       y : (Math.random() - 0.5) * 150 + selection_holder.selected.body.position.y+50
+     });
+   }
+ }
 
 static set_selected_bot(value){
   selection_holder.selected = value;

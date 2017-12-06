@@ -6,7 +6,7 @@ Matter.use('matter-wrap');
 
 const    MatterAttractors = require('matter-attractors');
 const    Events = require('matter-js').Events;
-const    io = require('socket.io-client')(window.location.hostname+':3000/');
+const    io = require('socket.io-client')();
 
 const  Bot = require('../../common/bot/Bot');
 const SimEngine = require('../../common/SimEngine')

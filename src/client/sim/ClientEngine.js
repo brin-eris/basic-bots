@@ -26,9 +26,9 @@ static save_current_bot(){
    if(selection_holder.selected !=null&& selection_holder.selected.body !=null){
      let brain = selection_holder.selected.brain;
       let dude = new  Bot();
-      dude.brain = brain;
+      dude.brain = brain.clone();
       dude.create(this.physicsEngine.world, {
-       x : (Math.random() -0.5) * 150 + selection_holder.selected.body.position.x+50,
+       x : (Math.random() -0.5) * 150 + selection_holder.selected.body.position.x+150,
        y : (Math.random() - 0.5) * 150 + selection_holder.selected.body.position.y+50
      });
    }
@@ -36,12 +36,12 @@ static save_current_bot(){
 
  mutate_current_bot(){
    if(selection_holder.selected !=null&& selection_holder.selected.body !=null){
-     let brain = selection_holder.selected.brain.mutate();
+     let brain = selection_holder.selected.brain;
       let dude = new  Bot();
-      dude.brain = brain;
+      dude.brain = brain.mutate();
       dude.create(this.physicsEngine.world, {
-       x : (Math.random() -0.5) * 150 + selection_holder.selected.body.position.x+50,
-       y : (Math.random() - 0.5) * 150 + selection_holder.selected.body.position.y+50
+       x : (Math.random() -0.5) * 150 + selection_holder.selected.body.position.x+150,
+       y : (Math.random() - 0.5) * 150 + selection_holder.selected.body.position.y+150
      });
    }
  }
@@ -63,8 +63,8 @@ static get_selected_bot(){
             element: this.rendererElement,
             engine: this.physicsEngine,
             options: {
-                width: this.width*1.1,
-                height: this.height*1.1,
+                width: this.width,
+                height: this.height,
                 // showForce: true,
                 //  showAngleIndicator: true,
                 //  showCollisions: true,
@@ -96,7 +96,6 @@ static get_selected_bot(){
                   if(bot!=null){
                     bot.is_ui_selected = false;
                     ClientEngine.set_selected_bot(null);
-
                   }
 
                   if(this.gameObject!=null && this.gameObject.class == Bot){

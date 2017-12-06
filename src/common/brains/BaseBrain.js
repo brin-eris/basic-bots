@@ -128,25 +128,25 @@ class BaseBrain{
 
 
     getOutputs(){
-      this.turn1 = (this.outputVector.subset(Mathjs.index(30))-0.5);
-      this.thrust1 = (this.outputVector.subset(Mathjs.index(31)) - 0.5)  ;
-      this.turn2 = (this.outputVector.subset(Mathjs.index(40))-0.5);
-      this.thrust2 = (this.outputVector.subset(Mathjs.index(41)) - 0.5)  ;
+      this.turn1 = (this.outputVector.subset(Mathjs.index(0))-0.5);
+      this.thrust1 = (this.outputVector.subset(Mathjs.index(1)) - 0.5)  ;
+      this.turn2 = (this.outputVector.subset(Mathjs.index(2))-0.5);
+      this.thrust2 = (this.outputVector.subset(Mathjs.index(3)) - 0.5)  ;
 
-      this.bodyColor.red = (this.outputVector.subset(Mathjs.index(2)));//* (this.hawk-this.dove);
-      this.bodyColor.green = (this.outputVector.subset(Mathjs.index(3)));
-      this.bodyColor.blue = (this.outputVector.subset(Mathjs.index(4)));//* (this.dove - this.hawk);
+      this.bodyColor.red = (this.outputVector.subset(Mathjs.index(5)));//* (this.hawk-this.dove);
+      this.bodyColor.green = (this.outputVector.subset(Mathjs.index(6)));
+      this.bodyColor.blue = (this.outputVector.subset(Mathjs.index(7)));//* (this.dove - this.hawk);
 
 
-      this.spike = (this.outputVector.subset(Mathjs.index(5))-0.5 -0.1*this.dove +0.1*this.hawk);//-0.2*this.dove +0.2*this.hawk);
+      this.spike = (this.outputVector.subset(Mathjs.index(8))-0.5 -0.1*this.dove +0.1*this.hawk);//-0.2*this.dove +0.2*this.hawk);
 
-      this.give = (this.outputVector.subset(Mathjs.index(6)) - 0.5 +0.1*this.dove -0.1*this.hawk);//+0.2*this.dove -0.2*this.hawk;
+      this.give = (this.outputVector.subset(Mathjs.index(9)) - 0.5 +0.1*this.dove -0.1*this.hawk);//+0.2*this.dove -0.2*this.hawk;
 
       this.voice = (this.outputVector.subset(Mathjs.index(10)) +
-      (this.outputVector.subset(Mathjs.index(13))))/2;//* Mathjs.compare(this.hawk-this.dove,this.dove-this.hawk);
+      (this.outputVector.subset(Mathjs.index(11))))/2;//* Mathjs.compare(this.hawk-this.dove,this.dove-this.hawk);
 
       this.farts = (this.outputVector.subset(Mathjs.index(12))+
-      (this.outputVector.subset(Mathjs.index(11))))/2>0.75;
+      (this.outputVector.subset(Mathjs.index(13))))/2>0.75;
 
 
       this.eyeColorA.red =(this.outputVector.subset(Mathjs.index(14)));
@@ -159,15 +159,9 @@ class BaseBrain{
       this.eyeColorC.blue =(this.outputVector.subset(Mathjs.index(21)));
       this.eyeColorC.green =(this.outputVector.subset(Mathjs.index(22)));
 
-      this.interestedInMating = ((this.outputVector.subset(Mathjs.index(23))-0.5)+
-      (this.outputVector.subset(Mathjs.index(24))-0.5)+
-      (this.outputVector.subset(Mathjs.index(25))-0.5))>0.0;
+      this.interestedInMating = (this.outputVector.subset(Mathjs.index(23)))>0.5;
 
       this.wantEat = (this.outputVector.subset(Mathjs.index(26))-0.5);
-      //this.strategy = (this.outputVector.subset(Mathjs.index(23)));
-      this.turn1 = (this.outputVector.subset(Mathjs.index(27))-0.5);
-      this.thrust1 = (this.outputVector.subset(Mathjs.index(28)) - 0.5)  ;
-
 
     }
 

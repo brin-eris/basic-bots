@@ -49,26 +49,6 @@ class SimEngine {
               y : Mathjs.round(Math.sin(i*3.14/60)* 500 )+HEIGHT/2
             });
       }
-      // for (let i = 0; i <= HEIGHT; i++){
-      //   new Wall().create(engine.world, {
-      //           x : WIDTH,
-      //           y : i
-      //         });
-      //   new Wall().create(engine.world, {
-      //                 x : 0,
-      //                 y : i
-      //     });
-      // }
-      // for (let i = 0; i <= WIDTH; i++){
-      //   new Wall().create(engine.world, {
-      //           x : i,
-      //           y : 0
-      //         });
-      //   new Wall().create(engine.world, {
-      //                 x : i,
-      //                 y : HEIGHT
-      //     });
-      //   }
 
       for (let i = 0; i < STARTING_BOTS; i++ ){
         new  Bot().create(engine.world, {
@@ -126,25 +106,7 @@ class SimEngine {
                 botCount++;
                 // lol not so trivial
                   if( oldest_brain.age < urmom.gameObject.age){
-                    fifth_oldest_brain = fourth_oldest_brain;
-                    fourth_oldest_brain = third_oldest_brain;
-                    third_oldest_brain = second_oldest_brain;
-                    second_oldest_brain = oldest_brain;
                     oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
-                  }else if(second_oldest_brain.age < urmom.gameObject.age){
-                    fifth_oldest_brain = fourth_oldest_brain;
-                    fourth_oldest_brain = third_oldest_brain;
-                    third_oldest_brain = second_oldest_brain;
-                    second_oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
-                  }else if(third_oldest_brain.age < urmom.gameObject.age){
-                    fifth_oldest_brain = fourth_oldest_brain;
-                    fourth_oldest_brain = third_oldest_brain;
-                    third_oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
-                  }else if(fourth_oldest_brain.age < urmom.gameObject.age){
-                    fifth_oldest_brain = fourth_oldest_brain;
-                    fourth_oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
-                  }else if(fifth_oldest_brain.age < urmom.gameObject.age){
-                    fifth_oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
                   }
                 }
                 if ( urmom.gameObject.class == Plant){
@@ -155,40 +117,22 @@ class SimEngine {
           if(botCount < MIN_BOTS && Math.random()>0.9){
 
             let child = new Bot( );
-            if(oldest_brain.age > 0
-              && second_oldest_brain.age > 0
-              && third_oldest_brain.age > 0
-              && fourth_oldest_brain.age > 0
-              && fifth_oldest_brain.age > 0 ){
-              if( Math.random() < 0.2) {
-                child.brain = oldest_brain.brain.mutate();
-
-              } //else if( Math.random() < 0.2){
-              //   child.brain = second_oldest_brain.brain.mutate();
-              // }else if( Math.random() < 0.2){
-              //   child.brain = third_oldest_brain.brain.mutate();
-              // }else if( Math.random() < 0.2){
-              //   child.brain = fourth_oldest_brain.brain.mutate();
-              // }else if( Math.random() < 0.2){
-              //   child.brain = fifth_oldest_brain.brain.mutate();
-              // }
-            }
+            // if(oldest_brain.age > 0){
+            //   if( Math.random() < 0.5) {
+            //     child.brain = oldest_brain.brain.mutate();
+            //   }
+            // }
             child.create(engine.world, {x: WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
 
           }
-          // else if(botCount > MAX_BOTS){
-          //   oldest_brain.brain.age = -100000;
-          // }
-
 
 
           if(plantCount < MIN_PLANTS){
             plantCount++;
             new Plant().create(engine.world, {
-              x : Mathjs.randomInt(50) * 20+WIDTH/2,
-              y : Mathjs.randomInt(50) * 20+HEIGHT/2
+              x : Mathjs.pickRandom(horizontal_center_points),
+              y : Mathjs.pickRandom(vertical_center_points)
               });
-
           }
       });
 

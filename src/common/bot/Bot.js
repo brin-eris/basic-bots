@@ -26,7 +26,7 @@ const AGE_DAMAGE = 0.000005;
 const HEAT_DAMAGE = 0.0015;
 const OVEREAT_PENALTY = 0.005;
 const BOOST_COST = 0.0004;
-const GESTATION_TIMER = 100;
+const GESTATION_TIMER = 20;
 const GIVE_AMOUNT = 0.005
 
 class Bot {
@@ -204,22 +204,29 @@ class Bot {
       if(them.gameObject){
         if(them.gameObject.class==Bot){
 
-              me.gameObject.brain.soundInput += 0.1*them.gameObject.voice ;
+              me.gameObject.brain.soundInput += them.gameObject.voice ;
 
               //console.log(them.gameObject.voice);
               if(me.gameObject.brain.give > 0.0 ){
                 me.gameObject.give(them.gameObject);
               }
         }else if(them.gameObject.class==Meat){
+          me.gameObject.brain.smellMeat += 0.2;
+        }
+
+      }
+    };
+
+    soundSensor.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      if(them.gameObject){
+        if(them.gameObject.class==Bot){
+          me.gameObject.brain.soundInput += 0.1*them.gameObject.voice ;
+          if(me.gameObject.brain.give > 0.0 ){
+                me.gameObject.give(them.gameObject);
+              }
+        }else if(them.gameObject.class==Meat){
           me.gameObject.brain.smellMeat += 0.1;
-            // only the blood thirsty eat meat
-            // if(me.gameObject.brain.hawk > 0){
-            //   //console.log('fresh meat!')
-            //   this.gestationTimer-=5;
-            //   me.gameObject.eat(them.gameObject);
-            //   me.gameObject.eat(them.gameObject);
-            //
-            // }
         }
 
       }
@@ -410,6 +417,12 @@ class Bot {
       me.gameObject.brain.eyeCInput.red += (them.gameColor.red*0.8);
       me.gameObject.brain.eyeCInput.blue += (them.gameColor.blue*0.8);
       me.gameObject.brain.eyeCInput.green += (them.gameColor.green*0.8);
+      if(them.gameObject.class == Bot){
+        if(me.gameObject.will_mate && them.gameObject.will_mate){
+          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+        }
+      }
     };
     this.eyeC = eyeC;
 
@@ -436,6 +449,12 @@ class Bot {
       me.gameObject.brain.eyeC2AInput.red += (them.gameColor.red);
       me.gameObject.brain.eyeC2AInput.blue += (them.gameColor.blue);
       me.gameObject.brain.eyeC2AInput.green += (them.gameColor.green);
+      if(them.gameObject.class == Bot){
+        if(me.gameObject.will_mate && them.gameObject.will_mate){
+          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+        }
+      }
     };
     this.eyeC2A = eyeC2A;
 
@@ -462,6 +481,12 @@ class Bot {
       me.gameObject.brain.eyeC2BInput.red += (them.gameColor.red);
       me.gameObject.brain.eyeC2BInput.blue += (them.gameColor.blue);
       me.gameObject.brain.eyeC2BInput.green += (them.gameColor.green);
+      if(them.gameObject.class == Bot){
+        if(me.gameObject.will_mate && them.gameObject.will_mate){
+          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+        }
+      }
     };
     this.eyeC2B = eyeC2B;
 
@@ -489,6 +514,12 @@ class Bot {
       me.gameObject.brain.eyeC3AInput.red += (them.gameColor.red);
       me.gameObject.brain.eyeC3AInput.blue += (them.gameColor.blue);
       me.gameObject.brain.eyeC3AInput.green += (them.gameColor.green);
+      if(them.gameObject.class == Bot){
+        if(me.gameObject.will_mate && them.gameObject.will_mate){
+          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+        }
+      }
     };
     this.eyeC3A = eyeC3A;
 
@@ -653,15 +684,11 @@ class Bot {
       let thrustRightSide = this.brain.farts == true ? this.brain.thrust2*3:this.brain.thrust2;
       let turnRightSide =  (this.brain.turn2 + facing) ;
 
-      // thrustLeftSide = thrustLeftSide/gluttonPenalty;
-      // thrustRightSide = thrustRightSide/gluttonPenalty;
-      // if(this.gluttony>0){
-      //   this.gluttony--;
-      // }
+
       let position = Vector.clone(this.body.position);
-      let leftButtcheek = Vector.create(-1.5 * Math.cos(facing- 1.5) + position.x, 1.5 * Math.sin(facing-1.5) + position.y);
-      let rightButtcheek = Vector.create(-1.5 * Math.cos(facing+1.5) + position.x, 1.5 * Math.sin(facing+1.5) + position.y);
-//      let butt = position;
+      let leftButtcheek = Vector.create(1.5 * Math.cos(facing - Mathjs.PI) + position.x, 1.5 * Math.sin(facing - Mathjs.PI) + position.y);
+      let rightButtcheek = Vector.create(1.5 * Math.cos(facing + Mathjs.PI) + position.x, 1.5 * Math.sin(facing + Mathjs.PI) + position.y);
+
       Matter.Body.applyForce(this.body,
         leftButtcheek,
         Vector.create(thrustLeftSide * Math.cos(turnLeftSide), thrustLeftSide * Math.sin(turnLeftSide)));
@@ -682,9 +709,9 @@ class Bot {
       this.body.gameColor = this.brain.bodyColor;
 
       this.body.render.fillStyle = this.rgbToHex(this.body.gameColor.red * 255, this.body.gameColor.green * 255, this.body.gameColor.blue * 255);
-      this.eyeA.render.fillStyle = this.eyeA2B.render.fillStyle = this.eyeA2A.render.fillStyle =this.rgbToHex(this.brain.eyeColorA.red* 255, this.brain.eyeColorA.blue* 255,this.brain.eyeColorA.green* 255);
-      this.eyeB.render.fillStyle = this.eyeB2B.render.fillStyle = this.eyeB2A.render.fillStyle = this.rgbToHex(this.brain.eyeColorB.green* 255,this.brain.eyeColorB.red* 255,this.brain.eyeColorB.blue* 255);
-      this.eyeC.render.fillStyle = this.eyeC2B.render.fillStyle = this.eyeC2A.render.fillStyle = this.eyeC3A.render.fillStyle = this.rgbToHex(this.brain.eyeColorC.red* 255,this.brain.eyeColorC.blue* 255,this.brain.eyeColorC.green* 255);
+      this.eyeA.render.fillStyle = this.eyeA2B.render.fillStyle = this.eyeA2A.render.fillStyle =this.rgbToHex(this.brain.eyeColorA.red* 255, this.brain.eyeColorA.green* 255,this.brain.eyeColorA.blue* 255);
+      this.eyeB.render.fillStyle = this.eyeB2B.render.fillStyle = this.eyeB2A.render.fillStyle = this.rgbToHex(this.brain.eyeColorB.red* 255,this.brain.eyeColorB.green* 255,this.brain.eyeColorB.blue* 255);
+      this.eyeC.render.fillStyle = this.eyeC2B.render.fillStyle = this.eyeC2A.render.fillStyle = this.eyeC3A.render.fillStyle = this.rgbToHex(this.brain.eyeColorC.red* 255,this.brain.eyeColorC.green* 255,this.brain.eyeColorC.blue* 255);
       if(this.is_ui_selected){
         this.body.render.strokeStyle =  this.rgbToHex(150,50,0);
         this.eyeA.render.strokeStyle =  this.rgbToHex(150,50,0);
@@ -704,18 +731,25 @@ class Bot {
         this.eyeC.render.lineWidth = 0;
       }
 
-      if(this.life > 0.7){
-        if(this.gestationTimer < 0 && this.brain.interestedInMating){
-          this.spawn(this.body.position);
-          this.spawn(this.body.position);
 
-          this.life = this.life * 0.5;
-          //console.log('natural birth');
-          this.gestationTimer = GESTATION_TIMER;
+        if(this.gestationTimer < 1 && this.brain.interestedInMating){
+          this.will_mate = true;
+        }else{
+          this.will_mate = false;
         }
 
-      }
   }
+
+    mate(channel_A, channel_B){
+      let child = new Bot();
+      child.maxLife = this.maxLife;
+      child.brain.rebuild(channel_A, channel_B);
+      child.create(this.world, Vector.create(this.body.position.x -150*Math.random(), this.body.position.y -150*Math.random()));
+
+      console.log('natural birth');
+      this.gestationTimer = GESTATION_TIMER;
+      this.will_mate = false;
+    }
 
   eat(food){
     // will only eat if wants to

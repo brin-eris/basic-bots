@@ -2,6 +2,8 @@
 const    Mathjs = require('mathjs');
 const    Matter = require('matter-js');
 const    MatterWrap = require('matter-wrap');
+Matter.use('matter-wrap');
+
 const    MatterAttractors = require('matter-attractors');
 const    Events = require('matter-js').Events;
 const    io = require('socket.io-client')('http://localhost:3000/');
@@ -20,6 +22,14 @@ static save_current_bot(){
   if(selection_holder.selected !=null && selection_holder.selected.body !=null){
      io.emit('save_bot',JSON.stringify( selection_holder.selected.brain));
   }
+}
+
+static set_selected_bot(value){
+  selection_holder.selected = value;
+}
+
+static get_selected_bot(){
+  return selection_holder.selected;
 }
 
  copy_current_bot(){
@@ -46,13 +56,17 @@ static save_current_bot(){
    }
  }
 
-static set_selected_bot(value){
-  selection_holder.selected = value;
-}
 
-static get_selected_bot(){
-  return selection_holder.selected;
-}
+  pause(){
+    if(this.is_renderer_running == true){
+      Matter.Render.stop(this.render);
+      this.is_renderer_running = false;
+    }else{
+      Matter.Render.run(this.render);
+      this.is_renderer_running = true;
+    }
+  }
+
 
     init(rendererElement){
       super.init();
@@ -116,7 +130,7 @@ static get_selected_bot(){
         super.start();
 
         Matter.Render.run(this.render);
-
+        this.is_renderer_running = true;
     }
 
 

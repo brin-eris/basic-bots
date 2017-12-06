@@ -27,4 +27,8 @@ document.addEventListener('DOMContentLoaded', function(e) {
       document.getElementById("mutate").addEventListener("click", function( event ) {
         Engine.mutate_current_bot();
       }, false);
+
+      document.getElementById("pause").addEventListener("click", function( event ) {
+        Engine.pause();
+      }, false);
 });

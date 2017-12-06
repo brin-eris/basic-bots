@@ -117,11 +117,7 @@ class SimEngine {
           if(botCount < MIN_BOTS && Math.random()>0.9){
 
             let child = new Bot( );
-            // if(oldest_brain.age > 0){
-            //   if( Math.random() < 0.5) {
-            //     child.brain = oldest_brain.brain.mutate();
-            //   }
-            // }
+          
             child.create(engine.world, {x: WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
 
           }

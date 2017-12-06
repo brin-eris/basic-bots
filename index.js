@@ -30,8 +30,8 @@ io.on('connection', function(client) {
           console.log('loading:');
 
           //let file_name = path.join(data_path, 'bot: ' + Date.now());
-          fs.readdir(data_path, function(){
-            
+          fs.readdir(data_path, function(data){
+
           });
         });
       });

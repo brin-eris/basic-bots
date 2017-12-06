@@ -117,7 +117,7 @@ class SimEngine {
           if(botCount < MIN_BOTS && Math.random()>0.9){
 
             let child = new Bot( );
-          
+
             child.create(engine.world, {x: WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
 
           }

@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
       Engine.start();
 
       document.getElementById("save").addEventListener("click", function( event ) {
-        ClientEngine.save_current_bot();
+      //  ClientEngine.save_current_bot();
       }, false);
 
       document.getElementById("copy").addEventListener("click", function( event ) {

@@ -25,7 +25,7 @@ class BaseBrain{
       this.turn2 = 0.0;
       this.thrust1 = 0.0;
       this.thrust2 = 0.0;
-      this.spike = 0.0;
+      this.sting = 0.0;
       this.voice = 0.0;
       this.heat = 0.0;
       this.turn = 0.0;
@@ -109,7 +109,7 @@ class BaseBrain{
         this.eyeC3AInput.green,
 
 
-        this.spike,
+        this.sting,
         this.voice,
         this.heat,
         this.turn1 - this.turn2,
@@ -128,7 +128,7 @@ class BaseBrain{
 
 
     getOutputs(){
-      this.turn1 = (this.outputVector.subset(Mathjs.index(0))-0.5);
+      this.turn1 = (this.outputVector.subset(Mathjs.index(0)) - 0.5);
       this.thrust1 = (this.outputVector.subset(Mathjs.index(1)) - 0.5)  ;
       this.turn2 = (this.outputVector.subset(Mathjs.index(2))-0.5);
       this.thrust2 = (this.outputVector.subset(Mathjs.index(3)) - 0.5)  ;
@@ -138,7 +138,7 @@ class BaseBrain{
       this.bodyColor.blue = (this.outputVector.subset(Mathjs.index(7)));//* (this.dove - this.hawk);
 
 
-      this.spike = (this.outputVector.subset(Mathjs.index(8))-0.5 -0.1*this.dove +0.1*this.hawk);//-0.2*this.dove +0.2*this.hawk);
+      this.sting = (this.outputVector.subset(Mathjs.index(8))-0.5 -0.1*this.dove +0.1*this.hawk);//-0.2*this.dove +0.2*this.hawk);
 
       this.give = (this.outputVector.subset(Mathjs.index(9)) - 0.5 +0.1*this.dove -0.1*this.hawk);//+0.2*this.dove -0.2*this.hawk;
 
@@ -149,14 +149,16 @@ class BaseBrain{
       (this.outputVector.subset(Mathjs.index(13))))/2>0.75;
 
 
-      this.eyeColorA.red =(this.outputVector.subset(Mathjs.index(14)));
-      this.eyeColorA.blue =(this.outputVector.subset(Mathjs.index(15)));
+      this.eyeColorA.red =(this.outputVector.subset(Mathjs.index(14)))+this.sting;
+      this.eyeColorA.blue =(this.outputVector.subset(Mathjs.index(15)))+this.give;
       this.eyeColorA.green =(this.outputVector.subset(Mathjs.index(16)));
-      this.eyeColorB.red =(this.outputVector.subset(Mathjs.index(17)));
+
+      this.eyeColorB.red =(this.outputVector.subset(Mathjs.index(17)))+this.sting;
       this.eyeColorB.green =(this.outputVector.subset(Mathjs.index(18)));
-      this.eyeColorB.blue =(this.outputVector.subset(Mathjs.index(19)));
-      this.eyeColorC.red =(this.outputVector.subset(Mathjs.index(20)));
-      this.eyeColorC.blue =(this.outputVector.subset(Mathjs.index(21)));
+      this.eyeColorB.blue =(this.outputVector.subset(Mathjs.index(19))) + this.give;
+
+      this.eyeColorC.red =(this.outputVector.subset(Mathjs.index(20))) + this.sting;
+      this.eyeColorC.blue =(this.outputVector.subset(Mathjs.index(21)))+this.give;
       this.eyeColorC.green =(this.outputVector.subset(Mathjs.index(22)));
 
       this.interestedInMating = (this.outputVector.subset(Mathjs.index(23)))>0.5;

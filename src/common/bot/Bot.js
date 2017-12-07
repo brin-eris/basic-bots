@@ -20,13 +20,13 @@ const Body = require('matter-js').Body;
 const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
-const COLLISION_DAMAGE = 0.005
-const SPIKE_DAMAGE = 0.03;
-const AGE_DAMAGE = 0.000005;
-const HEAT_DAMAGE = 0.0015;
+const COLLISION_DAMAGE = 0.0025
+const sting_DAMAGE = 0.015;
+const AGE_DAMAGE = 0.000003;
+const HEAT_DAMAGE = 0.0005;
 const OVEREAT_PENALTY = 0.005;
 const BOOST_COST = 0.0004;
-const GESTATION_TIMER = 20;
+const GESTATION_TIMER = 30;
 const GIVE_AMOUNT = 0.005
 
 class Bot {
@@ -159,9 +159,9 @@ class Bot {
 
           let baseDamage = (COLLISION_DAMAGE  * Math.abs(Vector.magnitude(relativeMomentum)));
 
-          if(them.gameObject.brain.spike > 0.0){
-            //one of thier body parts spiked me
-              me.gameObject.life -= baseDamage + ((1 + them.gameObject.brain.spike) * SPIKE_DAMAGE);
+          if(them.gameObject.brain.sting > 0.0){
+            //one of thier body parts stingd me
+              me.gameObject.life -= baseDamage + ((1 + them.gameObject.brain.sting) * sting_DAMAGE);
               me.gameObject.brain.ouchie += 0.5;
 
               if(me.gameObject.life <= 0.0){
@@ -170,7 +170,7 @@ class Bot {
                 them.gameObject.maxLife++;
               }
           }else{
-            // they didnt spike me, but i still got hit
+            // they didnt sting me, but i still got hit
             me.gameObject.life -= baseDamage ;
             me.gameObject.brain.ouchie += 0.5;
           }
@@ -218,6 +218,12 @@ class Bot {
 
               me.gameObject.brain.soundInput += them.gameObject.voice ;
 
+
+                if(me.gameObject.will_mate && them.gameObject.will_mate){
+                  me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+                  // me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+                }
+
               //console.log(them.gameObject.voice);
               if(me.gameObject.brain.give > 0.0 ){
                 me.gameObject.give(them.gameObject);
@@ -225,7 +231,6 @@ class Bot {
         }else if(them.gameObject.class==Meat){
           me.gameObject.brain.smellMeat += 0.2;
         }
-
       }
     };
 
@@ -430,9 +435,9 @@ class Bot {
       me.gameObject.brain.eyeCInput.blue += (them.gameColor.blue*0.8);
       me.gameObject.brain.eyeCInput.green += (them.gameColor.green*0.8);
       if(them.gameObject.class == Bot){
-        if(me.gameObject.will_mate && them.gameObject.will_mate){
+        if(me.gameObject.will_mate ){
           me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
-          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          //me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
         }
       }
     };
@@ -462,9 +467,9 @@ class Bot {
       me.gameObject.brain.eyeC2AInput.blue += (them.gameColor.blue);
       me.gameObject.brain.eyeC2AInput.green += (them.gameColor.green);
       if(them.gameObject.class == Bot){
-        if(me.gameObject.will_mate && them.gameObject.will_mate){
+        if(me.gameObject.will_mate){
           me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
-          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          //me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
         }
       }
     };
@@ -494,9 +499,9 @@ class Bot {
       me.gameObject.brain.eyeC2BInput.blue += (them.gameColor.blue);
       me.gameObject.brain.eyeC2BInput.green += (them.gameColor.green);
       if(them.gameObject.class == Bot){
-        if(me.gameObject.will_mate && them.gameObject.will_mate){
+        if(me.gameObject.will_mate){
           me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
-          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          //me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
         }
       }
     };
@@ -527,9 +532,9 @@ class Bot {
       me.gameObject.brain.eyeC3AInput.blue += (them.gameColor.blue);
       me.gameObject.brain.eyeC3AInput.green += (them.gameColor.green);
       if(them.gameObject.class == Bot){
-        if(me.gameObject.will_mate && them.gameObject.will_mate){
+        if(me.gameObject.will_mate){
           me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
-          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          //me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
         }
       }
     };
@@ -610,7 +615,7 @@ class Bot {
       bodyA: soundSensor,
       stiffness: 0.5
     });
-    //let spike = Body.create({});
+    //let sting = Body.create({});
 
     Matter.Composite.addBody(bot, body);
     Matter.Composite.addBody(bot, eyeA);
@@ -692,14 +697,14 @@ class Bot {
 
       let facing = this.body.angle;
       let thrustLeftSide = this.brain.farts == true ? this.brain.thrust1*3:this.brain.thrust1;
-      let turnLeftSide =  (this.brain.turn1 + facing) ;
+      let turnLeftSide =  (facing - this.brain.turn1 ) ;
       let thrustRightSide = this.brain.farts == true ? this.brain.thrust2*3:this.brain.thrust2;
-      let turnRightSide =  (this.brain.turn2 + facing) ;
+      let turnRightSide =  (facing + this.brain.turn2) ;
 
 
       let position = Vector.clone(this.body.position);
-      let leftButtcheek = Vector.create(1.5 * Math.cos(facing - Mathjs.PI) + position.x, 1.5 * Math.sin(facing - Mathjs.PI) + position.y);
-      let rightButtcheek = Vector.create(1.5 * Math.cos(facing + Mathjs.PI) + position.x, 1.5 * Math.sin(facing + Mathjs.PI) + position.y);
+      let leftButtcheek = Vector.create(1.5 * Math.cos(facing -0.01) + position.x, 1.5 * Math.sin(facing -0.01) + position.y);
+      let rightButtcheek = Vector.create(1.5 * Math.cos(facing +0.01) + position.x, 1.5 * Math.sin(facing +0.01) + position.y);
 
       Matter.Body.applyForce(this.body,
         leftButtcheek,
@@ -724,6 +729,7 @@ class Bot {
       this.eyeA.render.fillStyle = this.eyeA2B.render.fillStyle = this.eyeA2A.render.fillStyle =this.rgbToHex(this.brain.eyeColorA.red* 255, this.brain.eyeColorA.green* 255,this.brain.eyeColorA.blue* 255);
       this.eyeB.render.fillStyle = this.eyeB2B.render.fillStyle = this.eyeB2A.render.fillStyle = this.rgbToHex(this.brain.eyeColorB.red* 255,this.brain.eyeColorB.green* 255,this.brain.eyeColorB.blue* 255);
       this.eyeC.render.fillStyle = this.eyeC2B.render.fillStyle = this.eyeC2A.render.fillStyle = this.eyeC3A.render.fillStyle = this.rgbToHex(this.brain.eyeColorC.red* 255,this.brain.eyeColorC.green* 255,this.brain.eyeColorC.blue* 255);
+
       if(this.is_ui_selected){
         this.body.render.strokeStyle =  this.rgbToHex(150,50,0);
         this.eyeA.render.strokeStyle =  this.rgbToHex(150,50,0);
@@ -774,6 +780,7 @@ class Bot {
       if(this.life <= this.maxLife ){
       var speedMod = 1.0 - (this.body.speed -20)/100;
       this.life += (0.02 * speedMod);
+      this.gestationTimer--;
     }else {
 
       // glutton will take a penalty over time
@@ -781,9 +788,7 @@ class Bot {
       this.gluttony++;
     }
 
-        // eating, full or not ... could be a bad idea lol
 
-      this.gestationTimer--;
     }
     // sitting on food ruins it
     food.life -= 0.008;
@@ -802,14 +807,14 @@ class Bot {
 
   spawn(placement){
     let child = new Bot();
-    child.maxLife = this.maxLife;
+//    child.maxLife = this.maxLife;
     child.brain = this.brain.mutate();
     child.create(this.world, Vector.create(placement.x -150*Math.random(), placement.y -150*Math.random()));
   }
 
   componentToHex(c) {
     c = Math.floor(c);
-    c = Math.max(c,0);
+    c = Math.min(Math.max(c,0),255);
     var hex = c.toString(16).substring(0,2);
     return hex.length == 1 ? "0" + hex : hex;
   }

@@ -14,56 +14,56 @@ class Brain extends BaseBrain{
 
       this.inputWeightsA = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < 0.15){
-          value+= 10* (Math.random()-0.5);
+          value+=  100*(Math.random()-0.5);
         }
         return value;
       });
 
-      this.inputBiasA = Mathjs.random([this.inputSize],-0.01,0.01).map( function(value, index, matrix) {
+      this.inputBiasA = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < 0.15){
-          value+= 10* (Math.random()-0.5);
+          value+= (Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerWeightsA = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < 0.15){
-          value+= 10* (Math.random()-0.5);
+          value+=  100*(Math.random()-0.5);
         }
         return value;
       });
 
-      this.hiddenLayerBiasA = Mathjs.random([this.inputSize],-0.01,0.01).map( function(value, index, matrix) {
+      this.hiddenLayerBiasA = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < 0.15){
-          value+= 10* (Math.random()-0.5);
+          value+=  (Math.random()-0.5);
         }
         return value;
       });
 
       this.inputWeightsB = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < 0.15){
-          value+= 10* (Math.random()-0.5);
+          value+=  100*(Math.random()-0.5);
         }
         return value;
       });
 
-      this.inputBiasB = Mathjs.random([this.inputSize],-0.01,0.01).map( function(value, index, matrix) {
+      this.inputBiasB = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < 0.15){
-          value+= 10* (Math.random()-0.5);
+          value+=  (Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerWeightsB = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < 0.15){
-          value+= 10* (Math.random()-0.5);
+          value+=  100*(Math.random()-0.5);
         }
         return value;
       });
 
-      this.hiddenLayerBiasB = Mathjs.random([this.inputSize],-0.01,0.01).map( function(value, index, matrix) {
+      this.hiddenLayerBiasB = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < 0.15){
-          value+= 10* (Math.random()-0.5);
+          value+= 100* (Math.random()-0.5);
         }
         return value;
       });

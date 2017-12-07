@@ -13,11 +13,11 @@ const STARTING_BOTS = 7;
 const MIN_BOTS = 7;
 const MAX_BOTS = 20;
 const STARTING_PLANTS = 200;
-const MIN_PLANTS = 150;
+const MIN_PLANTS = 100;
 const WALLS = 0;
 
-const WIDTH = 2100;
-const HEIGHT = 1800;
+const WIDTH = 3000;
+const HEIGHT = 2200;
 
 // soak the brains in here to get juicy
 class SimEngine {

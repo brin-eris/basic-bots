@@ -21,12 +21,12 @@ const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
 const COLLISION_DAMAGE = 0.0025
-const sting_DAMAGE = 0.015;
+const sting_DAMAGE = 0.025;
 const AGE_DAMAGE = 0.000003;
 const HEAT_DAMAGE = 0.0005;
 const OVEREAT_PENALTY = 0.005;
 const BOOST_COST = 0.0004;
-const GESTATION_TIMER = 30;
+const GESTATION_TIMER = 15;
 const GIVE_AMOUNT = 0.005
 
 class Bot {
@@ -752,6 +752,11 @@ class Bot {
 
         if(this.gestationTimer < 1 && this.brain.interestedInMating){
           this.will_mate = true;
+          if(this.gestationTimer < -GESTATION_TIMER ){
+            this.spawn(this.body.position);
+            this.will_mate = false;
+            this.gestationTimer = GESTATION_TIMER;
+          }
         }else{
           this.will_mate = false;
         }

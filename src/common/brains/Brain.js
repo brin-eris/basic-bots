@@ -63,7 +63,7 @@ class Brain extends BaseBrain{
 
       this.hiddenLayerBiasB = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < 0.15){
-          value+= 100* (Math.random()-0.5);
+          value+=  (Math.random()-0.5);
         }
         return value;
       });

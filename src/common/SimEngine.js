@@ -82,10 +82,6 @@ class SimEngine {
       }
 
       let oldest_brain = {brain: null, age: 0};
-      let second_oldest_brain = {brain: null, age: 0};
-      let third_oldest_brain = {brain: null, age: 0};
-      let fourth_oldest_brain = {brain: null, age: 0};
-      let fifth_oldest_brain = {brain: null, age: 0};
 
 
       Matter.Events.on(engine, "beforeUpdate", function(e){

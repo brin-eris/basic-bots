@@ -20,20 +20,20 @@ const Body = require('matter-js').Body;
 const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
-const COLLISION_DAMAGE = 0.0025
-const sting_DAMAGE = 0.025;
-const AGE_DAMAGE = 0.000003;
-const HEAT_DAMAGE = 0.0005;
+const COLLISION_DAMAGE = 0.0035
+const sting_DAMAGE = 0.035;
+const AGE_DAMAGE = 0.0000032;
+const HEAT_DAMAGE = 0.00065;
 const OVEREAT_PENALTY = 0.005;
 const BOOST_COST = 0.0004;
-const GESTATION_TIMER = 15;
+const GESTATION_TIMER = 30;
 const GIVE_AMOUNT = 0.005
 
 class Bot {
   constructor() {
     this.kills = 0.0;
     this.class = Bot;
-    this.brain = new Brain();
+    this.brain = Dumber.create_new();
 
     this.life = 1.0;
     this.maxLife = 1.0;
@@ -220,7 +220,7 @@ class Bot {
 
 
                 if(me.gameObject.will_mate && them.gameObject.will_mate){
-                  me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+                  me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
                   // me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
                 }
 
@@ -436,7 +436,7 @@ class Bot {
       me.gameObject.brain.eyeCInput.green += (them.gameColor.green*0.8);
       if(them.gameObject.class == Bot){
         if(me.gameObject.will_mate ){
-          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
           //me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
         }
       }
@@ -468,7 +468,7 @@ class Bot {
       me.gameObject.brain.eyeC2AInput.green += (them.gameColor.green);
       if(them.gameObject.class == Bot){
         if(me.gameObject.will_mate){
-          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
           //me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
         }
       }
@@ -500,7 +500,7 @@ class Bot {
       me.gameObject.brain.eyeC2BInput.green += (them.gameColor.green);
       if(them.gameObject.class == Bot){
         if(me.gameObject.will_mate){
-          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
           //me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
         }
       }
@@ -533,7 +533,7 @@ class Bot {
       me.gameObject.brain.eyeC3AInput.green += (them.gameColor.green);
       if(them.gameObject.class == Bot){
         if(me.gameObject.will_mate){
-          me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
           //me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
         }
       }

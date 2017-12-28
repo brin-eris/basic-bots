@@ -6,72 +6,126 @@ const BaseBrain = require('./BaseBrain');
 
 class Dumber extends BaseBrain{
 
+    static create_new(){
+      let brain = new Dumber();
+      brain.buildLayers();
+      return brain;
+    }
+
     constructor(){
       super();
 
-      this.inputWeights = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          return  (Math.random() )*value +2*(Math.random()-0.5) + value;
+      this.inputWeightsA = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.05){
+          value+=  100*(Math.random()-0.5);
         }
         return value;
       });
 
-      this.inputBias = Mathjs.random([this.inputSize],-0.01, 0.01).map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          return  (Math.random() )*value +2*(Math.random()-0.5) + value;
+      this.inputBiasA = Mathjs.random([this.inputSize],-0.01, 0.01).map( function(value, index, matrix) {
+        if(Math.random() < 0.05){
+          value+= (Math.random()-0.5);
         }
         return value;
       });
 
-      this.hiddenLayerWeights = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          return  (Math.random() )*value +2*(Math.random()-0.5) + value;
-        }
-        return value;
-      });
-      this.hiddenLayerBias = Mathjs.random([this.inputSize],-0.01, 0.01).map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          return  (Math.random() )*value +2*(Math.random()-0.5) + value;
+      this.hiddenLayerWeightsA = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.05){
+          value+=  100*(Math.random()-0.5);
         }
         return value;
       });
 
-      this.funkyWeights = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          return  (Math.random() )*value +2*(Math.random()-0.5) + value;
+      this.hiddenLayerBiasA = Mathjs.random([this.inputSize],-0.01, 0.01).map( function(value, index, matrix) {
+        if(Math.random() < 0.05){
+          value+= (Math.random()-0.5);
         }
         return value;
       });
 
-      this.funkyBias = Mathjs.random([this.inputSize],-0.01,0.01);
+      this.funkyWeightsA = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.05){
+          value+=  100*(Math.random()-0.5);
+        }
+        return value;
+      });
+
+      this.funkyBiasA = Mathjs.random([this.inputSize],-0.01,0.01);
+
+      this.inputWeightsB = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.05){
+          value+=  100*(Math.random()-0.5);
+        }
+        return value;
+      });
+
+      this.inputBiasB = Mathjs.random([this.inputSize],-0.01, 0.01).map( function(value, index, matrix) {
+        if(Math.random() < 0.05){
+          value+= (Math.random()-0.5);
+        }
+        return value;
+      });
+
+      this.hiddenLayerWeightsB = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.05){
+          value+=  100*(Math.random()-0.5);
+        }
+        return value;
+      });
+      this.hiddenLayerBiasB = Mathjs.random([this.inputSize],-0.01, 0.01).map( function(value, index, matrix) {
+        if(Math.random() < 0.05){
+          value+= (Math.random()-0.5);
+        }
+        return value;
+      });
+
+      this.funkyWeightsB = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.05){
+          value+=  100*(Math.random()-0.5);
+        }
+        return value;
+      });
+
+      this.funkyBiasB = Mathjs.random([this.inputSize],-0.01,0.01);
+
+
       this.functions = this.buildFunctionsArray();
-      this.numLayers = 1;
 
 
-      this.buildLayers();
+        this.functionMapX  = new Array(1);
+            for(var i=0; i<this.functionMapX.length; i++){
+              this.functionMapX[i] = Mathjs.pickRandom(this.functions);
+        }
+
+        this.functionMapY  = new Array(1);
+            for(var i=0; i<this.functionMapY.length; i++){
+              this.functionMapY[i] = Mathjs.pickRandom(this.functions);
+        }
+
+        this.XBounds = new Array(this.inputSize);
+            for(var i=0; i<this.XBounds.length; i++){
+                this.XBounds[i] = (i)* 2 * Math.PI / this.inputSize - Math.PI;
+        }
+
+        this.YBounds = new Array(this.inputSize);
+
+            for(var i=0; i<this.YBounds.length; i++){
+                this.YBounds[i] = (i)* 2 / this.inputSize - 1;
+        }
+
+
     }
 
     buildLayers(){
 
-      this.functionMap  = new Array(this.numLayers);
-      for(var i=0; i<this.functionMap.length; i++){
-        this.functionMap[i] = Mathjs.pickRandom(this.functions);
-      }
-      this.functionMapY  = new Array(this.numLayers);
-      for(var i=0; i<this.functionMapY.length; i++){
-        this.functionMapY[i] = Mathjs.pickRandom(this.functions);
-      }
-      this.XBounds = new Array(this.inputSize);
-      for(var i=0; i<this.XBounds.length; i++){
-          this.XBounds[i] = (i)* 2 * Math.PI / this.inputSize - Math.PI;
-      }
-      this.YBounds = new Array(this.inputSize);
-      for(var i=0; i<this.YBounds.length; i++){
-          this.YBounds[i] = (i)* 2 / this.inputSize - 1;
-      }
-      this.layers = new Array(this.numLayers);
+
+      let numLayers = this.functionMapX.length < this.functionMapY.length ?  this.functionMapX.length : this.functionMapY.length;
+
+
+      this.layers = new Array(numLayers);
+
       for(let i=0; i<this.layers.length; i++){
-          let func = this.functionMap[i];
+          let func = this.functionMapX[i];
           let funY = this.functionMapY[i];
           let layerColumns = new Array(this.inputSize);
           for(let j = 0; j<layerColumns.length; j++){
@@ -80,8 +134,8 @@ class Dumber extends BaseBrain{
               layerRow[k] = func(this.XBounds[j]) * funY(this.YBounds[k]);
             }
           }
-
-          let temp = Mathjs.multiply(Mathjs.matrix(layerColumns), this.funkyWeights);
+          let funkyWeights = Mathjs.add(this.funkyWeightsA, this.funkyWeightsB);
+          let temp = Mathjs.multiply(Mathjs.matrix(layerColumns), funkyWeights);
           temp = temp.map(function(value, index, matrix){
               let result = 1.0/(1.0 + Mathjs.exp(-1 + value));
               result-=0.5;
@@ -154,34 +208,54 @@ class Dumber extends BaseBrain{
 
     doMagic(inputVector){
 
-      let postInputsWeightsVector = Mathjs.multiply(this.inputWeights, inputVector);
+      let postInputsWeightsVectorA = Mathjs.multiply(this.inputWeightsA, inputVector);
+      let postInputsWeightsVectorB = Mathjs.multiply(this.inputWeightsB, inputVector);
 
-      let postInputsBiasVector = Mathjs.add(postInputsWeightsVector, this.inputBias);
+      let postInputsWeightsVector = Mathjs.add(postInputsWeightsVectorA, postInputsWeightsVectorB);
 
-      let hiddenLayerInputVector =  postInputsBiasVector.map(function(value, index, matrix){
-      let result = ((1/(Math.PI)) *Mathjs.exp(-1 * value*value));
-        result = result < 0.0005 ? 0.0 : result;
-        return isNaN(result) ? 1.0 : result;
-        });
+      let postInputsBiasVectorA = Mathjs.add(postInputsWeightsVector, this.inputBiasA);
+      let postInputsBiasVectorB = Mathjs.add(postInputsWeightsVector, this.inputBiasB);
 
-        for(var i=0; i<this.layers.length;i++){
+      let hiddenLayerInputVectorA =  postInputsBiasVectorA.map(function(value, index, matrix){
+          let result = ((1/(Math.PI)) *Mathjs.exp(-1 * value*value));
+          result = result < 0.0005 ? 0.0 : result;
+          return isNaN(result) ? 1.0 : result;
+      });
+
+      for(var i=0; i<this.layers.length;i++){
            let layer =  this.layers[i];
-           hiddenLayerInputVector = Mathjs.multiply(layer, inputVector);//.map(function(value, index, matrix){
-            //    let result = Mathjs.exp(-1 * value*value);
-            //    result = result < 0.0005 ? 0.0 : result;
-            //    return isNaN(result) ? 1.0 : result;
-            //  });
-        }
+           hiddenLayerInputVectorA = Mathjs.multiply(layer, hiddenLayerInputVectorA);
+      }
 
 
-      let postHiddenLayerWeightsVector = Mathjs.multiply(hiddenLayerInputVector, this.hiddenLayerWeights);
-      let postHiddenLayerBaisVector = Mathjs.add(postHiddenLayerWeightsVector, this.hiddenLayerBias)
+      let hiddenLayerInputVectorB =  postInputsBiasVectorB.map(function(value, index, matrix){
+              let result = ((1/(Math.PI)) *Mathjs.exp(-1 * value*value));
+              result = result < 0.0005 ? 0.0 : result;
+              return isNaN(result) ? 1.0 : result;
+      });
+
+      for(var i=0; i<this.layers.length;i++){
+             let layer =  this.layers[i];
+             hiddenLayerInputVectorB = Mathjs.multiply(layer, hiddenLayerInputVectorB);
+      }
+
+
+      let postHiddenLayerWeightsVectorA = Mathjs.multiply(hiddenLayerInputVectorA, this.hiddenLayerWeightsA);
+      let postHiddenLayerWeightsVectorB = Mathjs.multiply(hiddenLayerInputVectorB, this.hiddenLayerWeightsB);
+
+
+
+
+      let postHiddenLayerBaisVectorA = Mathjs.add(postHiddenLayerWeightsVectorA, this.hiddenLayerBiasA);
+      let postHiddenLayerBaisVectorB = Mathjs.add(postHiddenLayerWeightsVectorB, this.hiddenLayerBiasB);
+
+      let postHiddenLayerBaisVector = Mathjs.add(postHiddenLayerBaisVectorA, postHiddenLayerBaisVectorB);
 
       let outputVector = postHiddenLayerBaisVector.map(function(value, index, matrix){
-        let result = 1.0/(1.0 + Mathjs.exp(-1 + value));
-        result = result < 0.0005 ? 0.0 : result;
-        return isNaN(result) ? 1.0 : result;
-        });
+          let result = 1.0/(1.0 + Mathjs.exp(-1 + value));
+          result = result < 0.0005 ? 0.0 : result;
+          return isNaN(result) ? 1.0 : result;
+      });
 
         return outputVector;
       }
@@ -195,18 +269,18 @@ class Dumber extends BaseBrain{
         childBrain.dove*=-1;
       }
 
-      childBrain.functionMap = new Array(this.functionMap.length);
+      childBrain.functionMapX = new Array(this.functionMapX.length);
 
-      for(let i = 0; i< this.functionMap.length; i++){
-        childBrain.functionMap[i] = this.functionMap[i];
+      for(let i = 0; i< this.functionMapX.length; i++){
+        childBrain.functionMapX[i] = this.functionMapX[i];
       }
 
       if(Math.random() < 0.01){
-        var index = Mathjs.randomInt(childBrain.functionMap.length);
-        childBrain.functionMap[index] = Mathjs.pickRandom(this.functions);
+        var index = Mathjs.randomInt(childBrain.functionMapX.length);
+        childBrain.functionMapX[index] = Mathjs.pickRandom(this.functions);
       }
 
-      childBrain.functionMap = new Array(this.functionMapY.length);
+      childBrain.functionMapY = new Array(this.functionMapY.length);
 
       for(let i = 0; i< this.functionMapY.length; i++){
         childBrain.functionMapY[i] = this.functionMapY[i];
@@ -217,126 +291,201 @@ class Dumber extends BaseBrain{
         childBrain.functionMapY[index] = Mathjs.pickRandom(this.functions);
       }
 
-      childBrain.numLayers = this.numLayers;
-      if(Math.random() < 0.01){
-        childBrain.numLayers++;
-        childBrain.functionMap.push(Mathjs.pickRandom(this.functions));
-        childBrain.functionMapY.push(Mathjs.pickRandom(this.functions));
-      }else if (Math.random() < 0.01 && childBrain.numLayers > 1) {
-        childBrain.numLayers--;
-        childBrain.functionMap.splice(0,1);
-        childBrain.functionMapY.splice(0,1);
-      }
 
 
+      childBrain.functionMapX = childBrain.mutate_map(childBrain.functionMapX);
 
-      childBrain.inputWeights = this.inputWeights.map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          value = 0.01*(Math.random() - 0.5)*value +0.1*(Math.random()-0.5) + value;
-        }
-        if(Math.random() < 0.01){
-          value+= 0.2*(Math.random()-0.5);
-        }
-        if(Math.random() < 0.001){
-          value+= 0.8*(Math.random()-0.5);
-        }
-        return value;
+      childBrain.functionMapY = childBrain.mutate_map(childBrain.functionMapY);
 
-      });
+      childBrain.inputWeightsA = this.mutate_layer(this.inputWeightsA);
 
       if(Math.random()< 0.01){
-        childBrain.inputWeights = Mathjs.transpose(childBrain.inputWeights);
+        childBrain.inputWeightsA = Mathjs.transpose(childBrain.inputWeightsA);
       }
       if(Math.random()< 0.01){
-        childBrain.inputWeights = Mathjs.inv(childBrain.inputWeights);
+        childBrain.inputWeightsA = Mathjs.inv(childBrain.inputWeightsA);
       }
 
-      childBrain.inputBias = this.inputBias.map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          value = 0.01*(Math.random() - 0.5)*value +0.1*(Math.random()-0.5) + value;
-        }
-        if(Math.random() < 0.01){
-          value+= 0.2*(Math.random()-0.5);
-        }
-        if(Math.random() < 0.001){
-          value+= 0.8*(Math.random()-0.5);
-        }
-        return value;
-
-      });
+      childBrain.inputBiasA = this.mutate_layer(this.inputBiasA);
 
 
-      childBrain.hiddenLayerBias = this.hiddenLayerBias.map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          value = 0.01*(Math.random() - 0.5)*value +0.1*(Math.random()-0.5) + value;
-        }
-        if(Math.random() < 0.01){
-          value+= 0.2*(Math.random()-0.5);
-        }
-        if(Math.random() < 0.001){
-          value+= 0.8*(Math.random()-0.5);
-        }
-        return value;
+      childBrain.hiddenLayerBiasA = this.mutate_layer(this.hiddenLayerBiasA);
 
-        });
-
-      childBrain.hiddenLayerWeights = this.hiddenLayerWeights.map(function(value, index, matrix){
-        if(Math.random() < 0.1){
-          value = 0.01*(Math.random() - 0.5)*value +0.1*(Math.random()-0.5) + value;
-        }
-        if(Math.random() < 0.01){
-          value+= 0.2*(Math.random()-0.5);
-        }
-        if(Math.random() < 0.001){
-          value+= 0.8*(Math.random()-0.5);
-        }
-        return value;
-
-      });
+      childBrain.hiddenLayerWeightsA = this.mutate_layer(this.hiddenLayerWeightsA);
 
       if(Math.random()< 0.01){
-        childBrain.hiddenLayerWeights = Mathjs.transpose(childBrain.hiddenLayerWeights);
+        childBrain.hiddenLayerWeightsA = Mathjs.transpose(childBrain.hiddenLayerWeightsA);
       }
       if(Math.random()< 0.01){
-        childBrain.hiddenLayerWeights = Mathjs.inv(childBrain.hiddenLayerWeights);
+        childBrain.hiddenLayerWeightsA = Mathjs.inv(childBrain.hiddenLayerWeightsA);
       }
 
-      childBrain.funkyBias = this.funkyBias.map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          value = 0.01*(Math.random() - 0.5)*value +0.1*(Math.random()-0.5) + value;
-        }
-        if(Math.random() < 0.01){
-          value+= 0.2*(Math.random()-0.5);
-        }
-        if(Math.random() < 0.001){
-          value+= 0.8*(Math.random()-0.5);
-        }
-        return value;
+      childBrain.funkyBiasA = this.mutate_layer(this.funkyBiasA);
 
-        });
-
-      childBrain.funkyWeights = this.funkyWeights.map( function(value, index, matrix) {
-        if(Math.random() < 0.1){
-          value = 0.01*(Math.random() - 0.5)*value +0.1*(Math.random()-0.5) + value;
-        }
-        if(Math.random() < 0.01){
-          value+= 0.2*(Math.random()-0.5);
-        }
-        if(Math.random() < 0.001){
-          value+= 0.8*(Math.random()-0.5);
-        }
-        return value;
-
-      });
+      childBrain.funkyWeightsA = this.mutate_layer(this.funkyWeightsA);
 
       if(Math.random()< 0.01){
-        childBrain.funkyWeights = Mathjs.transpose(childBrain.funkyWeights);
+        childBrain.funkyWeightsA = Mathjs.transpose(childBrain.funkyWeightsA);
       }
       if(Math.random()< 0.01){
-        childBrain.funkyWeights = Mathjs.inv(childBrain.funkyWeights);
+        childBrain.funkyWeightsA = Mathjs.inv(childBrain.funkyWeightsA);
       }
+
+      childBrain.inputWeightsB = this.mutate_layer(this.inputWeightsB);
+
+      if(Math.random()< 0.01){
+        childBrain.inputWeightsB = Mathjs.transpose(childBrain.inputWeightsB);
+      }
+      if(Math.random()< 0.01){
+        childBrain.inputWeightsB = Mathjs.inv(childBrain.inputWeightsB);
+      }
+
+      childBrain.inputBiasB = this.mutate_layer(this.inputBiasB);
+
+
+      childBrain.hiddenLayerBiasB = this.mutate_layer(this.hiddenLayerBiasB);
+
+      childBrain.hiddenLayerWeightsB = this.mutate_layer(this.hiddenLayerWeightsB);
+
+      if(Math.random()< 0.01){
+        childBrain.hiddenLayerWeightsB = Mathjs.transpose(childBrain.hiddenLayerWeightsB);
+      }
+      if(Math.random()< 0.01){
+        childBrain.hiddenLayerWeightsB = Mathjs.inv(childBrain.hiddenLayerWeightsB);
+      }
+
+      childBrain.funkyBiasB = this.mutate_layer(this.funkyBiasB);
+
+      childBrain.funkyWeightsB = this.mutate_layer(this.funkyWeightsB);
+
+      if(Math.random()< 0.01){
+        childBrain.funkyWeightsB = Mathjs.transpose(childBrain.funkyWeightsB);
+      }
+      if(Math.random()< 0.01){
+        childBrain.funkyWeightsB = Mathjs.inv(childBrain.funkyWeightsB);
+      }
+
       childBrain.buildLayers();
       return childBrain;
+    }
+
+    rebuild(channel_A, channel_B){
+      this.inputWeightsA = this.mutate_layer(channel_A.inputWeights);
+      this.inputBiasA = this.mutate_layer(channel_A.inputBias);
+      this.hiddenLayerWeightsA = this.mutate_layer(channel_A.hiddenLayerWeights);
+      this.hiddenLayerBiasA = this.mutate_layer(channel_A.hiddenLayerBias);
+      this.funkyBiasA = this.mutate_layer(channel_A.funkyBias);
+      this.funkyWeightsA = this.mutate_layer(channel_A.funkyWeights);
+      this.functionMapX = this.mutate_map(channel_A.functionMap);
+
+      this.inputWeightsB = this.mutate_layer(channel_B.inputWeights);
+      this.inputBiasB = this.mutate_layer(channel_B.inputBias);
+      this.hiddenLayerWeightsB = this.mutate_layer(channel_B.hiddenLayerWeights);
+      this.hiddenLayerBiasB = this.mutate_layer(channel_B.hiddenLayerBias);
+      this.funkyBiasB = this.mutate_layer(channel_B.funkyBias);
+      this.funkyWeightsB = this.mutate_layer(channel_B.funkyWeights);
+      this.functionMapY = this.mutate_map(channel_B.functionMap);
+
+      this.buildLayers();
+    }
+
+    mutate_map(map){
+      if(Math.random() < 0.01){
+        map.push(Mathjs.pickRandom(this.functions));
+
+      }else if (Math.random() < 0.01 && map.length > 1) {
+        map.splice(0,1);
+      }
+      return map;
+    }
+
+    mutate_layer(layer){
+      layer = layer.map(function(value, index, matrix){
+        if(Math.random() < 0.1){
+          value += 0.0001*(Math.random() - 0.5)*value +0.0001*(Math.random()-0.5) ;
+        }
+        if(Math.random() < 0.01){
+          value += 0.001*(Math.random()-0.5)*value +0.001*(Math.random()-0.5) ;
+        }
+        if(Math.random() < 0.001){
+          value += 0.01*(Math.random()-0.5)*value +0.01*(Math.random()-0.5) ;
+        }
+        if(Math.random() < 0.0001){
+          value += (Math.random()-0.5)*value ;
+        }
+        return value;
+      });
+      return layer;
+    }
+
+    get_half_chromosomes(){
+
+
+      let inputWeights = Math.random() < 0.5 ? Mathjs.clone(this.inputWeightsA) : Mathjs.clone(this.inputWeightsB);
+
+      let inputBias = Math.random() < 0.5 ? Mathjs.clone(this.inputBiasA) : Mathjs.clone(this.inputBiasB);
+
+      let hiddenLayerWeights = Math.random() < 0.5 ? Mathjs.clone(this.hiddenLayerWeightsA) : Mathjs.clone(this.hiddenLayerWeightsB);
+
+      let hiddenLayerBias = Math.random() < 0.5 ? Mathjs.clone(this.hiddenLayerBiasA) : Mathjs.clone(this.hiddenLayerBiasB);
+
+      let funkyWeights = Math.random() < 0.5 ? Mathjs.clone(this.funkyWeightsA) : Mathjs.clone(this.funkyWeightsB);
+
+      let funkyBias = Math.random() < 0.5 ? Mathjs.clone(this.funkyBiasA) : Mathjs.clone(this.funkyBiasB);
+
+      let tempFunctionMap = Math.random() < 0.5 ? (this.functionMapX) : (this.functionMapY);
+
+
+      let functionMap = new Array(tempFunctionMap.length);
+
+      for(let i = 0; i< tempFunctionMap.length; i++){
+        functionMap[i] = tempFunctionMap[i];
+      }
+      return {
+        inputWeights: inputWeights,
+        inputBias: inputBias,
+        hiddenLayerWeights: hiddenLayerWeights,
+        hiddenLayerBias: hiddenLayerBias,
+        funkyBias: funkyBias,
+        funkyWeights: funkyWeights,
+        functionMap: functionMap
+      };
+    }
+
+
+    clone(){
+      let neo = new Dumber();
+      neo.hiddenLayerWeightsB = Mathjs.clone(this.hiddenLayerWeightsB);
+      neo.hiddenLayerBiasB = Mathjs.clone(this.hiddenLayerBiasB);
+      neo.inputWeightsB = Mathjs.clone(this.inputWeightsB);
+      neo.inputBiasB = Mathjs.clone(this.inputBiasB);
+      neo.funkyWeightsB = Mathjs.clone(this.funkyWeightsB);
+      neo.funkyBiasB = Mathjs.clone(this.funkyBiasB);
+
+      neo.hiddenLayerWeightsA = Mathjs.clone(this.hiddenLayerWeightsA);
+      neo.hiddenLayerBiasA = Mathjs.clone(this.hiddenLayerBiasA);
+      neo.inputWeightsA = Mathjs.clone(this.inputWeightsA);
+      neo.inputBiasA = Mathjs.clone(this.inputBiasA);
+      neo.funkyWeightsA = Mathjs.clone(this.funkyWeightsA);
+      neo.funkyBiasA = Mathjs.clone(this.funkyBiasA);
+
+      neo.functionMapX = new Array(this.functionMapX.length);
+
+      for(let i = 0; i< this.functionMapX.length; i++){
+        neo.functionMapX[i] = this.functionMapX[i];
+      }
+
+      neo.functionMapY = new Array(this.functionMapY.length);
+
+      for(let i = 0; i< this.functionMapY.length; i++){
+        neo.functionMapY[i] = this.functionMapY[i];
+      }
+
+      neo.hawk = this.hawk;
+      neo.dove = this.dove;
+
+      neo.buildLayers();
+      return neo;
     }
 }
 

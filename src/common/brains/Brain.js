@@ -7,62 +7,64 @@ const BaseBrain = require('./BaseBrain');
 
 class Brain extends BaseBrain{
 
-
+  static create(){
+    return new Brain();
+  }
 
     constructor(){
       super();
 
       this.inputWeightsA = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.15){
+        if(Math.random() < 0.05){
           value+=  100*(Math.random()-0.5);
         }
         return value;
       });
 
       this.inputBiasA = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
-        if(Math.random() < 0.15){
+        if(Math.random() < 0.05){
           value+= (Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerWeightsA = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.15){
+        if(Math.random() < 0.05){
           value+=  100*(Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerBiasA = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
-        if(Math.random() < 0.15){
+        if(Math.random() < 0.05){
           value+=  (Math.random()-0.5);
         }
         return value;
       });
 
       this.inputWeightsB = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.15){
+        if(Math.random() < 0.05){
           value+=  100*(Math.random()-0.5);
         }
         return value;
       });
 
       this.inputBiasB = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
-        if(Math.random() < 0.15){
+        if(Math.random() < 0.05){
           value+=  (Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerWeightsB = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.15){
+        if(Math.random() < 0.05){
           value+=  100*(Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerBiasB = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
-        if(Math.random() < 0.15){
+        if(Math.random() < 0.05){
           value+=  (Math.random()-0.5);
         }
         return value;
@@ -130,7 +132,7 @@ class Brain extends BaseBrain{
       return postHiddenLayerBaisVector;
     }
 
-    mutate_half(){
+    get_half_chromosomes(){
       let inputWeights = Math.random() < 0.5 ? Mathjs.clone(this.inputWeightsA) : Mathjs.clone(this.inputWeightsB);
 
       let inputBias = Math.random() < 0.5 ? Mathjs.clone(this.inputBiasA) : Mathjs.clone(this.inputBiasB);

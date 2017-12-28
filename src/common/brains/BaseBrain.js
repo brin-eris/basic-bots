@@ -142,8 +142,14 @@ class BaseBrain{
 
       this.give = (this.outputVector.subset(Mathjs.index(9)) - 0.5 +0.1*this.dove -0.1*this.hawk);//+0.2*this.dove -0.2*this.hawk;
 
-      this.voice = (this.outputVector.subset(Mathjs.index(10)) +
-      (this.outputVector.subset(Mathjs.index(11))))/2;//* Mathjs.compare(this.hawk-this.dove,this.dove-this.hawk);
+      this.voice = (((this.outputVector.subset(Mathjs.index(30)) *
+      Mathjs.cos(this.outputVector.subset(Mathjs.index(32)) * 2 * Mathjs.PI)) +
+      (this.outputVector.subset(Mathjs.index(31)) *
+      Mathjs.sin(this.outputVector.subset(Mathjs.index(32)) * 2 * Mathjs.PI) ))+
+      ((this.outputVector.subset(Mathjs.index(30))/2 *
+      Mathjs.cos(this.outputVector.subset(Mathjs.index(32)) * 2 * Mathjs.PI)) +
+      (this.outputVector.subset(Mathjs.index(31))/2 *
+      Mathjs.sin(this.outputVector.subset(Mathjs.index(32)) * 2 * Mathjs.PI) ))) ;//* Mathjs.compare(this.hawk-this.dove,this.dove-this.hawk);
 
       this.farts = (this.outputVector.subset(Mathjs.index(12))+
       (this.outputVector.subset(Mathjs.index(13))))/2>0.75;

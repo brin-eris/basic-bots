@@ -24,6 +24,7 @@
     "matter-js": "^0.12.0",
     "matter-wrap": "^0.2.0",
     "nerdamer": "^0.7.11",
+    "p5": "^0.5.16",
     "react": "^16.1.1",
     "react-dom": "^16.1.1",
     "socket.io": "^2.0.4",

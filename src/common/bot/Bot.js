@@ -33,7 +33,7 @@ class Bot {
   constructor() {
     this.kills = 0.0;
     this.class = Bot;
-    this.brain = Dumber.create_new();
+    this.brain = Brain.create_new();
 
     this.life = 1.0;
     this.maxLife = 1.0;
@@ -676,11 +676,11 @@ class Bot {
     let center_eye_position = Vector.create(11 * Math.cos(behindUs) + this.body.position.x, 11 * Math.sin(behindUs) + this.body.position.y)
     this.brain.center_eye_vision = this.center_eye.scan(Composite.allBodies(this.world), center_eye_position, behindUs);
 
-    let left_eye_angle = behindUs - Math.PI/12;
+    let left_eye_angle = behindUs - Math.PI/18;
     let left_eye_position = Vector.create(11 * Math.cos(left_eye_angle) + this.body.position.x, 11 * Math.sin(left_eye_angle) + this.body.position.y)
     this.brain.left_eye_vision = this.left_eye.scan(Composite.allBodies(this.world), left_eye_position, left_eye_angle);
 
-    let right_eye_angle = behindUs + Math.PI/12;
+    let right_eye_angle = behindUs + Math.PI/18;
     let right_eye_position = Vector.create(11 * Math.cos(right_eye_angle) + this.body.position.x, 11 * Math.sin(right_eye_angle) + this.body.position.y)
     this.brain.right_eye_vision = this.right_eye.scan(Composite.allBodies(this.world), right_eye_position, right_eye_angle);
 

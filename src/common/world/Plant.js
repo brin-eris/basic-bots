@@ -8,11 +8,11 @@ const    Bodies = require('matter-js').Bodies;
 class Plant {
 
   static get_height(){
-    return 30;
+    return 40;
   }
 
   static get_width(){
-    return 30;
+    return 40;
   }
 
   constructor() {

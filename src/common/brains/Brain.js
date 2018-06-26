@@ -7,16 +7,18 @@ const BaseBrain = require('./BaseBrain');
 
 class Brain extends BaseBrain{
 
-  static create(){
-    return new Brain();
-  }
 
+  static create_new(){
+    let brain = new Brain();
+    //brain.buildLayers();
+    return brain;
+  }
     constructor(){
       super();
 
       this.inputWeightsA = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < 0.05){
-          value+=  100*(Math.random()-0.5);
+          value+=  (Math.random()-0.5);
         }
         return value;
       });
@@ -30,7 +32,7 @@ class Brain extends BaseBrain{
 
       this.hiddenLayerWeightsA = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < 0.05){
-          value+=  100*(Math.random()-0.5);
+          value+=  (Math.random()-0.5);
         }
         return value;
       });
@@ -44,7 +46,7 @@ class Brain extends BaseBrain{
 
       this.inputWeightsB = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < 0.05){
-          value+=  100*(Math.random()-0.5);
+          value+=  (Math.random()-0.5);
         }
         return value;
       });
@@ -58,7 +60,7 @@ class Brain extends BaseBrain{
 
       this.hiddenLayerWeightsB = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < 0.05){
-          value+=  100*(Math.random()-0.5);
+          value+=  (Math.random()-0.5);
         }
         return value;
       });
@@ -77,12 +79,12 @@ class Brain extends BaseBrain{
       let vec_A = this.proc_channel_A_input(input_vector);
       let vec_B = this.proc_channel_B_input(input_vector);
 
+    //  let combined = Mathjs.add(vec_A, vec_B);
+
+      vec_A = this.proc_channel_A_hidden(vec_A);
+      vec_B = this.proc_channel_B_hidden(vec_B);
+
       let combined = Mathjs.add(vec_A, vec_B);
-
-      vec_A = this.proc_channel_A_hidden(combined);
-      vec_B = this.proc_channel_B_hidden(combined);
-
-      combined = Mathjs.add(vec_A, vec_B);
 
       let outputVector = combined.map(function(value, index, matrix){
         let result = 1.0/(1.0 + Mathjs.exp(-1 + value));

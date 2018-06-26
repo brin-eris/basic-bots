@@ -16,7 +16,7 @@ const STARTING_PLANTS = 200;
 const MIN_PLANTS = 100;
 const WALLS = 0;
 
-const WIDTH = 3000;
+const WIDTH = 2200;
 const HEIGHT = 2200;
 
 // soak the brains in here to get juicy

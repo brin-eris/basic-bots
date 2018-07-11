@@ -206,8 +206,7 @@ class Bot {
       },
       isSensor: true,
       render: {
-        strokeStyle: '#aaaaaa',
-        lineWidth: 3
+        visible: false
       }
     });
     soundSensor.gameObject = this;

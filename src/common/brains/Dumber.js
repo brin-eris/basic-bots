@@ -15,73 +15,73 @@ class Dumber extends BaseBrain{
     constructor(){
       super();
 
-      this.inputWeightsA = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.05){
-          value+=  100*(Math.random()-0.5);
+      this.inputWeightsA = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.2){
+          value+=  10*(Math.random()-0.5);
         }
         return value;
       });
 
       this.inputBiasA = Mathjs.random([this.inputSize],-0.01, 0.01).map( function(value, index, matrix) {
-        if(Math.random() < 0.05){
-          value+= (Math.random()-0.5);
+        if(Math.random() < 0.2){
+          value+= 10*(Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerWeightsA = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.05){
-          value+=  100*(Math.random()-0.5);
+        if(Math.random() < 0.2){
+          value+=  10*(Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerBiasA = Mathjs.random([this.inputSize],-0.01, 0.01).map( function(value, index, matrix) {
-        if(Math.random() < 0.05){
-          value+= (Math.random()-0.5);
+        if(Math.random() < 0.2){
+          value+= 10*(Math.random()-0.5);
         }
         return value;
       });
 
       this.funkyWeightsA = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.05){
-          value+=  100*(Math.random()-0.5);
+        if(Math.random() < 0.2){
+          value+=  10*(Math.random()-0.5);
         }
         return value;
       });
 
       this.funkyBiasA = Mathjs.random([this.inputSize],-0.01,0.01);
 
-      this.inputWeightsB = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.05){
-          value+=  100*(Math.random()-0.5);
+      this.inputWeightsB = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+        if(Math.random() < 0.2){
+          value+=  10*(Math.random()-0.5);
         }
         return value;
       });
 
       this.inputBiasB = Mathjs.random([this.inputSize],-0.01, 0.01).map( function(value, index, matrix) {
-        if(Math.random() < 0.05){
-          value+= (Math.random()-0.5);
+        if(Math.random() < 0.2){
+          value+= 10*(Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerWeightsB = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.05){
-          value+=  100*(Math.random()-0.5);
+        if(Math.random() < 0.2){
+          value+=  10*(Math.random()-0.5);
         }
         return value;
       });
       this.hiddenLayerBiasB = Mathjs.random([this.inputSize],-0.01, 0.01).map( function(value, index, matrix) {
-        if(Math.random() < 0.05){
-          value+= (Math.random()-0.5);
+        if(Math.random() < 0.2){
+          value+= 10*(Math.random()-0.5);
         }
         return value;
       });
 
       this.funkyWeightsB = Mathjs.eye(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
-        if(Math.random() < 0.05){
-          value+=  100*(Math.random()-0.5);
+        if(Math.random() < 0.2){
+          value+=  10*(Math.random()-0.5);
         }
         return value;
       });
@@ -264,7 +264,7 @@ class Dumber extends BaseBrain{
       let childBrain = new Dumber();
       childBrain.hawk = this.hawk + (Math.random()-0.5)*.1;
       childBrain.dove = this.dove + (Math.random()-0.5)*.1;
-      if(Math.random() > 0.1){
+      if(Math.random() > 0.01){
         childBrain.hawk*=-1;
         childBrain.dove*=-1;
       }
@@ -390,7 +390,7 @@ class Dumber extends BaseBrain{
     }
 
     mutate_map(map){
-      if(Math.random() < 0.01){
+      if(Math.random() < 0.1){
         map.push(Mathjs.pickRandom(this.functions));
 
       }else if (Math.random() < 0.01 && map.length > 1) {

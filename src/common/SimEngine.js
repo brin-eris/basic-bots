@@ -10,14 +10,14 @@ const    Meat = require('./world/Meat');
 const    Wall = require('./world/Wall');
 
 const STARTING_BOTS = 7;
-const MIN_BOTS = 3;
-const MAX_BOTS = 25;
-const STARTING_PLANTS = 200;
+const MIN_BOTS = 2;
+const MAX_BOTS = 10;
+const STARTING_PLANTS = 130;
 const MIN_PLANTS = 100;
-const WALLS = 0;
+const WALLS = 4;
 
-const WIDTH = 2200;
-const HEIGHT = 2200;
+const WIDTH = 1800;
+const HEIGHT = 1800;
 
 // soak the brains in here to get juicy
 class SimEngine {
@@ -45,8 +45,8 @@ class SimEngine {
 
       for (let i = 0; i < WALLS; i++){
             new Wall().create(engine.world, {
-              x : Mathjs.round(Math.cos(i*3.14/60) * 500 )+WIDTH/2 ,
-              y : Mathjs.round(Math.sin(i*3.14/60)* 500 )+HEIGHT/2
+              x : Mathjs.round(Math.cos(i*3.14/(WALLS/2)) * 500 )+WIDTH/2 ,
+              y : Mathjs.round(Math.sin(i*3.14/(WALLS/2))* 500 )+HEIGHT/2
             });
       }
 
@@ -101,12 +101,13 @@ class SimEngine {
                 }
                 botCount++;
                 // lol not so trivial
-                  if( oldest_brain.age < urmom.gameObject.age){
-                    oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
-                  }
+                  // if( oldest_brain.age < urmom.gameObject.age){
+                  //   oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
+                  // }
                 }
                 if ( urmom.gameObject.class == Plant){
                   plantCount++;
+                  urmom.gameObject.tick();
                 }
             }
           }

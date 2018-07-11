@@ -20,20 +20,20 @@ const Body = require('matter-js').Body;
 const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
-const COLLISION_DAMAGE = 0.0035
-const sting_DAMAGE = 0.035;
-const AGE_DAMAGE = 0.0000032;
-const HEAT_DAMAGE = 0.00065;
-const OVEREAT_PENALTY = 0.005;
-const BOOST_COST = 0.0004;
-const GESTATION_TIMER = 30;
-const GIVE_AMOUNT = 0.005
+const COLLISION_DAMAGE = 0.0055;
+const sting_DAMAGE = 0.055;
+const AGE_DAMAGE = 0.0000022;
+const HEAT_DAMAGE = 0.003;
+const OVEREAT_PENALTY = 0.0005;
+const BOOST_COST = 0.00045;
+const GESTATION_TIMER = 35;
+const GIVE_AMOUNT = 0.005;
 
 class Bot {
   constructor() {
     this.kills = 0.0;
     this.class = Bot;
-    this.brain = Brain.create_new();
+    this.brain = Dumber.create_new();
 
     this.life = 1.0;
     this.maxLife = 1.0;
@@ -160,14 +160,14 @@ class Bot {
           let baseDamage = (COLLISION_DAMAGE  * Math.abs(Vector.magnitude(relativeMomentum)));
 
           if(them.gameObject.brain.sting > 0.0){
-            //one of thier body parts stingd me
+            //one of thier body parts stinged me
               me.gameObject.life -= baseDamage + ((1 + them.gameObject.brain.sting) * sting_DAMAGE);
               me.gameObject.brain.ouchie += 0.5;
 
               if(me.gameObject.life <= 0.0){
                 // tell my wife i loved her
-                them.gameObject.kills++
-                them.gameObject.maxLife++;
+              //  them.gameObject.kills++
+                //them.gameObject.maxLife++;
               }
           }else{
             // they didnt sting me, but i still got hit
@@ -206,7 +206,8 @@ class Bot {
       },
       isSensor: true,
       render: {
-        visible: false
+        strokeStyle: '#aaaaaa',
+        lineWidth: 3
       }
     });
     soundSensor.gameObject = this;
@@ -779,7 +780,7 @@ class Bot {
 
     if(this.brain.wantEat  > 0.0){
       // the amount eaten
-      food.life -= 0.02;
+      food.life -= 0.04;
 
       // if eating food bot still only gains life up to max
       if(this.life <= this.maxLife ){

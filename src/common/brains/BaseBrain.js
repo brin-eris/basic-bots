@@ -133,14 +133,14 @@ class BaseBrain{
       this.turn2 = (this.outputVector.subset(Mathjs.index(2))-0.5);
       this.thrust2 = (this.outputVector.subset(Mathjs.index(3)) - 0.5)  ;
 
-      this.bodyColor.red = (this.outputVector.subset(Mathjs.index(5)));//* (this.hawk-this.dove);
+      this.bodyColor.red = (this.outputVector.subset(Mathjs.index(5))) * (this.hawk - this.dove);
       this.bodyColor.green = (this.outputVector.subset(Mathjs.index(6)));
-      this.bodyColor.blue = (this.outputVector.subset(Mathjs.index(7)));//* (this.dove - this.hawk);
+      this.bodyColor.blue = (this.outputVector.subset(Mathjs.index(7))) * (this.dove - this.hawk);
 
 
-      this.sting = (this.outputVector.subset(Mathjs.index(8))-0.5 -0.1*this.dove +0.1*this.hawk);//-0.2*this.dove +0.2*this.hawk);
+      this.sting = (this.outputVector.subset(Mathjs.index(8))-0.5 -0.2*this.dove +0.2*this.hawk);
 
-      this.give = (this.outputVector.subset(Mathjs.index(9)) - 0.5 +0.1*this.dove -0.1*this.hawk);//+0.2*this.dove -0.2*this.hawk;
+      this.give = (this.outputVector.subset(Mathjs.index(9)) - 0.5 + 0.2*this.dove -0.2*this.hawk);
 
       this.voice = (((this.outputVector.subset(Mathjs.index(30)) *
       Mathjs.cos(this.outputVector.subset(Mathjs.index(32)) * 2 * Mathjs.PI)) +

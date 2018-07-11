@@ -8,11 +8,11 @@ const    Bodies = require('matter-js').Bodies;
 class Plant {
 
   static get_height(){
-    return 40;
+    return 60;
   }
 
   static get_width(){
-    return 40;
+    return 60;
   }
 
   constructor() {
@@ -37,7 +37,7 @@ class Plant {
             }
           });
 
-          this.body.gameColor = {red: 0.1, blue: 0.1, green: 0.9}
+          this.body.gameColor = {red: 0.0, blue: 0.0, green: this.life}
 
 
           plant.gameObject = this;
@@ -48,13 +48,27 @@ class Plant {
           World.add(world, plant);
       }
 
-      destroy(){
-        Matter.Composite.remove(this.world, this.parentComposite, true);
-        console.log('deforestization');
+      tick(){
+        this.life+= 0.0001;
+        this.body.gameColor = {red: 0.0, blue: 0.0, green: this.life}
+        this.body.render.fillStyle = this.rgbToHex(0,this.life * 255,0);
       }
 
+      destroy(){
+        Matter.Composite.remove(this.world, this.parentComposite, true);
+        //console.log('deforestization');
+      }
 
+      componentToHex(c) {
+        c = Math.floor(c);
+        c = Math.min(Math.max(c,0),255);
+        var hex = c.toString(16).substring(0,2);
+        return hex.length == 1 ? "0" + hex : hex;
+      }
 
+      rgbToHex(r, g, b) {
+        return "#" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
+      }
 
 
 }

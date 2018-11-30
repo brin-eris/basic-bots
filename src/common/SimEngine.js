@@ -9,14 +9,15 @@ const    Plant = require('./world/Plant');
 const    Meat = require('./world/Meat');
 const    Wall = require('./world/Wall');
 
-const STARTING_BOTS = 7;
+const STARTING_BOTS = 8;
 const MIN_BOTS = 2;
 const MAX_BOTS = 10;
-const STARTING_PLANTS = 130;
-const MIN_PLANTS = 100;
-const WALLS = 4;
+const SPECIES = 2;
+const STARTING_PLANTS = 180;
+const MIN_PLANTS = 180;
+const WALLS = 6;
 
-const WIDTH = 1800;
+const WIDTH = 2300;
 const HEIGHT = 1800;
 
 // soak the brains in here to get juicy
@@ -50,11 +51,15 @@ class SimEngine {
             });
       }
 
-      for (let i = 0; i < STARTING_BOTS; i++ ){
-        new  Bot().create(engine.world, {
-          x : (Math.random() -0.5) * WIDTH + WIDTH/2,
-          y : (Math.random() - 0.5) * HEIGHT + HEIGHT/2
-        });
+      for (let k=0;k<SPECIES;k++){
+        for (let i = 0; i < STARTING_BOTS; i++ ){
+          var b = new  Bot();
+          b.create(engine.world, {
+            x : (Math.random() -0.5) * WIDTH + WIDTH/2,
+            y : (Math.random() - 0.5) * HEIGHT + HEIGHT/2
+          });
+          b.species = k;
+        }
       }
 
       let spacer = 2;
@@ -85,7 +90,10 @@ class SimEngine {
 
 
       Matter.Events.on(engine, "beforeUpdate", function(e){
-        let botCount = 0;
+        let populationcount = new Array(SPECIES);
+          for (let k=0;k<SPECIES;k++){
+            populationcount[k] = 0;
+          }
         let plantCount = 0;
 
           for (var i = 0; i < engine.world.composites.length; i++) {
@@ -99,11 +107,8 @@ class SimEngine {
                     Matter.Composite.remove(engine.world, urmom, true);
                     continue;
                 }
-                botCount++;
-                // lol not so trivial
-                  // if( oldest_brain.age < urmom.gameObject.age){
-                  //   oldest_brain = {brain: urmom.gameObject.brain, age: urmom.gameObject.age };
-                  // }
+                populationcount[urmom.gameObject.species]++;
+
                 }
                 if ( urmom.gameObject.class == Plant){
                   plantCount++;
@@ -111,14 +116,18 @@ class SimEngine {
                 }
             }
           }
-          if(botCount < MIN_BOTS && Math.random()>0.9){
 
-            let child = new Bot( );
+          for (let k=0;k<SPECIES;k++){
+            var botCount = populationcount[k];
 
-            child.create(engine.world, {x: WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
+            if(botCount < MIN_BOTS && Math.random()>0.9){
+
+              let child = new Bot( );
+              child.species = k;
+              child.create(engine.world, {x: WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
 
           }
-
+        }
 
           if(plantCount < MIN_PLANTS){
             plantCount++;

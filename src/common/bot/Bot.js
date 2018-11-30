@@ -8,8 +8,10 @@ const    Wall = require('../world/Wall');
 const    Plant = require('../world/Plant');
 const    Meat = require('../world/Meat');
 const    Brain = require('../brains/Brain');
+const    OtherBrain = require('../brains/OtherBrain');
 const    Dumber = require('../brains/Dumber');
 const    DeltaBrain = require('../brains/DeltaBrain');
+//const    OOBrain = require('../brains/OOBrain');
 
 const    Eye = require('./Eye');
 
@@ -20,25 +22,26 @@ const Body = require('matter-js').Body;
 const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
-const COLLISION_DAMAGE = 0.0055;
-const sting_DAMAGE = 0.055;
-const AGE_DAMAGE = 0.0000022;
-const HEAT_DAMAGE = 0.003;
+
+const COLLISION_DAMAGE = 0.002;
+const sting_DAMAGE = 0.02;
+const AGE_DAMAGE = 0.000001;
+const HEAT_DAMAGE = 0.0002;
 const OVEREAT_PENALTY = 0.0005;
 const BOOST_COST = 0.00045;
-const GESTATION_TIMER = 35;
+const GESTATION_TIMER = 300;
 const GIVE_AMOUNT = 0.005;
 
 class Bot {
   constructor() {
-    this.kills = 0.0;
+
     this.class = Bot;
-    this.brain = Dumber.create_new();
+    this.brain = OtherBrain.create_new();
 
     this.life = 1.0;
     this.maxLife = 1.0;
     this.heat = 0.0;
-    this.gluttony = 0.0;
+
 
     this.center_eye = new Eye();
     this.left_eye = new Eye();
@@ -81,7 +84,7 @@ class Bot {
     let eyeC3AOffset = Vector.create( offsetLayer2Radius * 1.5,0);
 
 
-    let soundRadius = 100;
+    let soundRadius = 200;
 
     let bot = Matter.Composite.create({
       label: 'Bot',
@@ -139,13 +142,13 @@ class Bot {
           }else if(them.gameObject.class==Meat){
             me.gameObject.brain.smellMeat = 1.0;
             // only the blood thirsty eat meat
-            if(me.gameObject.brain.hawk > 0){
+          //  if(me.gameObject.brain.hawk > 0){
               //console.log('fresh meat!')
               this.gestationTimer-=5;
               me.gameObject.eat(them.gameObject);
               me.gameObject.eat(them.gameObject);
 
-            }
+          //  }
           }
       }
 
@@ -166,8 +169,8 @@ class Bot {
 
               if(me.gameObject.life <= 0.0){
                 // tell my wife i loved her
-              //  them.gameObject.kills++
-                //them.gameObject.maxLife++;
+
+
               }
           }else{
             // they didnt sting me, but i still got hit
@@ -190,13 +193,13 @@ class Bot {
         } else if(them.gameObject.class==Meat){
           me.gameObject.brain.smellMeat += 0.5;
           // only the blood thirsty eat meat
-            if(me.gameObject.brain.hawk > 0){
+          //  if(me.gameObject.brain.hawk > 0){
               //console.log('fresh meat!')
               this.gestationTimer-=5;
               me.gameObject.eat(them.gameObject) ;
               me.gameObject.eat(them.gameObject) ;
 
-          }
+          //}
         }
     };
 
@@ -218,10 +221,12 @@ class Bot {
 
               me.gameObject.brain.soundInput += them.gameObject.voice ;
 
-
+              if(me.gameObject.species == them.gameObject.species){
                 if(me.gameObject.will_mate && them.gameObject.will_mate){
-                  me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-                  // me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+                    me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+                    me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+                  //  me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+                }
                 }
 
               //console.log(them.gameObject.voice);
@@ -436,8 +441,10 @@ class Bot {
       me.gameObject.brain.eyeCInput.green += (them.gameColor.green*0.8);
       if(them.gameObject.class == Bot){
         if(me.gameObject.will_mate ){
-          me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-          //me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          if(me.gameObject.species == them.gameObject.species){
+            me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+            me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+          }
         }
       }
     };
@@ -468,8 +475,10 @@ class Bot {
       me.gameObject.brain.eyeC2AInput.green += (them.gameColor.green);
       if(them.gameObject.class == Bot){
         if(me.gameObject.will_mate){
-          me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-          //me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          if(me.gameObject.species == them.gameObject.species){
+            me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+            me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+          }
         }
       }
     };
@@ -500,8 +509,10 @@ class Bot {
       me.gameObject.brain.eyeC2BInput.green += (them.gameColor.green);
       if(them.gameObject.class == Bot){
         if(me.gameObject.will_mate){
-          me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-          //me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          if(me.gameObject.species == them.gameObject.species){
+            me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+            me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+          }
         }
       }
     };
@@ -533,9 +544,11 @@ class Bot {
       me.gameObject.brain.eyeC3AInput.green += (them.gameColor.green);
       if(them.gameObject.class == Bot){
         if(me.gameObject.will_mate){
+          if(me.gameObject.species == them.gameObject.species){
           me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-          //me.gameObject.mate(me.gameObject.brain.mutate_half(), them.gameObject.brain.mutate_half());
+          me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
         }
+      }
       }
     };
     this.eyeC3A = eyeC3A;
@@ -657,10 +670,7 @@ class Bot {
   }
 
   tick() {
-    // if(this.body.position.x < 0 || this.body.position.y<0 || this.body.position.x > 3000 || this.body.position.y>2000){
-    //   this.life = 0.0;
-    //   return;
-    // }
+
 
 
     this.heat = ( Mathjs.distance([
@@ -676,18 +686,18 @@ class Bot {
     let center_eye_position = Vector.create(11 * Math.cos(behindUs) + this.body.position.x, 11 * Math.sin(behindUs) + this.body.position.y)
     this.brain.center_eye_vision = this.center_eye.scan(Composite.allBodies(this.world), center_eye_position, behindUs);
 
-    let left_eye_angle = behindUs - Math.PI/18;
+    let left_eye_angle = behindUs - Math.PI/12;
     let left_eye_position = Vector.create(11 * Math.cos(left_eye_angle) + this.body.position.x, 11 * Math.sin(left_eye_angle) + this.body.position.y)
     this.brain.left_eye_vision = this.left_eye.scan(Composite.allBodies(this.world), left_eye_position, left_eye_angle);
 
-    let right_eye_angle = behindUs + Math.PI/18;
+    let right_eye_angle = behindUs + Math.PI/12;
     let right_eye_position = Vector.create(11 * Math.cos(right_eye_angle) + this.body.position.x, 11 * Math.sin(right_eye_angle) + this.body.position.y)
     this.brain.right_eye_vision = this.right_eye.scan(Composite.allBodies(this.world), right_eye_position, right_eye_angle);
 
 
-    // set all brain inputs that arent from events
+    // think
     this.brain.tick();
-      let gluttonPenalty = this.gluttony+1;//OVEREAT_PENALTY *
+
 
     // get all brain outputs
       this.age = this.brain.age;
@@ -752,11 +762,11 @@ class Bot {
 
         if(this.gestationTimer < 1 && this.brain.interestedInMating){
           this.will_mate = true;
-          if(this.gestationTimer < -GESTATION_TIMER ){
+           if(this.gestationTimer < -GESTATION_TIMER ){
             this.spawn(this.body.position);
             this.will_mate = false;
             this.gestationTimer = GESTATION_TIMER;
-          }
+           }
         }else{
           this.will_mate = false;
         }
@@ -765,9 +775,9 @@ class Bot {
 
     mate(channel_A, channel_B){
       let child = new Bot();
-      child.maxLife = this.maxLife;
+      child.species = this.species;
       child.brain.rebuild(channel_A, channel_B);
-      child.create(this.world, Vector.create(this.body.position.x -150*Math.random(), this.body.position.y -150*Math.random()));
+      child.create(this.world, Vector.create(this.body.position.x - 200*(Math.random()-0.5), this.body.position.y - 200*(Math.random()-0.5)));
 
       console.log('natural birth');
       this.gestationTimer = GESTATION_TIMER;
@@ -777,20 +787,18 @@ class Bot {
   eat(food){
     // will only eat if wants to
 
-    if(this.brain.wantEat  > 0.0){
+    if(this.brain.wantEat ){
       // the amount eaten
       food.life -= 0.04;
-
-      // if eating food bot still only gains life up to max
-      if(this.life <= this.maxLife ){
-      var speedMod = 1.0 - (this.body.speed -20)/100;
-      this.life += (0.02 * speedMod);
       this.gestationTimer--;
+      // if eating food bot still only gains life up to max
+      if(this.life < this.maxLife ){
+      var speedMod = 1.0 - (this.body.speed -20)/100;
+      this.life += (0.03 * speedMod);
+
     }else {
 
-      // glutton will take a penalty over time
-      // otherwise it could take damage and then eat to full having no purpose
-      this.gluttony++;
+
     }
 
 
@@ -812,7 +820,7 @@ class Bot {
 
   spawn(placement){
     let child = new Bot();
-//    child.maxLife = this.maxLife;
+    child.species = this.species;
     child.brain = this.brain.mutate();
     child.create(this.world, Vector.create(placement.x -150*Math.random(), placement.y -150*Math.random()));
   }

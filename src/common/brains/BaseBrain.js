@@ -2,7 +2,7 @@
 
 const Mathjs = require('mathjs');
 
-const INPUT_SIZE = 43;
+const INPUT_SIZE = 22;
 
 
 class BaseBrain{
@@ -13,13 +13,7 @@ class BaseBrain{
       this.inputSize = INPUT_SIZE;
 
       this.smellMeat = 0.0;
-      if(Math.random()>0.5){
-        this.hawk = 0.0;
-        this.dove = 1.0;
-      }else{
-        this.hawk = 1.0;
-        this.dove = 0.0;
-      }
+      this.memory = 0;
       this.ccClock = 0.0;
       this.turn1 = 0.0;
       this.turn2 = 0.0;
@@ -79,35 +73,35 @@ class BaseBrain{
         this.right_eye_vision.blue,
         this.right_eye_vision.green,
 
-        this.bodyInput.red,
-        this.bodyInput.blue,
-        this.bodyInput.green,
-
-
-        this.eyeAInput.red,
-        this.eyeAInput.blue,
-        this.eyeAInput.green,
-
-        this.eyeBInput.red,
-        this.eyeBInput.blue,
-        this.eyeBInput.green,
-
-        this.eyeCInput.red,
-        this.eyeCInput.blue,
-        this.eyeCInput.green,
-
-        this.eyeC2AInput.red,
-        this.eyeC2AInput.blue,
-        this.eyeC2AInput.green,
-
-        this.eyeC2BInput.red,
-        this.eyeC2BInput.blue,
-        this.eyeC2BInput.green,
-
-        this.eyeC3AInput.red,
-        this.eyeC3AInput.blue,
-        this.eyeC3AInput.green,
-
+        // this.bodyInput.red,
+        // this.bodyInput.blue,
+        // this.bodyInput.green,
+        //
+        //
+        // this.eyeAInput.red,
+        // this.eyeAInput.blue,
+        // this.eyeAInput.green,
+        //
+        // this.eyeBInput.red,
+        // this.eyeBInput.blue,
+        // this.eyeBInput.green,
+        //
+        // this.eyeCInput.red,
+        // this.eyeCInput.blue,
+        // this.eyeCInput.green,
+        //
+        // this.eyeC2AInput.red,
+        // this.eyeC2AInput.blue,
+        // this.eyeC2AInput.green,
+        //
+        // this.eyeC2BInput.red,
+        // this.eyeC2BInput.blue,
+        // this.eyeC2BInput.green,
+        //
+        // this.eyeC3AInput.red,
+        // this.eyeC3AInput.blue,
+        // this.eyeC3AInput.green,
+        //
 
         this.sting,
         this.voice,
@@ -121,56 +115,49 @@ class BaseBrain{
         this.give,
         Mathjs.PI,
         this.smellMeat,
-        this.dove - this.hawk
+        this.memory
         ]);
 
     }
 
 
     getOutputs(){
-      this.turn1 = (this.outputVector.subset(Mathjs.index(0)) - 0.5);
-      this.thrust1 = (this.outputVector.subset(Mathjs.index(1)) - 0.5)  ;
-      this.turn2 = (this.outputVector.subset(Mathjs.index(2))-0.5);
-      this.thrust2 = (this.outputVector.subset(Mathjs.index(3)) - 0.5)  ;
+      let threshold = 0.5;
+      this.turn1 = (this.outputVector.subset(Mathjs.index(0)) - threshold );//*Math.PI;
+      this.thrust1 = (this.outputVector.subset(Mathjs.index(1)) - threshold) ;
+      this.turn2 = (this.outputVector.subset(Mathjs.index(2)) - threshold);//*Math.PI;
+      this.thrust2 = (this.outputVector.subset(Mathjs.index(3)) - threshold)  ;
 
-      this.bodyColor.red = (this.outputVector.subset(Mathjs.index(5))) * (this.hawk - this.dove);
-      this.bodyColor.green = (this.outputVector.subset(Mathjs.index(6)));
-      this.bodyColor.blue = (this.outputVector.subset(Mathjs.index(7))) * (this.dove - this.hawk);
-
-
-      this.sting = (this.outputVector.subset(Mathjs.index(8))-0.5 -0.2*this.dove +0.2*this.hawk);
-
-      this.give = (this.outputVector.subset(Mathjs.index(9)) - 0.5 + 0.2*this.dove -0.2*this.hawk);
-
-      this.voice = (((this.outputVector.subset(Mathjs.index(30)) *
-      Mathjs.cos(this.outputVector.subset(Mathjs.index(32)) * 2 * Mathjs.PI)) +
-      (this.outputVector.subset(Mathjs.index(31)) *
-      Mathjs.sin(this.outputVector.subset(Mathjs.index(32)) * 2 * Mathjs.PI) ))+
-      ((this.outputVector.subset(Mathjs.index(30))/2 *
-      Mathjs.cos(this.outputVector.subset(Mathjs.index(32)) * 2 * Mathjs.PI)) +
-      (this.outputVector.subset(Mathjs.index(31))/2 *
-      Mathjs.sin(this.outputVector.subset(Mathjs.index(32)) * 2 * Mathjs.PI) ))) ;//* Mathjs.compare(this.hawk-this.dove,this.dove-this.hawk);
-
-      this.farts = (this.outputVector.subset(Mathjs.index(12))+
-      (this.outputVector.subset(Mathjs.index(13))))/2>0.75;
+      this.bodyColor.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(4))) ;
+      this.bodyColor.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(5)));
+      this.bodyColor.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(6))) ;
 
 
-      this.eyeColorA.red =(this.outputVector.subset(Mathjs.index(14)))+this.sting;
-      this.eyeColorA.blue =(this.outputVector.subset(Mathjs.index(15)))+this.give;
-      this.eyeColorA.green =(this.outputVector.subset(Mathjs.index(16)));
+      this.sting = Mathjs.abs(this.outputVector.subset(Mathjs.index(7)));
 
-      this.eyeColorB.red =(this.outputVector.subset(Mathjs.index(17)))+this.sting;
-      this.eyeColorB.green =(this.outputVector.subset(Mathjs.index(18)));
-      this.eyeColorB.blue =(this.outputVector.subset(Mathjs.index(19))) + this.give;
+      this.give = Mathjs.abs(this.outputVector.subset(Mathjs.index(8)));
 
-      this.eyeColorC.red =(this.outputVector.subset(Mathjs.index(20))) + this.sting;
-      this.eyeColorC.blue =(this.outputVector.subset(Mathjs.index(21)))+this.give;
-      this.eyeColorC.green =(this.outputVector.subset(Mathjs.index(22)));
+      this.voice = this.outputVector.subset(Mathjs.index(9)) ;//* Mathjs.compare(this.hawk-this.dove,this.dove-this.hawk);
 
-      this.interestedInMating = (this.outputVector.subset(Mathjs.index(23)))>0.5;
+      this.farts = (this.outputVector.subset(Mathjs.index(10)) > threshold);
 
-      this.wantEat = (this.outputVector.subset(Mathjs.index(26))-0.5);
 
+      this.eyeColorA.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(12))) + this.sting;
+      this.eyeColorA.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(13))) + this.give;
+      this.eyeColorA.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(14)));
+
+      this.eyeColorB.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(15))) + this.sting;
+      this.eyeColorB.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(16))) + this.give;
+      this.eyeColorB.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(17)));
+
+      this.eyeColorC.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(18))) + this.sting;
+      this.eyeColorC.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(19))) + this.give;
+      this.eyeColorC.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(20)));
+
+      this.interestedInMating = (this.outputVector.subset(Mathjs.index(21)))>threshold;
+
+      this.wantEat = (this.outputVector.subset(Mathjs.index(11))>threshold);
+      this.memory = this.outputVector.subset(Mathjs.index(12));
     }
 
     cleanupInputs(){

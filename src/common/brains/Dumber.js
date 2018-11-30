@@ -154,7 +154,7 @@ class Dumber extends BaseBrain{
         return Mathjs.cos(x);
       }
       let sigmoidSuck = function(x){
-        let result = 1.0/(1.0 + Mathjs.exp(-1 + x));
+        let result = 1.0/(1.0 + Mathjs.exp(-1 * x));
 
         return isNaN(result) ? 1.0 : result;
       }
@@ -220,6 +220,7 @@ class Dumber extends BaseBrain{
           let result = ((1/(Math.PI)) *Mathjs.exp(-1 * value*value));
           result = result < 0.0005 ? 0.0 : result;
           return isNaN(result) ? 1.0 : result;
+          //return Mathjs.sin(value);
       });
 
       for(var i=0; i<this.layers.length;i++){
@@ -232,11 +233,17 @@ class Dumber extends BaseBrain{
               let result = ((1/(Math.PI)) *Mathjs.exp(-1 * value*value));
               result = result < 0.0005 ? 0.0 : result;
               return isNaN(result) ? 1.0 : result;
+              //return Mathjs.sin(value);
       });
 
       for(var i=0; i<this.layers.length;i++){
              let layer =  this.layers[i];
-             hiddenLayerInputVectorB = Mathjs.multiply(layer, hiddenLayerInputVectorB);
+             hiddenLayerInputVectorB = Mathjs.multiply(layer, hiddenLayerInputVectorB.map(function(value, index, matrix){
+                     let result = ((1/(Math.PI)) *Mathjs.exp(-1 * value*value));
+
+                     return isNaN(result) ? 1.0 : result;
+                     //return Mathjs.sin(value)*Mathjs.sinh(value);
+             }));
       }
 
 
@@ -255,6 +262,7 @@ class Dumber extends BaseBrain{
           let result = 1.0/(1.0 + Mathjs.exp(-1 + value));
           result = result < 0.0005 ? 0.0 : result;
           return isNaN(result) ? 1.0 : result;
+           //return Mathjs.sin(value);
       });
 
         return outputVector;
@@ -262,12 +270,7 @@ class Dumber extends BaseBrain{
 
     mutate(){
       let childBrain = new Dumber();
-      childBrain.hawk = this.hawk + (Math.random()-0.5)*.1;
-      childBrain.dove = this.dove + (Math.random()-0.5)*.1;
-      if(Math.random() > 0.01){
-        childBrain.hawk*=-1;
-        childBrain.dove*=-1;
-      }
+
 
       childBrain.functionMapX = new Array(this.functionMapX.length);
 
@@ -481,8 +484,7 @@ class Dumber extends BaseBrain{
         neo.functionMapY[i] = this.functionMapY[i];
       }
 
-      neo.hawk = this.hawk;
-      neo.dove = this.dove;
+
 
       neo.buildLayers();
       return neo;

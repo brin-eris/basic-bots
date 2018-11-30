@@ -5,103 +5,90 @@ const Mathjs = require('mathjs');
 const BaseBrain = require('./BaseBrain');
 
 
-class Brain extends BaseBrain{
+class OtherBrain extends BaseBrain{
 
 
   static create_new(){
-    let brain = new Brain();
-    //brain.buildLayers();
+    let brain = new OtherBrain();
+    brain.buildLayers();
     return brain;
   }
     constructor(){
       super();
-     var mutation_rate = 0.3;
-
+     var mutation_rate = 0.6;
+     var mutation_magnitude = 1.5;
       this.inputWeightsA = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  3*(Math.random()-0.5);
+          value+=  mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
 
       this.inputBiasA = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+= 3*(Math.random()-0.5);
+          value+= mutation_magnitude*(Math.random()-0.5)*.1;
         }
         return value;
       });
 
       this.hiddenLayerWeightsA = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  3*(Math.random()-0.5);
+          value+=  mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerBiasA = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  3*(Math.random()-0.5);
+          value+=  mutation_magnitude*(Math.random()-0.5)*.1;
         }
         return value;
       });
 
       this.inputWeightsB = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  3*(Math.random()-0.5);
+          value+=  mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
 
       this.inputBiasB = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  3*(Math.random()-0.5);
+          value+=  mutation_magnitude*(Math.random()-0.5)*.1;
         }
         return value;
       });
 
       this.hiddenLayerWeightsB = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  3*(Math.random()-0.5);
+          value+=  mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerBiasB = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  3*(Math.random()-0.5);
+          value+=  mutation_magnitude*(Math.random()-0.5)*.1;
         }
         return value;
       });
 
+
+    }
+
+
+    buildLayers(){
+      this.combined_input_weights = Mathjs.add(this.inputWeightsA, this.inputWeightsB);
+      this.combined_input_bias = Mathjs.add(this.inputBiasA, this.inputBiasB);
+      this.combined_hidden_weights = Mathjs.add(this.hiddenLayerWeightsA, this.hiddenLayerWeightsB);
+      this.combined_hidden_bias = Mathjs.add(this.hiddenLayerBiasA, this.hiddenLayerBiasB);
     }
 
     doMagic(input_vector){
 
-      let vec_A = this.proc_channel_A_input(input_vector);
-      let vec_B = this.proc_channel_B_input(input_vector);
+      let postInputsWeightsVector = Mathjs.multiply(this.combined_input_weights, input_vector);
 
-      let combined = Mathjs.add(vec_A, vec_B);
-
-      vec_A = this.proc_channel_A_hidden(combined);
-      vec_B = this.proc_channel_B_hidden(combined);
-
-      combined = Mathjs.add(vec_A, vec_B);
-
-      let outputVector = combined.map(function(value, index, matrix){
-        let result = (1.0/(1.0 + Mathjs.exp(-1 * value)) - 0.5)*2;
-        //(value*value)/(1 + value*value);
-        //Mathjs.exp(-1 * value * value);
-        //1.0/(1.0 + Mathjs.exp(-1 * value));
-
-        return isNaN(result) ? 0.5 : result;
-        });
-        return outputVector;
-    }
-
-    proc_channel_A_input(input_vector){
-      let postInputsWeightsVector = Mathjs.multiply(this.inputWeightsA, input_vector);
-
-      let postInputsBiasVector = Mathjs.add(postInputsWeightsVector, this.inputBiasA);
+      let postInputsBiasVector = Mathjs.add(postInputsWeightsVector, this.combined_input_bias);
 
       let hiddenLayerInputVector =  postInputsBiasVector.map(function(value, index, matrix){
         let result = (1.0/(1.0 + Mathjs.exp(-1 * value)) - 0.5)*2;
@@ -109,67 +96,43 @@ class Brain extends BaseBrain{
         //Mathjs.sin(value*value);
         //1.0/(1.0 + Mathjs.exp(-1 * value));
         //(value*value)/(1 + value*value)
-
+        if(isNaN(result)){
+            result = 0.5
+        }
         return result;
         });
 
-      return hiddenLayerInputVector;
+        let postHiddenLayerWeightsVector = Mathjs.multiply(hiddenLayerInputVector, this.combined_hidden_weights);
+        let postHiddenLayerBaisVector = Mathjs.add(postHiddenLayerWeightsVector, this.combined_hidden_bias);
+
+        let outputVector = postHiddenLayerBaisVector.map(function(value, index, matrix){
+          let result = (1.0/(1.0 + Mathjs.exp(-1 * value)) - 0.5)*2;
+          //(value*value)/(1 + value*value);
+          //Mathjs.sin(value*value);
+          //1.0/(1.0 + Mathjs.exp(-1 * value));
+          if(isNaN(result)){
+            result = 0.5
+          }
+          return result;
+          });
+
+
+        return outputVector;
     }
 
-    proc_channel_B_input(input_vector){
-      let postInputsWeightsVector = Mathjs.multiply(this.inputWeightsB, input_vector);
 
-      let postInputsBiasVector = Mathjs.add(postInputsWeightsVector, this.inputBiasB);
-
-      let hiddenLayerInputVector =  postInputsBiasVector.map(function(value, index, matrix){
-        let result = (1.0/(1.0 + Mathjs.exp(-1 * value)) - 0.5)*2;
-        //(value*value)/(1 + value*value);
-        //Mathjs.cos(value*value);
-        //1.0/(1.0 + Mathjs.exp(-1 * value));
-
-        return result;
-        });
-
-        return hiddenLayerInputVector;
-    }
-
-    proc_channel_A_hidden(hiddenLayerInputVector){
-      let postHiddenLayerWeightsVector = Mathjs.multiply(hiddenLayerInputVector, this.hiddenLayerWeightsA);
-      let postHiddenLayerBaisVector = Mathjs.add(postHiddenLayerWeightsVector, this.hiddenLayerBiasA)
-      return postHiddenLayerBaisVector.map(function(value, index, matrix){
-        let result = (1.0/(1.0 + Mathjs.exp(-1 * value)) - 0.5)*2;
-        //(value*value)/(1 + value*value);
-        //Mathjs.sin(value*value);
-        //1.0/(1.0 + Mathjs.exp(-1 * value));
-
-        return result;
-        });
-    }
-
-    proc_channel_B_hidden(hiddenLayerInputVector){
-      let postHiddenLayerWeightsVector = Mathjs.multiply(hiddenLayerInputVector, this.hiddenLayerWeightsB);
-      let postHiddenLayerBaisVector = Mathjs.add(postHiddenLayerWeightsVector, this.hiddenLayerBiasB)
-      return postHiddenLayerBaisVector.map(function(value, index, matrix){
-        let result = (1.0/(1.0 + Mathjs.exp(-1 * value)) - 0.5)*2;
-        //(value*value)/(1 + value*value);
-        //Mathjs.cos(value*value);
-        //(value * value)/(1.0 + value * value);
-        //1.0/(1.0 + Mathjs.exp(-1 * value));
-        return result;
-        });
-    }
 
     get_half_chromosomes(){
       let inputs_result = Math.random();
 
-      let inputWeights = inputs_result < 0.5 ? Mathjs.clone(this.inputWeightsA) : Mathjs.clone(this.inputWeightsB);
+      let inputWeights = Math.random() < 0.5 ? Mathjs.clone(this.inputWeightsA) : Mathjs.clone(this.inputWeightsB);
 
-      let inputBias = inputs_result < 0.5 ? Mathjs.clone(this.inputBiasA) : Mathjs.clone(this.inputBiasB);
+      let inputBias = Math.random() < 0.5 ? Mathjs.clone(this.inputBiasA) : Mathjs.clone(this.inputBiasB);
 
         let hidden_result = Math.random();
-      let hiddenLayerWeights = hidden_result < 0.5 ? Mathjs.clone(this.hiddenLayerWeightsA) : Mathjs.clone(this.hiddenLayerWeightsB);
+      let hiddenLayerWeights = Math.random() < 0.5 ? Mathjs.clone(this.hiddenLayerWeightsA) : Mathjs.clone(this.hiddenLayerWeightsB);
 
-      let hiddenLayerBias = hidden_result < 0.5 ? Mathjs.clone(this.hiddenLayerBiasA) : Mathjs.clone(this.hiddenLayerBiasB);
+      let hiddenLayerBias = Math.random() < 0.5 ? Mathjs.clone(this.hiddenLayerBiasA) : Mathjs.clone(this.hiddenLayerBiasB);
 
       return {
         inputWeights: inputWeights,
@@ -188,10 +151,11 @@ class Brain extends BaseBrain{
       this.inputBiasB = this.mutate_layer(channel_B.inputBias);
       this.hiddenLayerWeightsB = this.mutate_layer(channel_B.hiddenLayerWeights);
       this.hiddenLayerBiasB = this.mutate_layer(channel_B.hiddenLayerBias);
+      this.buildLayers();
     }
 
     mutate(){
-      let childBrain = new Brain();
+      let childBrain = new OtherBrain();
 
 
       childBrain.inputWeightsA = this.mutate_layer(this.inputWeightsA);
@@ -241,6 +205,7 @@ class Brain extends BaseBrain{
       if(Math.random()< 0.05){
         childBrain.hiddenLayerWeightsB = Mathjs.inv(childBrain.hiddenLayerWeightsB);
       }
+      childBrain.buildLayers();
       return childBrain;
     }
 
@@ -265,7 +230,7 @@ class Brain extends BaseBrain{
 
 
     clone(){
-      let neo = new Brain();
+      let neo = new OtherBrain();
       neo.hiddenLayerWeightsB = Mathjs.clone(this.hiddenLayerWeightsB);
       neo.hiddenLayerBiasB = Mathjs.clone(this.hiddenLayerBiasB);
       neo.inputWeightsB = Mathjs.clone(this.inputWeightsB);
@@ -274,10 +239,11 @@ class Brain extends BaseBrain{
       neo.hiddenLayerBiasA = Mathjs.clone(this.hiddenLayerBiasA);
       neo.inputWeightsA = Mathjs.clone(this.inputWeightsA);
       neo.inputBiasA = Mathjs.clone(this.inputBiasA);
-    
+
+      neo.buildLayers();
       return neo;
     }
 }
 
 
-module.exports = Brain;
+module.exports = OtherBrain;

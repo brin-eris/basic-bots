@@ -1,5 +1,8 @@
 {
   "name": "brains",
+  "engines": {
+   "node": "10.9.0"
+ },
   "version": "0.0.1",
   "description": "making brains",
   "main": "index.js",

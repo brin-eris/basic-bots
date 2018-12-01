@@ -10,7 +10,7 @@ const    Meat = require('./world/Meat');
 const    Wall = require('./world/Wall');
 
 const STARTING_BOTS = 8;
-const MIN_BOTS = 2;
+const MIN_BOTS = 4;
 const MAX_BOTS = 10;
 const SPECIES = 2;
 const STARTING_PLANTS = 180;

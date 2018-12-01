@@ -25,11 +25,11 @@ const Mathjs = require('mathjs');
 
 const COLLISION_DAMAGE = 0.002;
 const sting_DAMAGE = 0.02;
-const AGE_DAMAGE = 0.000001;
+const AGE_DAMAGE = 0.000002;
 const HEAT_DAMAGE = 0.0002;
 const OVEREAT_PENALTY = 0.0005;
 const BOOST_COST = 0.00045;
-const GESTATION_TIMER = 300;
+const GESTATION_TIMER = 200;
 const GIVE_AMOUNT = 0.005;
 
 class Bot {
@@ -762,13 +762,14 @@ class Bot {
 
         if(this.gestationTimer < 1 && this.brain.interestedInMating){
           this.will_mate = true;
-           if(this.gestationTimer < -GESTATION_TIMER ){
-            this.spawn(this.body.position);
-            this.will_mate = false;
-            this.gestationTimer = GESTATION_TIMER;
-           }
+
         }else{
           this.will_mate = false;
+        }
+        if(this.gestationTimer < -GESTATION_TIMER ){
+         this.spawn(this.body.position);
+         this.will_mate = false;
+         this.gestationTimer = GESTATION_TIMER;
         }
 
   }
@@ -779,7 +780,7 @@ class Bot {
       child.brain.rebuild(channel_A, channel_B);
       child.create(this.world, Vector.create(this.body.position.x - 200*(Math.random()-0.5), this.body.position.y - 200*(Math.random()-0.5)));
 
-      console.log('natural birth');
+      console.log('sexual reproduction');
       this.gestationTimer = GESTATION_TIMER;
       this.will_mate = false;
     }
@@ -789,22 +790,23 @@ class Bot {
 
     if(this.brain.wantEat ){
       // the amount eaten
-      food.life -= 0.04;
+      food.life -= 0.1;
       this.gestationTimer--;
+
       // if eating food bot still only gains life up to max
       if(this.life < this.maxLife ){
       var speedMod = 1.0 - (this.body.speed -20)/100;
-      this.life += (0.03 * speedMod);
+      this.life += (0.1 * speedMod);
 
     }else {
 
-
+        this.gestationTimer--;
     }
 
 
     }
     // sitting on food ruins it
-    food.life -= 0.008;
+    food.life -= 0.01;
     if(food.life <0.0){ food.destroy()}
     //console.log('nom' + food.class);
   }
@@ -823,6 +825,7 @@ class Bot {
     child.species = this.species;
     child.brain = this.brain.mutate();
     child.create(this.world, Vector.create(placement.x -150*Math.random(), placement.y -150*Math.random()));
+      console.log('asexual reproduction');
   }
 
   componentToHex(c) {

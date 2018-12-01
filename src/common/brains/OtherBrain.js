@@ -15,9 +15,9 @@ class OtherBrain extends BaseBrain{
   }
     constructor(){
       super();
-     var mutation_rate = 0.6;
+     var mutation_rate = 0.1;
      var mutation_magnitude = 1.5;
-      this.inputWeightsA = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+      this.inputWeightsA = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
           value+=  mutation_magnitude*(Math.random()-0.5);
         }
@@ -211,16 +211,16 @@ class OtherBrain extends BaseBrain{
 
     mutate_layer(layer){
       layer = layer.map(function(value, index, matrix){
-        if(Math.random() < 0.1){
+        if(Math.random() < 0.5){
           value += 0.001*(Math.random()-0.5)*value + 0.001*(Math.random()-0.5) ;
         }
-        if(Math.random() < 0.01){
+        if(Math.random() < 0.05){
           value += 0.01*(Math.random()-0.5)*value +0.01*(Math.random()-0.5) ;
         }
-        if(Math.random() < 0.001){
+        if(Math.random() < 0.005){
           value += 0.1*(Math.random()-0.5)*value +0.1*(Math.random()-0.5) ;
         }
-        if(Math.random() < 0.0001){
+        if(Math.random() < 0.0005){
           value += (Math.random()-0.5)*value + (Math.random()-0.5)*value ;
         }
         return value;

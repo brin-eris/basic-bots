@@ -23,14 +23,14 @@ const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
 
-const COLLISION_DAMAGE = 0.002;
-const sting_DAMAGE = 0.02;
-const AGE_DAMAGE = 0.000002;
-const HEAT_DAMAGE = 0.0002;
+const COLLISION_DAMAGE = 0.0025;
+const sting_DAMAGE = 10;
+const AGE_DAMAGE = 0.000025;
+const HEAT_DAMAGE = 0.00022;
 const OVEREAT_PENALTY = 0.0005;
-const BOOST_COST = 0.00045;
+const BOOST_COST = 0.0015;
 const GESTATION_TIMER = 200;
-const GIVE_AMOUNT = 0.005;
+const GIVE_AMOUNT = 0.004;
 
 class Bot {
   constructor() {
@@ -54,7 +54,7 @@ class Bot {
 
 
     this.centerOfUniverse = {x: world.bounds.max.x/2, y: world.bounds.max.y/2};
-    this.phantomZone = ( Mathjs.distance([
+    this.phantomZone = Math.abs( Mathjs.distance([
       0,
       0],
     [ this.centerOfUniverse.x,
@@ -65,7 +65,7 @@ class Bot {
     this.gestationTimer = GESTATION_TIMER;
     let radius = 10;
     this.radius = radius;
-    let eyeRadius = 5;
+    let eyeRadius = 6;
     let offsetRadius = radius * 1.6 + eyeRadius;
     let offsetLayer2Radius = offsetRadius * 2;
 
@@ -84,7 +84,7 @@ class Bot {
     let eyeC3AOffset = Vector.create( offsetLayer2Radius * 1.5,0);
 
 
-    let soundRadius = 200;
+    let soundRadius = 250;
 
     let bot = Matter.Composite.create({
       label: 'Bot',
@@ -138,17 +138,15 @@ class Bot {
 
             let damage = (COLLISION_DAMAGE * Math.abs(Vector.magnitude(relativeMomentum)));
               me.gameObject.life -= damage;
-              me.gameObject.brain.ouchie += 0.5;
+              me.gameObject.brain.ouchie += damage;
           }else if(them.gameObject.class==Meat){
             me.gameObject.brain.smellMeat = 1.0;
             // only the blood thirsty eat meat
-          //  if(me.gameObject.brain.hawk > 0){
-              //console.log('fresh meat!')
-              this.gestationTimer-=5;
-              me.gameObject.eat(them.gameObject);
+          //  if(me.gameObject.species == 0){
               me.gameObject.eat(them.gameObject);
 
           //  }
+
           }
       }
 
@@ -163,19 +161,20 @@ class Bot {
           let baseDamage = (COLLISION_DAMAGE  * Math.abs(Vector.magnitude(relativeMomentum)));
 
           if(them.gameObject.brain.sting > 0.0){
-            //one of thier body parts stinged me
-              me.gameObject.life -= baseDamage + ((1 + them.gameObject.brain.sting) * sting_DAMAGE);
-              me.gameObject.brain.ouchie += 0.5;
-
+            //one of thier body parts stung me
+            let damage_stung = baseDamage * (1 + (them.gameObject.brain.sting)*(them.gameObject.brain.sting) * sting_DAMAGE);
+              me.gameObject.life -= damage_stung;
+              me.gameObject.brain.ouchie += damage_stung;
+              //console.log("damage_stung:" + damage_stung + "; baseDamage:" + baseDamage + "; stinger:" + them.gameObject.brain.sting);
               if(me.gameObject.life <= 0.0){
                 // tell my wife i loved her
-
+                console.log("tell my wife i loved her: " + me.gameObject.species);
 
               }
           }else{
             // they didnt sting me, but i still got hit
             me.gameObject.life -= baseDamage ;
-            me.gameObject.brain.ouchie += 0.5;
+            me.gameObject.brain.ouchie += baseDamage;
           }
 
         } else if(them.gameObject && them.gameObject.class==Plant){
@@ -189,17 +188,7 @@ class Bot {
 
             let damage = (COLLISION_DAMAGE * Math.abs(Vector.magnitude(relativeMomentum)));
               me.gameObject.life -= damage;
-              me.gameObject.brain.ouchie += 0.5;
-        } else if(them.gameObject.class==Meat){
-          me.gameObject.brain.smellMeat += 0.5;
-          // only the blood thirsty eat meat
-          //  if(me.gameObject.brain.hawk > 0){
-              //console.log('fresh meat!')
-              this.gestationTimer-=5;
-              me.gameObject.eat(them.gameObject) ;
-              me.gameObject.eat(them.gameObject) ;
-
-          //}
+              me.gameObject.brain.ouchie += damage;
         }
     };
 
@@ -219,22 +208,33 @@ class Bot {
       if(them.gameObject){
         if(them.gameObject.class==Bot){
 
-              me.gameObject.brain.soundInput += them.gameObject.voice ;
+          let distance = Math.abs(( Mathjs.distance([
+            me.gameObject.body.position.x,
+            me.gameObject.body.position.y],
+          [ them.gameObject.body.position.x,
+            them.gameObject.body.position.y])));
+              me.gameObject.brain.soundInput += (5/distance)  * them.gameObject.voice ;
 
               if(me.gameObject.species == them.gameObject.species){
                 if(me.gameObject.will_mate && them.gameObject.will_mate){
                     me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+                    if(Math.random()<0.25){
                     me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-                  //  me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+                    }
                 }
-                }
+              }
 
               //console.log(them.gameObject.voice);
               if(me.gameObject.brain.give > 0.0 ){
                 me.gameObject.give(them.gameObject);
               }
         }else if(them.gameObject.class==Meat){
-          me.gameObject.brain.smellMeat += 0.2;
+          let distance = Math.abs(( Mathjs.distance([
+            me.gameObject.body.position.x,
+            me.gameObject.body.position.y],
+          [ them.gameObject.body.position.x,
+            them.gameObject.body.position.y])));
+          me.gameObject.brain.smellMeat += .1 + 1/distance;
         }
       }
     };
@@ -242,14 +242,7 @@ class Bot {
     soundSensor.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
       if(them.gameObject){
-        if(them.gameObject.class==Bot){
-          me.gameObject.brain.soundInput += 0.1*them.gameObject.voice ;
-          if(me.gameObject.brain.give > 0.0 ){
-                me.gameObject.give(them.gameObject);
-              }
-        }else if(them.gameObject.class==Meat){
-          me.gameObject.brain.smellMeat += 0.1;
-        }
+
 
       }
     };
@@ -430,20 +423,22 @@ class Bot {
     eyeC.imAfukinSensor = false;
     eyeC.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeCInput.red += (them.gameColor.red*0.8);
-      me.gameObject.brain.eyeCInput.blue += (them.gameColor.blue*0.8);
-      me.gameObject.brain.eyeCInput.green += (them.gameColor.green*0.8);
+      me.gameObject.brain.eyeCInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeCInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeCInput.green += (them.gameColor.green);
     };
     eyeC.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeCInput.red += (them.gameColor.red*0.8);
-      me.gameObject.brain.eyeCInput.blue += (them.gameColor.blue*0.8);
-      me.gameObject.brain.eyeCInput.green += (them.gameColor.green*0.8);
+      me.gameObject.brain.eyeCInput.red += (them.gameColor.red);
+      me.gameObject.brain.eyeCInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.eyeCInput.green += (them.gameColor.green);
       if(them.gameObject.class == Bot){
         if(me.gameObject.will_mate ){
           if(me.gameObject.species == them.gameObject.species){
             me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+            if(Math.random()<0.25){
             me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+            }
           }
         }
       }
@@ -477,7 +472,9 @@ class Bot {
         if(me.gameObject.will_mate){
           if(me.gameObject.species == them.gameObject.species){
             me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+            if(Math.random()<0.25){
             me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+            }
           }
         }
       }
@@ -511,7 +508,9 @@ class Bot {
         if(me.gameObject.will_mate){
           if(me.gameObject.species == them.gameObject.species){
             me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+            if(Math.random()<0.25){
             me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+            }
           }
         }
       }
@@ -546,7 +545,9 @@ class Bot {
         if(me.gameObject.will_mate){
           if(me.gameObject.species == them.gameObject.species){
           me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+          if(Math.random()<0.25){
           me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
+          }
         }
       }
       }
@@ -673,7 +674,7 @@ class Bot {
 
 
 
-    this.heat = ( Mathjs.distance([
+    this.heat = Math.abs( Mathjs.distance([
       this.body.position.x,
       this.body.position.y],
     [ this.centerOfUniverse.x,
@@ -694,7 +695,8 @@ class Bot {
     let right_eye_position = Vector.create(11 * Math.cos(right_eye_angle) + this.body.position.x, 11 * Math.sin(right_eye_angle) + this.body.position.y)
     this.brain.right_eye_vision = this.right_eye.scan(Composite.allBodies(this.world), right_eye_position, right_eye_angle);
 
-
+    //this.brain.senseSexualAdvance
+    this.brain.gestation = this.gestationTimer/GESTATION_TIMER;
     // think
     this.brain.tick();
 
@@ -706,9 +708,9 @@ class Bot {
 
 
       let facing = this.body.angle;
-      let thrustLeftSide = this.brain.farts == true ? this.brain.thrust1*3:this.brain.thrust1;
+      let thrustLeftSide = this.brain.farts == true ? this.brain.thrust1*4:this.brain.thrust1;
       let turnLeftSide =  (facing - this.brain.turn1 ) ;
-      let thrustRightSide = this.brain.farts == true ? this.brain.thrust2*3:this.brain.thrust2;
+      let thrustRightSide = this.brain.farts == true ? this.brain.thrust2*4:this.brain.thrust2;
       let turnRightSide =  (facing + this.brain.turn2) ;
 
 
@@ -725,7 +727,7 @@ class Bot {
         Vector.create(thrustRightSide * Math.cos(turnRightSide), thrustRightSide * Math.sin(turnRightSide)));
 
 
-      this.life -= (AGE_DAMAGE * this.brain.age + this.heat * HEAT_DAMAGE );// +   Math.abs(this.heat)
+      this.life -= (AGE_DAMAGE * this.brain.age + Math.abs(this.heat * HEAT_DAMAGE ));// +   Math.abs(this.heat)
       if(this.brain.farts){
         this.life -= BOOST_COST;
       }
@@ -767,7 +769,8 @@ class Bot {
           this.will_mate = false;
         }
         if(this.gestationTimer < -GESTATION_TIMER ){
-         this.spawn(this.body.position);
+          console.log("self love");
+         this.mate(this.brain.get_half_chromosomes(), this.brain.get_half_chromosomes());
          this.will_mate = false;
          this.gestationTimer = GESTATION_TIMER;
         }
@@ -778,11 +781,12 @@ class Bot {
       let child = new Bot();
       child.species = this.species;
       child.brain.rebuild(channel_A, channel_B);
-      child.create(this.world, Vector.create(this.body.position.x - 200*(Math.random()-0.5), this.body.position.y - 200*(Math.random()-0.5)));
+      child.create(this.world, Vector.create(this.body.position.x - 300*(Math.random()-0.5), this.body.position.y - 300*(Math.random()-0.5)));
 
-      console.log('sexual reproduction');
+      console.log('sexual reproduction: ' + this.species);
       this.gestationTimer = GESTATION_TIMER;
       this.will_mate = false;
+      this.health -= .25;
     }
 
   eat(food){
@@ -796,7 +800,7 @@ class Bot {
       // if eating food bot still only gains life up to max
       if(this.life < this.maxLife ){
       var speedMod = 1.0 - (this.body.speed -20)/100;
-      this.life += (0.1 * speedMod);
+      this.life += (0.2 * speedMod);
 
     }else {
 
@@ -806,7 +810,7 @@ class Bot {
 
     }
     // sitting on food ruins it
-    food.life -= 0.01;
+    food.life -= 0.02;
     if(food.life <0.0){ food.destroy()}
     //console.log('nom' + food.class);
   }
@@ -824,8 +828,9 @@ class Bot {
     let child = new Bot();
     child.species = this.species;
     child.brain = this.brain.mutate();
-    child.create(this.world, Vector.create(placement.x -150*Math.random(), placement.y -150*Math.random()));
-      console.log('asexual reproduction');
+    child.create(this.world, Vector.create(placement.x -300*Math.random(), placement.y -300*Math.random()));
+      console.log('asexual reproduction: ' + this.species);
+      this.health -= .5;
   }
 
   componentToHex(c) {

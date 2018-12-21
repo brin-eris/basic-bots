@@ -7,7 +7,7 @@ const    Bodies = require('matter-js').Bodies;
 
 class Meat {
   constructor(quantity) {
-    this.life = quantity * .05;
+    this.life = quantity * .02;
     this.class = Meat;
   }
 
@@ -16,7 +16,7 @@ class Meat {
           label: 'Meat'
         });
 
-          this.body =  Bodies.circle(position.x, position.y, 10, {
+          this.body =  Bodies.circle(position.x, position.y, 15, {
             friction: 0.5,
             frictionStatic: 0.1,
             isStatic: true,

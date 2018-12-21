@@ -32,24 +32,17 @@ static get_selected_bot(){
   return selection_holder.selected;
 }
 
- copy_current_bot(){
+ mate_self_current_bot(){
    if(selection_holder.selected !=null&& selection_holder.selected.body !=null){
-     let brain = selection_holder.selected.brain;
-      let dude = new  Bot();
-      dude.brain = brain.clone();
-      dude.create(this.physicsEngine.world, {
-       x : (Math.random() -0.5) * 150 + selection_holder.selected.body.position.x+150,
-       y : (Math.random() - 0.5) * 150 + selection_holder.selected.body.position.y+50
-     });
+     selection_holder.selected.mate( selection_holder.selected.brain.get_half_chromosomes(),selection_holder.selected.brain.get_half_chromosomes());
+
    }
  }
 
  mutate_current_bot(){
    if(selection_holder.selected !=null&& selection_holder.selected.body !=null){
-     let brain = selection_holder.selected.brain;
-      let dude = new  Bot();
-      dude.brain = brain.mutate();
-      dude.create(this.physicsEngine.world, {
+
+      selection_holder.selected.spawn(this.physicsEngine.world, {
        x : (Math.random() -0.5) * 150 + selection_holder.selected.body.position.x+150,
        y : (Math.random() - 0.5) * 150 + selection_holder.selected.body.position.y+150
      });

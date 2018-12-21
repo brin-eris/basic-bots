@@ -15,9 +15,9 @@ class OtherBrain extends BaseBrain{
   }
     constructor(){
       super();
-     var mutation_rate = 0.1;
-     var mutation_magnitude = 1.5;
-      this.inputWeightsA = Mathjs.ones(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
+     var mutation_rate = 0.55;
+     var mutation_magnitude = 2.0;
+      this.inputWeightsA = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
           value+=  mutation_magnitude*(Math.random()-0.5);
         }
@@ -26,7 +26,7 @@ class OtherBrain extends BaseBrain{
 
       this.inputBiasA = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+= mutation_magnitude*(Math.random()-0.5)*.1;
+          value+= mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
@@ -40,7 +40,7 @@ class OtherBrain extends BaseBrain{
 
       this.hiddenLayerBiasA = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  mutation_magnitude*(Math.random()-0.5)*.1;
+          value+=  mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
@@ -54,7 +54,7 @@ class OtherBrain extends BaseBrain{
 
       this.inputBiasB = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  mutation_magnitude*(Math.random()-0.5)*.1;
+          value+=  mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
@@ -68,7 +68,7 @@ class OtherBrain extends BaseBrain{
 
       this.hiddenLayerBiasB = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  mutation_magnitude*(Math.random()-0.5)*.1;
+          value+=  mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
@@ -91,13 +91,13 @@ class OtherBrain extends BaseBrain{
       let postInputsBiasVector = Mathjs.add(postInputsWeightsVector, this.combined_input_bias);
 
       let hiddenLayerInputVector =  postInputsBiasVector.map(function(value, index, matrix){
-        let result = (1.0/(1.0 + Mathjs.exp(-1 * value)) - 0.5)*2;
+        let result = (1.0/(1.0 + Mathjs.exp(-1 * value/2)) - 0.5)*2;
         //(value*value)/(1 + value*value);
         //Mathjs.sin(value*value);
         //1.0/(1.0 + Mathjs.exp(-1 * value));
         //(value*value)/(1 + value*value)
         if(isNaN(result)){
-            result = 0.5
+            result = 0.0
         }
         return result;
         });
@@ -106,12 +106,12 @@ class OtherBrain extends BaseBrain{
         let postHiddenLayerBaisVector = Mathjs.add(postHiddenLayerWeightsVector, this.combined_hidden_bias);
 
         let outputVector = postHiddenLayerBaisVector.map(function(value, index, matrix){
-          let result = (1.0/(1.0 + Mathjs.exp(-1 * value)) - 0.5)*2;
+          let result = (1.0/(1.0 + Mathjs.exp(-1 * value/2)) - 0.5)*2;
           //(value*value)/(1 + value*value);
           //Mathjs.sin(value*value);
           //1.0/(1.0 + Mathjs.exp(-1 * value));
           if(isNaN(result)){
-            result = 0.5
+            result = 0.0
           }
           return result;
           });
@@ -211,18 +211,19 @@ class OtherBrain extends BaseBrain{
 
     mutate_layer(layer){
       layer = layer.map(function(value, index, matrix){
-        if(Math.random() < 0.5){
+        if(Math.random() < 0.1){
           value += 0.001*(Math.random()-0.5)*value + 0.001*(Math.random()-0.5) ;
         }
-        if(Math.random() < 0.05){
+        if(Math.random() < 0.01){
           value += 0.01*(Math.random()-0.5)*value +0.01*(Math.random()-0.5) ;
         }
-        if(Math.random() < 0.005){
+        if(Math.random() < 0.001){
           value += 0.1*(Math.random()-0.5)*value +0.1*(Math.random()-0.5) ;
         }
-        if(Math.random() < 0.0005){
+        if(Math.random() < 0.0001){
           value += (Math.random()-0.5)*value + (Math.random()-0.5)*value ;
         }
+
         return value;
       });
       return layer;

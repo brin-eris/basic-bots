@@ -9,16 +9,16 @@ const    Plant = require('./world/Plant');
 const    Meat = require('./world/Meat');
 const    Wall = require('./world/Wall');
 
-const STARTING_BOTS = 8;
-const MIN_BOTS = 4;
+const STARTING_BOTS = 6;
+const MIN_BOTS = 3;
 const MAX_BOTS = 10;
 const SPECIES = 2;
-const STARTING_PLANTS = 180;
-const MIN_PLANTS = 180;
-const WALLS = 6;
+const STARTING_PLANTS = 350;
+const MIN_PLANTS = 350;
+const WALLS = 12;
 
-const WIDTH = 2300;
-const HEIGHT = 1800;
+const WIDTH = 2500;
+const HEIGHT = 2000;
 
 // soak the brains in here to get juicy
 class SimEngine {
@@ -51,16 +51,7 @@ class SimEngine {
             });
       }
 
-      for (let k=0;k<SPECIES;k++){
-        for (let i = 0; i < STARTING_BOTS; i++ ){
-          var b = new  Bot();
-          b.create(engine.world, {
-            x : (Math.random() -0.5) * WIDTH + WIDTH/2,
-            y : (Math.random() - 0.5) * HEIGHT + HEIGHT/2
-          });
-          b.species = k;
-        }
-      }
+
 
       let spacer = 2;
 
@@ -86,6 +77,17 @@ class SimEngine {
           });
       }
 
+      for (let k=0;k<SPECIES;k++){
+        for (let i = 0; i < STARTING_BOTS; i++ ){
+          var b = new  Bot();
+          b.create(engine.world, {
+            x : (Math.random() -0.5) * WIDTH + WIDTH/2,
+            y : (Math.random() - 0.5) * HEIGHT + HEIGHT/2
+          });
+          b.species = k;
+        }
+      }
+
       let oldest_brain = {brain: null, age: 0};
 
 
@@ -102,7 +104,7 @@ class SimEngine {
               if( urmom.gameObject.class == Bot){
                 urmom.gameObject.tick();
                 if(urmom.gameObject.life <=0 || urmom.gameObject.age < 0){
-                    new Meat(urmom.gameObject.maxLife).create(engine.world, urmom.gameObject.body.position);
+                    new Meat(urmom.gameObject.brain.age).create(engine.world, urmom.gameObject.body.position);
                     urmom.gameObject = null;
                     Matter.Composite.remove(engine.world, urmom, true);
                     continue;
@@ -117,6 +119,14 @@ class SimEngine {
             }
           }
 
+          if(plantCount < MIN_PLANTS){
+            plantCount++;
+            new Plant().create(engine.world, {
+              x : Mathjs.pickRandom(horizontal_center_points),
+              y : Mathjs.pickRandom(vertical_center_points)
+              });
+          }
+
           for (let k=0;k<SPECIES;k++){
             var botCount = populationcount[k];
 
@@ -125,17 +135,11 @@ class SimEngine {
               let child = new Bot( );
               child.species = k;
               child.create(engine.world, {x: WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
-
+              console.log("Spawned new: " + k);
+            }
           }
-        }
 
-          if(plantCount < MIN_PLANTS){
-            plantCount++;
-            new Plant().create(engine.world, {
-              x : Mathjs.pickRandom(horizontal_center_points),
-              y : Mathjs.pickRandom(vertical_center_points)
-              });
-          }
+
       });
 
       Matter.Events.on(engine, "collisionStart", function(e){

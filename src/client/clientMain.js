@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
       }, false);
 
       document.getElementById("copy").addEventListener("click", function( event ) {
-        Engine.copy_current_bot();
+        Engine.mate_self_current_bot();
       }, false);
 
       document.getElementById("mutate").addEventListener("click", function( event ) {

@@ -2,7 +2,7 @@
 
 const Mathjs = require('mathjs');
 
-const INPUT_SIZE = 22;
+const INPUT_SIZE = 39;
 
 
 class BaseBrain{
@@ -13,7 +13,10 @@ class BaseBrain{
       this.inputSize = INPUT_SIZE;
 
       this.smellMeat = 0.0;
-      this.memory = 0;
+      this.memory1 = 0.0;
+      this.memory2 = 0.0;
+      this.memory3 = 0.0;
+      this.memory4 = 0.0;
       this.ccClock = 0.0;
       this.turn1 = 0.0;
       this.turn2 = 0.0;
@@ -57,7 +60,7 @@ class BaseBrain{
       if(this.clock  == 0 ){
         this.age++;
       }
-      this.ccClock = (this.clock - 30)/60;
+      this.ccClock = (this.clock - 30)/30;
 
       this.inputVector = Mathjs.matrix([
 
@@ -73,56 +76,50 @@ class BaseBrain{
         this.right_eye_vision.blue,
         this.right_eye_vision.green,
 
-        // this.bodyInput.red,
-        // this.bodyInput.blue,
-        // this.bodyInput.green,
-        //
-        //
-        // this.eyeAInput.red,
-        // this.eyeAInput.blue,
-        // this.eyeAInput.green,
-        //
-        // this.eyeBInput.red,
-        // this.eyeBInput.blue,
-        // this.eyeBInput.green,
-        //
-        // this.eyeCInput.red,
-        // this.eyeCInput.blue,
-        // this.eyeCInput.green,
-        //
-        // this.eyeC2AInput.red,
-        // this.eyeC2AInput.blue,
-        // this.eyeC2AInput.green,
-        //
-        // this.eyeC2BInput.red,
-        // this.eyeC2BInput.blue,
-        // this.eyeC2BInput.green,
-        //
-        // this.eyeC3AInput.red,
-        // this.eyeC3AInput.blue,
-        // this.eyeC3AInput.green,
-        //
+        this.bodyInput.red,
+        this.bodyInput.blue,
+        this.bodyInput.green,
 
-        this.sting,
-        this.voice,
+
+        this.eyeAInput.red,
+        this.eyeAInput.blue,
+        this.eyeAInput.green,
+
+        this.eyeBInput.red,
+        this.eyeBInput.blue,
+        this.eyeBInput.green,
+
+        this.eyeCInput.red +   this.eyeC2AInput.red +   this.eyeC2BInput.red + this.eyeC3AInput.red,
+        this.eyeCInput.blue + this.eyeC2AInput.blue + this.eyeC2BInput.blue +   this.eyeC3AInput.blue,
+        this.eyeCInput.green + this.eyeC2AInput.green + this.eyeC2BInput.green +   this.eyeC3AInput.green,
+
+         this.bodyColor.red,
+         this.bodyColor.blue,
+         this.bodyColor.green,
+
+
+         this.sting,
+         this.voice,
         this.heat,
-        this.turn1 - this.turn2,
-        this.thrust1 - this.thrust2,
+        this.gestation,
         this.soundInput,
         this.ouchie,
         this.life,
-        Mathjs.sin(this.ccClock*Mathjs.PI/180),
-        this.give,
-        Mathjs.PI,
+        this.ccClock,
+         this.give,
         this.smellMeat,
-        this.memory
+        this.memory1,
+        this.memory2,
+        this.memory3,
+        this.memory4,
+        Math.random()*2 - 1.0
         ]);
 
     }
 
 
     getOutputs(){
-      let threshold = 0.5;
+      let threshold = 0.0;
       this.turn1 = (this.outputVector.subset(Mathjs.index(0)) - threshold );//*Math.PI;
       this.thrust1 = (this.outputVector.subset(Mathjs.index(1)) - threshold) ;
       this.turn2 = (this.outputVector.subset(Mathjs.index(2)) - threshold);//*Math.PI;
@@ -157,7 +154,10 @@ class BaseBrain{
       this.interestedInMating = (this.outputVector.subset(Mathjs.index(21)))>threshold;
 
       this.wantEat = (this.outputVector.subset(Mathjs.index(11))>threshold);
-      this.memory = this.outputVector.subset(Mathjs.index(12));
+      this.memory1 = this.outputVector.subset(Mathjs.index(22));
+      this.memory2 = this.outputVector.subset(Mathjs.index(23));
+      this.memory3 = this.outputVector.subset(Mathjs.index(24));
+      this.memory4 = this.outputVector.subset(Mathjs.index(25));
     }
 
     cleanupInputs(){

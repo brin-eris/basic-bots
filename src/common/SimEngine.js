@@ -10,8 +10,8 @@ const    Meat = require('./world/Meat');
 const    Wall = require('./world/Wall');
 
 const STARTING_BOTS = 6;
-const MIN_BOTS = 3;
-const MAX_BOTS = 10;
+const MIN_BOTS_PER_SPECIES = 3;
+const MAX_BOTS = 20;
 const SPECIES = 2;
 const STARTING_PLANTS = 350;
 const MIN_PLANTS = 350;
@@ -91,8 +91,11 @@ class SimEngine {
       let oldest_brain = {brain: null, age: 0};
 
 
+      let someone_needs_to_die = false;
+
       Matter.Events.on(engine, "beforeUpdate", function(e){
         let populationcount = new Array(SPECIES);
+        let total_pop = 0;
           for (let k=0;k<SPECIES;k++){
             populationcount[k] = 0;
           }
@@ -102,25 +105,35 @@ class SimEngine {
             let urmom = engine.world.composites[i];
             if(urmom.gameObject != null ){
               if( urmom.gameObject.class == Bot){
+
                 urmom.gameObject.tick();
-                if(urmom.gameObject.life <=0 || urmom.gameObject.age < 0){
+                if(urmom.gameObject.life <=0 || urmom.gameObject.age < 0 || (someone_needs_to_die && Math.random() > 0.99)){
                     new Meat(urmom.gameObject.brain.age).create(engine.world, urmom.gameObject.body.position);
                     urmom.gameObject = null;
                     Matter.Composite.remove(engine.world, urmom, true);
+                    someone_needs_to_die = false;
                     continue;
                 }
-                populationcount[urmom.gameObject.species]++;
 
+                populationcount[urmom.gameObject.species]++;
+                total_pop++;
                 }
                 if ( urmom.gameObject.class == Plant){
                   plantCount++;
                   urmom.gameObject.tick();
                 }
+                if ( urmom.gameObject.class == Meat){
+                  urmom.gameObject.tick();
+                }
             }
           }
 
-          if(plantCount < MIN_PLANTS){
-            plantCount++;
+          someone_needs_to_die = (total_pop > MAX_BOTS);
+          if(someone_needs_to_die){
+            console.log('someone_needs_to_die');
+          }
+          if(plantCount < MIN_PLANTS && Math.random()>0.99){
+
             new Plant().create(engine.world, {
               x : Mathjs.pickRandom(horizontal_center_points),
               y : Mathjs.pickRandom(vertical_center_points)
@@ -130,13 +143,15 @@ class SimEngine {
           for (let k=0;k<SPECIES;k++){
             var botCount = populationcount[k];
 
-            if(botCount < MIN_BOTS && Math.random()>0.9){
+            if(botCount < MIN_BOTS_PER_SPECIES && Math.random()>0.99){
 
               let child = new Bot( );
               child.species = k;
               child.create(engine.world, {x: WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
               console.log("Spawned new: " + k);
             }
+
+
           }
 
 

@@ -49,7 +49,7 @@ class Plant {
       }
 
       tick(){
-        this.life+= 0.0001;
+        this.life+= 0.001;
         this.body.gameColor = {red: 0.0, blue: 0.0, green: this.life}
         this.body.render.fillStyle = this.rgbToHex(0,this.life * 255,0);
       }

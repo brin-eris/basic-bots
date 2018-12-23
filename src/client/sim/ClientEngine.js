@@ -34,18 +34,15 @@ static get_selected_bot(){
 
  mate_self_current_bot(){
    if(selection_holder.selected !=null&& selection_holder.selected.body !=null){
-     selection_holder.selected.mate( selection_holder.selected.brain.get_half_chromosomes(),selection_holder.selected.brain.get_half_chromosomes());
+     selection_holder.selected.mate( selection_holder.selected.brain, selection_holder.selected.brain);
 
    }
  }
 
  mutate_current_bot(){
    if(selection_holder.selected !=null&& selection_holder.selected.body !=null){
+     selection_holder.selected.spawn( selection_holder.selected.brain);
 
-      selection_holder.selected.spawn(this.physicsEngine.world, {
-       x : (Math.random() -0.5) * 150 + selection_holder.selected.body.position.x+150,
-       y : (Math.random() - 0.5) * 150 + selection_holder.selected.body.position.y+150
-     });
    }
  }
 

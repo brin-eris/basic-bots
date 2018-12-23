@@ -7,7 +7,7 @@ const    Bodies = require('matter-js').Bodies;
 
 class Meat {
   constructor(quantity) {
-    this.life = quantity * .02;
+    this.life = quantity * .05;
     this.class = Meat;
   }
 
@@ -39,10 +39,31 @@ class Meat {
           World.add(world, meat);
       }
 
+      tick(){
+        this.life-= 0.001;
+        if(this.life < 0.0){
+          this.destroy();
+          return;
+        }
+        this.body.gameColor = {red: this.life, blue: 0.0, green: 0.0}
+        this.body.render.fillStyle = this.rgbToHex(this.life * 255,0,0);
+
+      }
+
       destroy(){
         Matter.Composite.remove(this.world, this.parentComposite, true);
       }
 
+      componentToHex(c) {
+        c = Math.floor(c);
+        c = Math.min(Math.max(c,0),255);
+        var hex = c.toString(16).substring(0,2);
+        return hex.length == 1 ? "0" + hex : hex;
+      }
+
+      rgbToHex(r, g, b) {
+        return "#" + this.componentToHex(r) + this.componentToHex(g) + this.componentToHex(b);
+      }
 }
 
 

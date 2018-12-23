@@ -2,7 +2,7 @@
 
 const Mathjs = require('mathjs');
 
-const INPUT_SIZE = 39;
+const INPUT_SIZE = 43;
 
 
 class BaseBrain{
@@ -12,6 +12,10 @@ class BaseBrain{
     constructor(){
       this.inputSize = INPUT_SIZE;
 
+      this.voiceInput = 0;
+      this.isPreggers = 0;
+      this.sexytime = 0;
+      this.happy = 0;
       this.smellMeat = 0.0;
       this.memory1 = 0.0;
       this.memory2 = 0.0;
@@ -40,17 +44,17 @@ class BaseBrain{
       this.right_eye_vision = { red:0, green: 0, blue:0 };
 
       this.bodyInput = { red:0, green: 0, blue:0 };
-      this.eyeAInput = { red:0, green: 0, blue:0 };
-      this.eyeBInput = { red:0, green: 0, blue:0 };
-      this.eyeCInput = { red:0, green: 0, blue:0 };
-      this.eyeC2AInput = { red:0, green: 0, blue:0 };
-      this.eyeC2BInput = { red:0, green: 0, blue:0 };
-      this.eyeC3AInput = { red:0, green: 0, blue:0 };
+      this.armAInput = { red:0, green: 0, blue:0 };
+      this.armBInput = { red:0, green: 0, blue:0 };
+      this.armCInput = { red:0, green: 0, blue:0 };
+      this.armC2AInput = { red:0, green: 0, blue:0 };
+      this.armC2BInput = { red:0, green: 0, blue:0 };
+      this.armC3AInput = { red:0, green: 0, blue:0 };
 
       this.bodyColor = { red:0, green: 0, blue:0 };
-      this.eyeColorA = { red:0, green: 0, blue:0 };
-      this.eyeColorB = { red:0, green: 0, blue:0 };
-      this.eyeColorC = { red:0, green: 0, blue:0 };
+      this.armColorA = { red:0, green: 0, blue:0 };
+      this.armColorB = { red:0, green: 0, blue:0 };
+      this.armColorC = { red:0, green: 0, blue:0 };
       this.tailForce = 0;
     }
 
@@ -81,29 +85,31 @@ class BaseBrain{
         this.bodyInput.green,
 
 
-        this.eyeAInput.red,
-        this.eyeAInput.blue,
-        this.eyeAInput.green,
+        this.armAInput.red,
+        this.armAInput.blue,
+        this.armAInput.green,
 
-        this.eyeBInput.red,
-        this.eyeBInput.blue,
-        this.eyeBInput.green,
+        this.armBInput.red,
+        this.armBInput.blue,
+        this.armBInput.green,
 
-        this.eyeCInput.red +   this.eyeC2AInput.red +   this.eyeC2BInput.red + this.eyeC3AInput.red,
-        this.eyeCInput.blue + this.eyeC2AInput.blue + this.eyeC2BInput.blue +   this.eyeC3AInput.blue,
-        this.eyeCInput.green + this.eyeC2AInput.green + this.eyeC2BInput.green +   this.eyeC3AInput.green,
+        this.armCInput.red +   this.armC2AInput.red +   this.armC2BInput.red + this.armC3AInput.red,
+        this.armCInput.blue + this.armC2AInput.blue + this.armC2BInput.blue +   this.armC3AInput.blue,
+        this.armCInput.green + this.armC2AInput.green + this.armC2BInput.green +   this.armC3AInput.green,
 
          this.bodyColor.red,
          this.bodyColor.blue,
          this.bodyColor.green,
 
-
+         this.voiceInput,
+         this.isPreggers,
          this.sting,
          this.voice,
         this.heat,
         this.gestation,
         this.soundInput,
         this.ouchie,
+        this.happy,
         this.life,
         this.ccClock,
          this.give,
@@ -112,7 +118,8 @@ class BaseBrain{
         this.memory2,
         this.memory3,
         this.memory4,
-        Math.random()*2 - 1.0
+        Math.random()*2 - 1.0,
+        this.sexytime
         ]);
 
     }
@@ -139,41 +146,56 @@ class BaseBrain{
       this.farts = (this.outputVector.subset(Mathjs.index(10)) > threshold);
 
 
-      this.eyeColorA.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(12))) + this.sting;
-      this.eyeColorA.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(13))) + this.give;
-      this.eyeColorA.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(14)));
+      this.armColorA.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(12)));// + this.sting;
+      this.armColorA.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(13)));// + this.give;
+      this.armColorA.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(14)));
 
-      this.eyeColorB.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(15))) + this.sting;
-      this.eyeColorB.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(16))) + this.give;
-      this.eyeColorB.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(17)));
+      this.armColorB.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(15)));// + this.sting;
+      this.armColorB.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(16)));// + this.give;
+      this.armColorB.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(17)));
 
-      this.eyeColorC.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(18))) + this.sting;
-      this.eyeColorC.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(19))) + this.give;
-      this.eyeColorC.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(20)));
+      this.armColorC.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(18)));// + this.sting;
+      this.armColorC.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(19)));// + this.give;
+      this.armColorC.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(20)));
 
-      this.interestedInMating = (this.outputVector.subset(Mathjs.index(21)))>threshold;
+      this.interestInMating = (this.outputVector.subset(Mathjs.index(21)));
 
-      this.wantEat = (this.outputVector.subset(Mathjs.index(11))>threshold);
+      this.wantEat = (this.outputVector.subset(Mathjs.index(11)));
       this.memory1 = this.outputVector.subset(Mathjs.index(22));
       this.memory2 = this.outputVector.subset(Mathjs.index(23));
       this.memory3 = this.outputVector.subset(Mathjs.index(24));
       this.memory4 = this.outputVector.subset(Mathjs.index(25));
+
+    //  this.pivotEye1 =  this.outputVector.subset(Mathjs.index(26)) * this.outputVector.subset(Mathjs.index(28))/5;
+    //  this.pivotEye2 =  this.outputVector.subset(Mathjs.index(27)) * this.outputVector.subset(Mathjs.index(29))/5;
     }
 
     cleanupInputs(){
+      this.sexytime  = 0.5*  this.sexytime;
+      if(this.sexytime <0.01){
+        this.sexytime = 0;
+      }
+        this.happy  = 0.5*  this.happy;
+        if(this.happy <0.01){
+          this.happy = 0;
+        }
+          this.ouchie = 0.5 * this.ouchie;
+          if(this.ouchie <0.01){
+            this.ouchie = 0;
+          }
       this.smellMeat  = 0.0;
       this.soundInput = 0.0;
-      this.ouchie = 0.0;
+      this.voiceInput = 0.0;
       this.heat = 0.0;
       this.center_eye_vision = { red:0, green: 0, blue:0 };
       this.left_eye_vision = { red:0, green: 0, blue:0 };
       this.right_eye_vision = { red:0, green: 0, blue:0 };
-      this.eyeAInput = { red:0, green: 0, blue:0 };
-      this.eyeBInput = { red:0, green: 0, blue:0 };
-      this.eyeCInput = { red:0, green: 0, blue:0 };
-      this.eyeC2AInput = { red:0, green: 0, blue:0 };
-      this.eyeC2BInput = { red:0, green: 0, blue:0 };
-      this.eyeC3AInput = { red:0, green: 0, blue:0 };
+      this.armAInput = { red:0, green: 0, blue:0 };
+      this.armBInput = { red:0, green: 0, blue:0 };
+      this.armCInput = { red:0, green: 0, blue:0 };
+      this.armC2AInput = { red:0, green: 0, blue:0 };
+      this.armC2BInput = { red:0, green: 0, blue:0 };
+      this.armC3AInput = { red:0, green: 0, blue:0 };
       this.bodyInput = { red:0, green: 0, blue:0 };
     }
 

@@ -23,14 +23,15 @@ const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
 
-const COLLISION_DAMAGE = 0.0025;
+const COLLISION_DAMAGE = 0.0021;
 const sting_DAMAGE = 10;
-const AGE_DAMAGE = 0.000025;
+const AGE_DAMAGE = 0.000015;
 const HEAT_DAMAGE = 0.00022;
-const OVEREAT_PENALTY = 0.0005;
-const BOOST_COST = 0.0015;
-const GESTATION_TIMER = 200;
-const GIVE_AMOUNT = 0.004;
+const OVEREAT_PENALTY = 0.0001;
+const BOOST_COST = 0.002;
+const GESTATION_TIMER = 400;
+const GIVE_AMOUNT = 0.0002;
+const SEXUAL_MATURITY = 7;
 
 class Bot {
   constructor() {
@@ -41,13 +42,13 @@ class Bot {
     this.life = 1.0;
     this.maxLife = 1.0;
     this.heat = 0.0;
-
-
+    this.isPreggers = false;
+    this.gestationTimer = 1;
     this.center_eye = new Eye();
     this.left_eye = new Eye();
     this.right_eye = new Eye();
     this.is_ui_selected = false;
-
+    this.womb = Array();
   }
 
   create(world, position) {
@@ -62,26 +63,26 @@ class Bot {
 
 
     let group = Body.nextGroup(true);
-    this.gestationTimer = GESTATION_TIMER;
+
     let radius = 10;
     this.radius = radius;
-    let eyeRadius = 6;
-    let offsetRadius = radius * 1.6 + eyeRadius;
-    let offsetLayer2Radius = offsetRadius * 2;
+    let armRadius = 6;
+    let offsetRadius = radius * 1.6 + armRadius;
+    let offsetLayer2Radius = offsetRadius * 1.6;
 
-    let eyeAOffset = Vector.create( offsetRadius * Math.cos(1.1), offsetRadius * Math.sin(1.1));
-    let eyeA2AOffset = Vector.create( offsetRadius * Math.cos(2.1), offsetRadius * Math.sin(2.1));
-    let eyeA2BOffset = Vector.create( offsetRadius * Math.cos(1.6), offsetRadius * Math.sin(1.6));
+    let armAOffset = Vector.create( offsetRadius * Math.cos(1.1), offsetRadius * Math.sin(1.1));
+    let armA2AOffset = Vector.create( offsetLayer2Radius* Math.cos(1.3), offsetLayer2Radius * Math.sin(1.3));
+    let armA2BOffset = Vector.create( offsetRadius * Math.cos(1.6), offsetRadius * Math.sin(1.6));
 
-    let eyeBOffset = Vector.create( offsetRadius * Math.cos(-1.1),  offsetRadius * Math.sin(-1.1));
-    let eyeB2AOffset = Vector.create( offsetRadius * Math.cos(-2.1),  offsetRadius * Math.sin(-2.1));
-    let eyeB2BOffset = Vector.create( offsetRadius * Math.cos(-1.6),  offsetRadius * Math.sin(-1.6));
+    let armBOffset = Vector.create( offsetRadius * Math.cos(-1.1),  offsetRadius * Math.sin(-1.1));
+    let armB2AOffset = Vector.create( offsetLayer2Radius* Math.cos(-1.3),  offsetLayer2Radius * Math.sin(-1.3));
+    let armB2BOffset = Vector.create( offsetRadius * Math.cos(-1.6),  offsetRadius * Math.sin(-1.6));
 
 
-    let eyeCOffset = Vector.create( offsetRadius * 1.5, 0 );
-    let eyeC2AOffset = Vector.create( offsetLayer2Radius  ,  offsetLayer2Radius * Math.sin(-0.3));
-    let eyeC2BOffset = Vector.create( offsetLayer2Radius , offsetLayer2Radius * Math.sin(0.3));
-    let eyeC3AOffset = Vector.create( offsetLayer2Radius * 1.5,0);
+    let armCOffset = Vector.create( offsetRadius * 1.5, 0 );
+    let armC2AOffset = Vector.create( offsetLayer2Radius  ,  offsetLayer2Radius * Math.sin(-0.3));
+    let armC2BOffset = Vector.create( offsetLayer2Radius , offsetLayer2Radius * Math.sin(0.3));
+    let armC3AOffset = Vector.create( offsetLayer2Radius * 1.5,0);
 
 
     let soundRadius = 250;
@@ -213,14 +214,12 @@ class Bot {
             me.gameObject.body.position.y],
           [ them.gameObject.body.position.x,
             them.gameObject.body.position.y])));
-              me.gameObject.brain.soundInput += (5/distance)  * them.gameObject.voice ;
+            me.gameObject.brain.soundInput += (distance*them.speed)/(soundRadius*100);
+              me.gameObject.brain.voiceInput +=  them.gameObject.voice ;
 
               if(me.gameObject.species == them.gameObject.species){
                 if(me.gameObject.will_mate && them.gameObject.will_mate){
-                    me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-                    if(Math.random()<0.25){
-                    me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-                    }
+                  me.gameObject.brain.sexytime =+ them.gameObject.brain.interestInMating + them.gameObject.brain.sexytime;
                 }
               }
 
@@ -248,7 +247,7 @@ class Bot {
     };
 
 
-    let eyeA = Bodies.circle(position.x + eyeAOffset.x, position.y + eyeAOffset.y, eyeRadius, {
+    let armA = Bodies.circle(position.x + armAOffset.x, position.y + armAOffset.y, armRadius, {
       collisionFilter: {
         group: group
       },
@@ -258,24 +257,29 @@ class Bot {
         fillStyle: '#aaaaaa'
       }
     });
-    eyeA.gameObject = this;
-    eyeA.imAfukinSensor = false;
-    eyeA.onCollideActive = function(me, them){
+    armA.gameObject = this;
+    armA.imAfukinSensor = false;
+    armA.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeAInput.green += (them.gameColor.green);
+      me.gameObject.brain.armAInput.red += (them.gameColor.red);
+      me.gameObject.brain.armAInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armAInput.green += (them.gameColor.green);
     };
-    eyeA.onCollide = function(me, them){
+    armA.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeAInput.green += (them.gameColor.green);
+      me.gameObject.brain.armAInput.red += (them.gameColor.red);
+      me.gameObject.brain.armAInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armAInput.green += (them.gameColor.green);
+    if(them.gameObject.class == Bot){
+      if(me.gameObject.brain.give > 0.0 ){
+        me.gameObject.give(them.gameObject);
+      }
+    }
     };
-    this.eyeA = eyeA;
+    this.armA = armA;
 
 
-    let eyeA2A = Bodies.circle(position.x + eyeA2AOffset.x, position.y + eyeA2AOffset.y, eyeRadius, {
+    let armA2A = Bodies.circle(position.x + armA2AOffset.x, position.y + armA2AOffset.y, armRadius, {
       collisionFilter: {
         group: group
       },
@@ -285,167 +289,196 @@ class Bot {
         fillStyle: '#aaaaaa'
       }
     });
-    eyeA2A.gameObject = this;
-    eyeA2A.imAfukinSensor = false;
-    eyeA2A.onCollideActive = function(me, them){
+    armA2A.gameObject = this;
+    armA2A.imAfukinSensor = false;
+    armA2A.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeAInput.green += (them.gameColor.green);
+      me.gameObject.brain.armAInput.red += (them.gameColor.red);
+      me.gameObject.brain.armAInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armAInput.green += (them.gameColor.green);
     };
-    eyeA2A.onCollide = function(me, them){
+    armA2A.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeAInput.green += (them.gameColor.green);
-    };
-    this.eyeA2A = eyeA2A;
-
-    let eyeA2B = Bodies.circle(position.x + eyeA2BOffset.x, position.y + eyeA2BOffset.y, eyeRadius, {
-      collisionFilter: {
-        group: group
-      },
-      restitution: 0.3,
-      isSensor: false,
-      render: {
-        fillStyle: '#aaaaaa'
-      }
-    });
-    eyeA2B.gameObject = this;
-    eyeA2B.imAfukinSensor = false;
-    eyeA2B.onCollideActive = function(me, them){
-      if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeAInput.green += (them.gameColor.green);
-    };
-    eyeA2B.onCollide = function(me, them){
-      if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeAInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeAInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeAInput.green += (them.gameColor.green);
-    };
-
-    this.eyeA2B = eyeA2B;
-
-
-    let eyeB = Bodies.circle(position.x + eyeBOffset.x, position.y + eyeBOffset.y, eyeRadius, {
-      collisionFilter: {
-        group: group
-      },
-      restitution: 0.3,
-      isSensor: false,
-      render: {
-        fillStyle: '#aaaaaa'
-      }
-    });
-    eyeB.gameObject = this;
-    eyeB.imAfukinSensor = false;
-    eyeB.onCollideActive = function(me, them){
-      if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeBInput.green += (them.gameColor.green);
-    };
-    eyeB.onCollide = function(me, them){
-      if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeBInput.green += (them.gameColor.green);
-    };
-    this.eyeB = eyeB;
-
-    let eyeB2A = Bodies.circle(position.x + eyeB2AOffset.x, position.y + eyeB2AOffset.y, eyeRadius, {
-      collisionFilter: {
-        group: group
-      },
-      restitution: 0.3,
-      isSensor: false,
-      render: {
-        fillStyle: '#aaaaaa'
-      }
-    });
-    eyeB2A.gameObject = this;
-    eyeB2A.imAfukinSensor = false;
-    eyeB2A.onCollideActive = function(me, them){
-      if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeBInput.green += (them.gameColor.green);
-    };
-    eyeB2A.onCollide = function(me, them){
-      if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeBInput.green += (them.gameColor.green);
-    };
-    this.eyeB2A = eyeB2A;
-
-
-    let eyeB2B = Bodies.circle(position.x + eyeB2BOffset.x, position.y + eyeB2BOffset.y, eyeRadius, {
-      collisionFilter: {
-        group: group
-      },
-      restitution: 0.3,
-      isSensor: false,
-      render: {
-        fillStyle: '#aaaaaa'
-      }
-    });
-    eyeB2B.gameObject = this;
-    eyeB2B.imAfukinSensor = false;
-    eyeB2B.onCollideActive = function(me, them){
-      if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeBInput.green += (them.gameColor.green);
-    };
-    eyeB2B.onCollide = function(me, them){
-      if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeBInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeBInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeBInput.green += (them.gameColor.green);
-    };
-    this.eyeB2B = eyeB2B;
-
-
-    let eyeC = Bodies.circle(position.x + eyeCOffset.x, position.y + eyeCOffset.y, eyeRadius, {
-      collisionFilter: {
-        group: group
-      },
-      restitution: 0.3,
-      isSensor: false,
-      render: {
-        fillStyle: '#aaaaaa'
-      }
-    });
-    eyeC.gameObject = this;
-    eyeC.imAfukinSensor = false;
-    eyeC.onCollideActive = function(me, them){
-      if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeCInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeCInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeCInput.green += (them.gameColor.green);
-    };
-    eyeC.onCollide = function(me, them){
-      if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeCInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeCInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeCInput.green += (them.gameColor.green);
+      me.gameObject.brain.armAInput.red += (them.gameColor.red);
+      me.gameObject.brain.armAInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armAInput.green += (them.gameColor.green);
       if(them.gameObject.class == Bot){
-        if(me.gameObject.will_mate ){
-          if(me.gameObject.species == them.gameObject.species){
-            me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-            if(Math.random()<0.25){
-            me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-            }
+        if(me.gameObject.brain.give > 0.0 ){
+          me.gameObject.give(them.gameObject);
+        }
+      }
+    };
+    this.armA2A = armA2A;
+
+    let armA2B = Bodies.circle(position.x + armA2BOffset.x, position.y + armA2BOffset.y, armRadius, {
+      collisionFilter: {
+        group: group
+      },
+      restitution: 0.3,
+      isSensor: false,
+      render: {
+        fillStyle: '#aaaaaa'
+      }
+    });
+    armA2B.gameObject = this;
+    armA2B.imAfukinSensor = false;
+    armA2B.onCollideActive = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.armAInput.red += (them.gameColor.red);
+      me.gameObject.brain.armAInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armAInput.green += (them.gameColor.green);
+    };
+    armA2B.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.armAInput.red += (them.gameColor.red);
+      me.gameObject.brain.armAInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armAInput.green += (them.gameColor.green);
+      if(them.gameObject.class == Bot){
+        if(me.gameObject.brain.give > 0.0 ){
+          me.gameObject.give(them.gameObject);
+        }
+      }
+    };
+
+    this.armA2B = armA2B;
+
+
+    let armB = Bodies.circle(position.x + armBOffset.x, position.y + armBOffset.y, armRadius, {
+      collisionFilter: {
+        group: group
+      },
+      restitution: 0.3,
+      isSensor: false,
+      render: {
+        fillStyle: '#aaaaaa'
+      }
+    });
+    armB.gameObject = this;
+    armB.imAfukinSensor = false;
+    armB.onCollideActive = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.armBInput.red += (them.gameColor.red);
+      me.gameObject.brain.armBInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armBInput.green += (them.gameColor.green);
+    };
+    armB.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.armBInput.red += (them.gameColor.red);
+      me.gameObject.brain.armBInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armBInput.green += (them.gameColor.green);
+      if(them.gameObject.class == Bot){
+        if(me.gameObject.brain.give > 0.0 ){
+          me.gameObject.give(them.gameObject);
+        }
+      }
+    };
+    this.armB = armB;
+
+    let armB2A = Bodies.circle(position.x + armB2AOffset.x, position.y + armB2AOffset.y, armRadius, {
+      collisionFilter: {
+        group: group
+      },
+      restitution: 0.3,
+      isSensor: false,
+      render: {
+        fillStyle: '#aaaaaa'
+      }
+    });
+    armB2A.gameObject = this;
+    armB2A.imAfukinSensor = false;
+    armB2A.onCollideActive = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.armBInput.red += (them.gameColor.red);
+      me.gameObject.brain.armBInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armBInput.green += (them.gameColor.green);
+    };
+    armB2A.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.armBInput.red += (them.gameColor.red);
+      me.gameObject.brain.armBInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armBInput.green += (them.gameColor.green);
+      if(them.gameObject.class == Bot){
+        if(me.gameObject.brain.give > 0.0 ){
+          me.gameObject.give(them.gameObject);
+        }
+      }
+    };
+    this.armB2A = armB2A;
+
+
+    let armB2B = Bodies.circle(position.x + armB2BOffset.x, position.y + armB2BOffset.y, armRadius, {
+      collisionFilter: {
+        group: group
+      },
+      restitution: 0.3,
+      isSensor: false,
+      render: {
+        fillStyle: '#aaaaaa'
+      }
+    });
+    armB2B.gameObject = this;
+    armB2B.imAfukinSensor = false;
+    armB2B.onCollideActive = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.armBInput.red += (them.gameColor.red);
+      me.gameObject.brain.armBInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armBInput.green += (them.gameColor.green);
+    };
+    armB2B.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.armBInput.red += (them.gameColor.red);
+      me.gameObject.brain.armBInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armBInput.green += (them.gameColor.green);
+      if(them.gameObject.class == Bot){
+        if(me.gameObject.brain.give > 0.0 ){
+          me.gameObject.give(them.gameObject);
+        }
+      }
+    };
+    this.armB2B = armB2B;
+
+
+    let armC = Bodies.circle(position.x + armCOffset.x, position.y + armCOffset.y, armRadius, {
+      collisionFilter: {
+        group: group
+      },
+      restitution: 0.3,
+      isSensor: false,
+      render: {
+        fillStyle: '#aaaaaa'
+      }
+    });
+    armC.gameObject = this;
+    armC.imAfukinSensor = false;
+    armC.onCollideActive = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.armCInput.red += (them.gameColor.red);
+      me.gameObject.brain.armCInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armCInput.green += (them.gameColor.green);
+    };
+    armC.onCollide = function(me, them){
+      if(them.imAfukinSensor){return;}
+      me.gameObject.brain.armCInput.red += (them.gameColor.red);
+      me.gameObject.brain.armCInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armCInput.green += (them.gameColor.green);
+      if(them.gameObject.class == Bot){
+        if(me.gameObject.brain.give > 0.0 ){
+          me.gameObject.give(them.gameObject);
+        }
+        if(me.gameObject.species == them.gameObject.species){
+              me.gameObject.brain.sexytime =+  me.gameObject.brain.interestInMating + them.gameObject.brain.sexytime ;
+                //console.log('sexytime: '+me.gameObject.brain.sexytime);
+              if(me.gameObject.brain.sexytime > 1.0 && me.gameObject.will_mate){
+                me.gameObject.brain.sexytime = -1;
+            me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
+
           }
         }
       }
     };
-    this.eyeC = eyeC;
+    this.armC = armC;
 
-    let eyeC2A = Bodies.circle(position.x + eyeC2AOffset.x, position.y + eyeC2AOffset.y, eyeRadius, {
+    let armC2A = Bodies.circle(position.x + armC2AOffset.x, position.y + armC2AOffset.y, armRadius, {
       collisionFilter: {
         group: group
       },
@@ -455,33 +488,37 @@ class Bot {
         fillStyle: '#aaaaaa'
       }
     });
-    eyeC2A.gameObject = this;
-    eyeC2A.imAfukinSensor = false;
-    eyeC2A.onCollideActive = function(me, them){
+    armC2A.gameObject = this;
+    armC2A.imAfukinSensor = false;
+    armC2A.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC2AInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeC2AInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeC2AInput.green += (them.gameColor.green);
+      me.gameObject.brain.armC2AInput.red += (them.gameColor.red);
+      me.gameObject.brain.armC2AInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armC2AInput.green += (them.gameColor.green);
     };
-    eyeC2A.onCollide = function(me, them){
+    armC2A.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC2AInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeC2AInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeC2AInput.green += (them.gameColor.green);
+      me.gameObject.brain.armC2AInput.red += (them.gameColor.red);
+      me.gameObject.brain.armC2AInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armC2AInput.green += (them.gameColor.green);
       if(them.gameObject.class == Bot){
-        if(me.gameObject.will_mate){
-          if(me.gameObject.species == them.gameObject.species){
-            me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-            if(Math.random()<0.25){
-            me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-            }
+        if(me.gameObject.brain.give > 0.0 ){
+          me.gameObject.give(them.gameObject);
+        }
+         if(me.gameObject.species == them.gameObject.species){
+           me.gameObject.brain.sexytime =+  me.gameObject.brain.interestInMating + them.gameObject.brain.sexytime ;
+             //console.log('sexytime: '+me.gameObject.brain.sexytime);
+           if(me.gameObject.brain.sexytime > 1.0 && me.gameObject.will_mate){
+               me.gameObject.brain.sexytime = -1;
+            me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
+
           }
         }
       }
     };
-    this.eyeC2A = eyeC2A;
+    this.armC2A = armC2A;
 
-    let eyeC2B = Bodies.circle(position.x + eyeC2BOffset.x, position.y + eyeC2BOffset.y, eyeRadius, {
+    let armC2B = Bodies.circle(position.x + armC2BOffset.x, position.y + armC2BOffset.y, armRadius, {
       collisionFilter: {
         group: group
       },
@@ -491,34 +528,38 @@ class Bot {
         fillStyle: '#aaaaaa'
       }
     });
-    eyeC2B.gameObject = this;
-    eyeC2B.imAfukinSensor = false;
-    eyeC2B.onCollideActive = function(me, them){
+    armC2B.gameObject = this;
+    armC2B.imAfukinSensor = false;
+    armC2B.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC2BInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeC2BInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeC2BInput.green += (them.gameColor.green);
+      me.gameObject.brain.armC2BInput.red += (them.gameColor.red);
+      me.gameObject.brain.armC2BInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armC2BInput.green += (them.gameColor.green);
     };
-    eyeC2B.onCollide = function(me, them){
+    armC2B.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC2BInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeC2BInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeC2BInput.green += (them.gameColor.green);
+      me.gameObject.brain.armC2BInput.red += (them.gameColor.red);
+      me.gameObject.brain.armC2BInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armC2BInput.green += (them.gameColor.green);
       if(them.gameObject.class == Bot){
-        if(me.gameObject.will_mate){
+        if(me.gameObject.brain.give > 0.0 ){
+          me.gameObject.give(them.gameObject);
+        }
           if(me.gameObject.species == them.gameObject.species){
-            me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-            if(Math.random()<0.25){
-            me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-            }
+            me.gameObject.brain.sexytime =+   me.gameObject.brain.interestInMating + them.gameObject.brain.sexytime ;
+              //console.log('sexytime: '+me.gameObject.brain.sexytime);
+            if(me.gameObject.brain.sexytime > 1.0 && me.gameObject.will_mate){
+                me.gameObject.brain.sexytime = -1;
+            me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
+
           }
         }
       }
     };
-    this.eyeC2B = eyeC2B;
+    this.armC2B = armC2B;
 
 
-    let eyeC3A = Bodies.circle(position.x + eyeC3AOffset.x, position.y + eyeC3AOffset.y, eyeRadius, {
+    let armC3A = Bodies.circle(position.x + armC3AOffset.x, position.y + armC3AOffset.y, armRadius, {
       collisionFilter: {
         group: group
       },
@@ -528,31 +569,39 @@ class Bot {
         fillStyle: '#aaaaaa'
       }
     });
-    eyeC3A.gameObject = this;
-    eyeC3A.imAfukinSensor = false;
-    eyeC3A.onCollideActive = function(me, them){
+    armC3A.gameObject = this;
+    armC3A.imAfukinSensor = false;
+    armC3A.onCollideActive = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC3AInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeC3AInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeC3AInput.green += (them.gameColor.green);
+      me.gameObject.brain.armC3AInput.red += (them.gameColor.red);
+      me.gameObject.brain.armC3AInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armC3AInput.green += (them.gameColor.green);
     };
-    eyeC3A.onCollide = function(me, them){
+    armC3A.onCollide = function(me, them){
       if(them.imAfukinSensor){return;}
-      me.gameObject.brain.eyeC3AInput.red += (them.gameColor.red);
-      me.gameObject.brain.eyeC3AInput.blue += (them.gameColor.blue);
-      me.gameObject.brain.eyeC3AInput.green += (them.gameColor.green);
+      me.gameObject.brain.armC3AInput.red += (them.gameColor.red);
+      me.gameObject.brain.armC3AInput.blue += (them.gameColor.blue);
+      me.gameObject.brain.armC3AInput.green += (them.gameColor.green);
+      if(them.gameObject.class != Plant && them.gameObject.class != Meat){
+        me.gameObject.brain.sexytime =+  0.1;
+      }
       if(them.gameObject.class == Bot){
-        if(me.gameObject.will_mate){
+        if(me.gameObject.brain.give > 0.0 ){
+          me.gameObject.give(them.gameObject);
+        }
           if(me.gameObject.species == them.gameObject.species){
-          me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-          if(Math.random()<0.25){
-          me.gameObject.mate(me.gameObject.brain.get_half_chromosomes(), them.gameObject.brain.get_half_chromosomes());
-          }
+
+            me.gameObject.brain.sexytime =+  me.gameObject.brain.interestInMating + them.gameObject.brain.sexytime ;
+              //console.log('sexytime: '+me.gameObject.brain.sexytime);
+            if(me.gameObject.brain.sexytime > 1.0 && me.gameObject.will_mate){
+                me.gameObject.brain.sexytime = -1;
+          me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
+
         }
       }
       }
     };
-    this.eyeC3A = eyeC3A;
+    this.armC3A = armC3A;
 
 
 
@@ -560,66 +609,66 @@ class Bot {
 
     let shitA = Matter.Constraint.create({
       bodyB: body,
-      pointB: eyeAOffset,
-      bodyA: eyeA,
+      pointB: armAOffset,
+      bodyA: armA,
       stiffness: 0.01
     });
     let shitA2A = Matter.Constraint.create({
       bodyB: body,
-      pointB: eyeA2AOffset,
-      bodyA: eyeA2A,
+      pointB: armA2AOffset,
+      bodyA: armA2A,
       stiffness: 0.01
     });
     let shitA2B = Matter.Constraint.create({
       bodyB: body,
-      pointB: eyeA2BOffset,
-      bodyA: eyeA2B,
+      pointB: armA2BOffset,
+      bodyA: armA2B,
       stiffness: 0.01
     });
 
     let shitB = Matter.Constraint.create({
       bodyB: body,
-      pointB: eyeBOffset,
-      bodyA: eyeB,
+      pointB: armBOffset,
+      bodyA: armB,
       stiffness: 0.01
     });
     let shitB2A = Matter.Constraint.create({
       bodyB: body,
-      pointB: eyeB2AOffset,
-      bodyA: eyeB2A,
+      pointB: armB2AOffset,
+      bodyA: armB2A,
       stiffness: 0.01
     });
     let shitB2B = Matter.Constraint.create({
       bodyB: body,
-      pointB: eyeB2BOffset,
-      bodyA: eyeB2B,
+      pointB: armB2BOffset,
+      bodyA: armB2B,
       stiffness: 0.01
     });
 
     let shitC = Matter.Constraint.create({
       bodyB: body,
-      pointB: eyeCOffset,
-      bodyA: eyeC,
+      pointB: armCOffset,
+      bodyA: armC,
       stiffness: 0.5
     });
 
     let shitC2A = Matter.Constraint.create({
       bodyB: body,
-      pointB: eyeC2AOffset,
-      bodyA: eyeC2A,
+      pointB: armC2AOffset,
+      bodyA: armC2A,
       stiffness: 0.5
     });
     let shitC2B = Matter.Constraint.create({
       bodyB: body,
-      pointB: eyeC2BOffset,
-      bodyA: eyeC2B,
+      pointB: armC2BOffset,
+      bodyA: armC2B,
       stiffness: 0.5
     });
 
     let shitC3A = Matter.Constraint.create({
       bodyB: body,
-      pointB: eyeC3AOffset,
-      bodyA: eyeC3A,
+      pointB: armC3AOffset,
+      bodyA: armC3A,
       stiffness: 0.5
     });
 
@@ -632,16 +681,16 @@ class Bot {
     //let sting = Body.create({});
 
     Matter.Composite.addBody(bot, body);
-    Matter.Composite.addBody(bot, eyeA);
-    Matter.Composite.addBody(bot, eyeA2A);
-    Matter.Composite.addBody(bot, eyeA2B);
-    Matter.Composite.addBody(bot, eyeB);
-    Matter.Composite.addBody(bot, eyeB2A);
-    Matter.Composite.addBody(bot, eyeB2B);
-    Matter.Composite.addBody(bot, eyeC);
-    Matter.Composite.addBody(bot, eyeC2A);
-    Matter.Composite.addBody(bot, eyeC2B);
-    Matter.Composite.addBody(bot, eyeC3A);
+    Matter.Composite.addBody(bot, armA);
+    Matter.Composite.addBody(bot, armA2A);
+    Matter.Composite.addBody(bot, armA2B);
+    Matter.Composite.addBody(bot, armB);
+    Matter.Composite.addBody(bot, armB2A);
+    Matter.Composite.addBody(bot, armB2B);
+    Matter.Composite.addBody(bot, armC);
+    Matter.Composite.addBody(bot, armC2A);
+    Matter.Composite.addBody(bot, armC2B);
+    Matter.Composite.addBody(bot, armC3A);
     Matter.Composite.addBody(bot, soundSensor);
     Matter.Composite.addConstraint(bot, shitA);
     Matter.Composite.addConstraint(bot, shitA2A);
@@ -663,9 +712,9 @@ class Bot {
     this.world = world;
     World.add(world, bot);
 
-    this.eyeA.gameColor = this.eyeA2B.gameColor = this.eyeA2A.gameColor = { red:0, green: 0, blue:0 };
-    this.eyeB.gameColor = this.eyeB2B.gameColor = this.eyeB2A.gameColor = { red:0, green: 0, blue:0 };
-    this.eyeC.gameColor = this.eyeC2B.gameColor = this.eyeC2A.gameColor = this.eyeC3A.gameColor = { red:0, green: 0, blue:0 };
+    this.armA.gameColor = this.armA2B.gameColor = this.armA2A.gameColor = { red:0, green: 0, blue:0 };
+    this.armB.gameColor = this.armB2B.gameColor = this.armB2A.gameColor = { red:0, green: 0, blue:0 };
+    this.armC.gameColor = this.armC2B.gameColor = this.armC2A.gameColor = this.armC3A.gameColor = { red:0, green: 0, blue:0 };
     this.body.gameColor = { red:0, green: 0, blue:0 };
 
   }
@@ -708,9 +757,9 @@ class Bot {
 
 
       let facing = this.body.angle;
-      let thrustLeftSide = this.brain.farts == true ? this.brain.thrust1*4:this.brain.thrust1;
+      let thrustLeftSide = this.brain.farts == true ? this.brain.thrust1*3:this.brain.thrust1;
       let turnLeftSide =  (facing - this.brain.turn1 ) ;
-      let thrustRightSide = this.brain.farts == true ? this.brain.thrust2*4:this.brain.thrust2;
+      let thrustRightSide = this.brain.farts == true ? this.brain.thrust2*3:this.brain.thrust2;
       let turnRightSide =  (facing + this.brain.turn2) ;
 
 
@@ -728,83 +777,132 @@ class Bot {
 
 
       this.life -= (AGE_DAMAGE * this.brain.age + Math.abs(this.heat * HEAT_DAMAGE ));// +   Math.abs(this.heat)
+      if(this.isPreggers){
+        this.life -= (AGE_DAMAGE * this.brain.age )/2;
+        this.brain.isPreggers = 1.0;
+          this.gestationTimer--;
+      }else{
+        this.brain.isPreggers = 0;
+        this.gestationTimer++;
+      }
+
       if(this.brain.farts){
         this.life -= BOOST_COST;
       }
 
-      this.eyeA.gameColor = this.eyeA2B.gameColor = this.eyeA2A.gameColor = this.brain.eyeColorA;
-      this.eyeB.gameColor = this.eyeB2B.gameColor = this.eyeB2A.gameColor = this.brain.eyeColorB;
-      this.eyeC.gameColor = this.eyeC2B.gameColor = this.eyeC2A.gameColor = this.eyeC3A.gameColor = this.brain.eyeColorA;
+      this.armA.gameColor = this.armA2B.gameColor = this.armA2A.gameColor = this.brain.armColorA;
+      this.armB.gameColor = this.armB2B.gameColor = this.armB2A.gameColor = this.brain.armColorB;
+      this.armC.gameColor = this.armC2B.gameColor = this.armC2A.gameColor = this.armC3A.gameColor = this.brain.armColorA;
       this.body.gameColor = this.brain.bodyColor;
 
       this.body.render.fillStyle = this.rgbToHex(this.body.gameColor.red * 255, this.body.gameColor.green * 255, this.body.gameColor.blue * 255);
-      this.eyeA.render.fillStyle = this.eyeA2B.render.fillStyle = this.eyeA2A.render.fillStyle =this.rgbToHex(this.brain.eyeColorA.red* 255, this.brain.eyeColorA.green* 255,this.brain.eyeColorA.blue* 255);
-      this.eyeB.render.fillStyle = this.eyeB2B.render.fillStyle = this.eyeB2A.render.fillStyle = this.rgbToHex(this.brain.eyeColorB.red* 255,this.brain.eyeColorB.green* 255,this.brain.eyeColorB.blue* 255);
-      this.eyeC.render.fillStyle = this.eyeC2B.render.fillStyle = this.eyeC2A.render.fillStyle = this.eyeC3A.render.fillStyle = this.rgbToHex(this.brain.eyeColorC.red* 255,this.brain.eyeColorC.green* 255,this.brain.eyeColorC.blue* 255);
+      this.armA.render.fillStyle = this.armA2B.render.fillStyle = this.armA2A.render.fillStyle =this.rgbToHex(this.brain.armColorA.red* 255, this.brain.armColorA.green* 255,this.brain.armColorA.blue* 255);
+      this.armB.render.fillStyle = this.armB2B.render.fillStyle = this.armB2A.render.fillStyle = this.rgbToHex(this.brain.armColorB.red* 255,this.brain.armColorB.green* 255,this.brain.armColorB.blue* 255);
+      this.armC.render.fillStyle = this.armC2B.render.fillStyle = this.armC2A.render.fillStyle = this.armC3A.render.fillStyle = this.rgbToHex(this.brain.armColorC.red* 255,this.brain.armColorC.green* 255,this.brain.armColorC.blue* 255);
 
       if(this.is_ui_selected){
         this.body.render.strokeStyle =  this.rgbToHex(150,50,0);
-        this.eyeA.render.strokeStyle =  this.rgbToHex(150,50,0);
-        this.eyeB.render.strokeStyle =  this.rgbToHex(150,50,0);
-        this.eyeC.render.strokeStyle =  this.rgbToHex(150,50,0);
+        this.armA.render.strokeStyle =  this.rgbToHex(150,50,0);
+        this.armB.render.strokeStyle =  this.rgbToHex(150,50,0);
+        this.armC.render.strokeStyle =  this.rgbToHex(150,50,0);
 
         this.body.render.lineWidth = 8;
-        this.eyeA.render.lineWidth = 8;
-        this.eyeB.render.lineWidth = 8;
-        this.eyeC.render.lineWidth = 8;
+        this.armA.render.lineWidth = 8;
+        this.armB.render.lineWidth = 8;
+        this.armC.render.lineWidth = 8;
       }else{
         this.ui_selection_counter=0;
 
         this.body.render.lineWidth = 0;
-        this.eyeA.render.lineWidth = 0;
-        this.eyeB.render.lineWidth = 0;
-        this.eyeC.render.lineWidth = 0;
+        this.armA.render.lineWidth = 0;
+        this.armB.render.lineWidth = 0;
+        this.armC.render.lineWidth = 0;
       }
 
 
-        if(this.gestationTimer < 1 && this.brain.interestedInMating){
+        if( this.brain.interestInMating > 0 && this.brain.age > SEXUAL_MATURITY ){
           this.will_mate = true;
 
         }else{
           this.will_mate = false;
         }
-        if(this.gestationTimer < -GESTATION_TIMER ){
-          console.log("self love");
-         this.mate(this.brain.get_half_chromosomes(), this.brain.get_half_chromosomes());
-         this.will_mate = false;
-         this.gestationTimer = GESTATION_TIMER;
+
+        if(this.gestationTimer < 1 && this.isPreggers){
+          this.giveBirth();
+        }
+
+        if(this.gestationTimer> GESTATION_TIMER *2){
+          this.mate(this.brain, this.brain);
+          console.log('self love');
         }
 
   }
 
-    mate(channel_A, channel_B){
-      let child = new Bot();
-      child.species = this.species;
-      child.brain.rebuild(channel_A, channel_B);
-      child.create(this.world, Vector.create(this.body.position.x - 300*(Math.random()-0.5), this.body.position.y - 300*(Math.random()-0.5)));
-
-      console.log('sexual reproduction: ' + this.species);
+    concieve(channel_A, channel_B){
       this.gestationTimer = GESTATION_TIMER;
-      this.will_mate = false;
-      this.health -= .25;
+      this.isPreggers = true;
+      this.womb.push({ channel_A: channel_A, channel_B:channel_B});
+    }
+
+    giveBirth(){
+      console.log('birth: ' + this.species + ' litter of:' + this.womb.length);
+      while(this.womb.length > 0){
+        let genes = this.womb.pop();
+        let child = new Bot();
+        child.species = this.species;
+        child.brain.rebuild(genes.channel_A, genes.channel_B);
+        child.create(this.world, Vector.create(this.body.position.x - 300*(Math.random()-0.5), this.body.position.y - 300*(Math.random()-0.5)));
+
+        this.health = this.health *.75;
+      }
+      this.gestationTimer = 1;
+      this.isPreggers = false;
+    }
+
+    mate(p1, p2){
+      this.brain.happy += 1.0
+      if(!this.isPreggers){
+        this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
+        if(Math.random() > 0.75){
+          this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
+          if(Math.random() > 0.75){
+              this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
+              if(Math.random() > 0.75){
+                  this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
+              }
+          }
+        }
+      }
+      console.log('mating: ' + this.species);
+
     }
 
   eat(food){
     // will only eat if wants to
 
-    if(this.brain.wantEat ){
+    if(this.brain.wantEat > 0){
       // the amount eaten
-      food.life -= 0.1;
-      this.gestationTimer--;
+      food.life -= 0.1 * this.brain.wantEat;
 
+
+      this.brain.happy += 0.1
       // if eating food bot still only gains life up to max
-      if(this.life < this.maxLife ){
-      var speedMod = 1.0 - (this.body.speed -20)/100;
-      this.life += (0.2 * speedMod);
-
+    if(this.life < this.maxLife ){
+      var speedMod = 1.0 - (this.body.speed)/100;
+      this.life += (this.brain.wantEat * speedMod);
+      if(this.isPreggers){
+          //this.gestationTimer--;
+            this.brain.happy += 0.1;
+      }
     }else {
 
-        this.gestationTimer--;
+      if(this.isPreggers){
+          this.gestationTimer--;
+            this.brain.happy += 0.1;
+      }else{
+        this.life -= OVEREAT_PENALTY * this.brain.wantEat;
+          this.brain.ouchie += 0.1;
+      }
     }
 
 
@@ -818,19 +916,18 @@ class Bot {
   give(them){
     if(them.life<them.maxLife ){
       let toGive = GIVE_AMOUNT * this.brain.give;
-      this.life -=toGive;
+      this.life -=toGive + GIVE_AMOUNT/2;
       them.life +=toGive;
     }
 
   }
 
-  spawn(placement){
+  spawn(brain){
     let child = new Bot();
     child.species = this.species;
-    child.brain = this.brain.mutate();
-    child.create(this.world, Vector.create(placement.x -300*Math.random(), placement.y -300*Math.random()));
-      console.log('asexual reproduction: ' + this.species);
-      this.health -= .5;
+    child.brain.rebuild(brain.get_half_chromosomes(), brain.get_half_chromosomes());
+    child.create(this.world, Vector.create(this.body.position.x - 300*(Math.random()-0.5), this.body.position.y - 300*(Math.random()-0.5)));
+
   }
 
   componentToHex(c) {

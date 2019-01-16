@@ -23,27 +23,29 @@ const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
 
-const COLLISION_DAMAGE = 0.0021;
+const COLLISION_DAMAGE = 0.0003;
 const sting_DAMAGE = 10;
 const AGE_DAMAGE = 0.000015;
-const HEAT_DAMAGE = 0.00022;
-const OVEREAT_PENALTY = 0.0001;
-const BOOST_COST = 0.002;
-const GESTATION_TIMER = 400;
-const GIVE_AMOUNT = 0.0002;
-const SEXUAL_MATURITY = 7;
+const HEAT_DAMAGE = 0.00015;
+const OVEREAT_PENALTY = 0.15;
+const BOOST_COST = 0.005;
+const GESTATION_TIMER = 2.5;
+const GIVE_AMOUNT = 0.1;
+const SEXUAL_MATURITY = 5;
+const EAT_AMOUNT = 0.15;
+const MAX_LIFE = 1.0;
 
 class Bot {
   constructor() {
 
     this.class = Bot;
-    this.brain = OtherBrain.create_new();
+    this.brain = Brain.create_new();
 
-    this.life = 1.0;
-    this.maxLife = 1.0;
+    this.life = MAX_LIFE;
+
     this.heat = 0.0;
     this.isPreggers = false;
-    this.gestationTimer = 1;
+    this.gestationTimer = 0;
     this.center_eye = new Eye();
     this.left_eye = new Eye();
     this.right_eye = new Eye();
@@ -71,21 +73,21 @@ class Bot {
     let offsetLayer2Radius = offsetRadius * 1.6;
 
     let armAOffset = Vector.create( offsetRadius * Math.cos(1.1), offsetRadius * Math.sin(1.1));
-    let armA2AOffset = Vector.create( offsetLayer2Radius* Math.cos(1.3), offsetLayer2Radius * Math.sin(1.3));
+    let armA2AOffset = Vector.create( offsetRadius* Math.cos(2.1), offsetRadius * Math.sin(2.1));
     let armA2BOffset = Vector.create( offsetRadius * Math.cos(1.6), offsetRadius * Math.sin(1.6));
 
     let armBOffset = Vector.create( offsetRadius * Math.cos(-1.1),  offsetRadius * Math.sin(-1.1));
-    let armB2AOffset = Vector.create( offsetLayer2Radius* Math.cos(-1.3),  offsetLayer2Radius * Math.sin(-1.3));
+    let armB2AOffset = Vector.create( offsetRadius* Math.cos(-2.1),  offsetRadius * Math.sin(-2.1));
     let armB2BOffset = Vector.create( offsetRadius * Math.cos(-1.6),  offsetRadius * Math.sin(-1.6));
 
 
     let armCOffset = Vector.create( offsetRadius * 1.5, 0 );
     let armC2AOffset = Vector.create( offsetLayer2Radius  ,  offsetLayer2Radius * Math.sin(-0.3));
     let armC2BOffset = Vector.create( offsetLayer2Radius , offsetLayer2Radius * Math.sin(0.3));
-    let armC3AOffset = Vector.create( offsetLayer2Radius * 1.5,0);
+    let armC3AOffset = Vector.create( offsetLayer2Radius * 1.3,0);
 
 
-    let soundRadius = 250;
+    let soundRadius = 200;
 
     let bot = Matter.Composite.create({
       label: 'Bot',
@@ -137,11 +139,11 @@ class Bot {
             let theirMomentum = Vector.mult(them.velocity, 1.0);
             let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-            let damage = (COLLISION_DAMAGE * Math.abs(Vector.magnitude(relativeMomentum)));
+            let damage = (COLLISION_DAMAGE * Math.abs(Vector.magnitude(relativeMomentum)))*10;
               me.gameObject.life -= damage;
               me.gameObject.brain.ouchie += damage;
           }else if(them.gameObject.class==Meat){
-            me.gameObject.brain.smellMeat = 1.0;
+            me.gameObject.brain.smellMeat += 1.0;
             // only the blood thirsty eat meat
           //  if(me.gameObject.species == 0){
               me.gameObject.eat(them.gameObject);
@@ -187,7 +189,7 @@ class Bot {
             let theirMomentum = Vector.mult(them.velocity, 1.0);
             let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-            let damage = (COLLISION_DAMAGE * Math.abs(Vector.magnitude(relativeMomentum)));
+            let damage = (COLLISION_DAMAGE * Math.abs(Vector.magnitude(relativeMomentum)))*10;
               me.gameObject.life -= damage;
               me.gameObject.brain.ouchie += damage;
         }
@@ -219,14 +221,14 @@ class Bot {
 
               if(me.gameObject.species == them.gameObject.species){
                 if(me.gameObject.will_mate && them.gameObject.will_mate){
-                  me.gameObject.brain.sexytime =+ them.gameObject.brain.interestInMating + them.gameObject.brain.sexytime;
+                  me.gameObject.brain.sexytime += them.gameObject.brain.interestInMating;
                 }
               }
 
               //console.log(them.gameObject.voice);
-              if(me.gameObject.brain.give > 0.0 ){
-                me.gameObject.give(them.gameObject);
-              }
+              // if(me.gameObject.brain.give > 0.0 ){
+              //   me.gameObject.give(them.gameObject);
+              // }
         }else if(them.gameObject.class==Meat){
           let distance = Math.abs(( Mathjs.distance([
             me.gameObject.body.position.x,
@@ -466,11 +468,11 @@ class Bot {
           me.gameObject.give(them.gameObject);
         }
         if(me.gameObject.species == them.gameObject.species){
-              me.gameObject.brain.sexytime =+  me.gameObject.brain.interestInMating + them.gameObject.brain.sexytime ;
+              me.gameObject.brain.sexytime +=  me.gameObject.brain.interestInMating ;
                 //console.log('sexytime: '+me.gameObject.brain.sexytime);
-              if(me.gameObject.brain.sexytime > 1.0 && me.gameObject.will_mate){
-                me.gameObject.brain.sexytime = -1;
-            me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
+              if(me.gameObject.brain.sexytime > 3.0 && me.gameObject.will_mate){
+
+                me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
 
           }
         }
@@ -506,10 +508,10 @@ class Bot {
           me.gameObject.give(them.gameObject);
         }
          if(me.gameObject.species == them.gameObject.species){
-           me.gameObject.brain.sexytime =+  me.gameObject.brain.interestInMating + them.gameObject.brain.sexytime ;
+           me.gameObject.brain.sexytime +=  me.gameObject.brain.interestInMating  ;
              //console.log('sexytime: '+me.gameObject.brain.sexytime);
-           if(me.gameObject.brain.sexytime > 1.0 && me.gameObject.will_mate){
-               me.gameObject.brain.sexytime = -1;
+           if(me.gameObject.brain.sexytime > 3.0 && me.gameObject.will_mate){
+
             me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
 
           }
@@ -546,10 +548,10 @@ class Bot {
           me.gameObject.give(them.gameObject);
         }
           if(me.gameObject.species == them.gameObject.species){
-            me.gameObject.brain.sexytime =+   me.gameObject.brain.interestInMating + them.gameObject.brain.sexytime ;
+            me.gameObject.brain.sexytime +=   me.gameObject.brain.interestInMating  ;
               //console.log('sexytime: '+me.gameObject.brain.sexytime);
-            if(me.gameObject.brain.sexytime > 1.0 && me.gameObject.will_mate){
-                me.gameObject.brain.sexytime = -1;
+            if(me.gameObject.brain.sexytime > 3.0 && me.gameObject.will_mate){
+
             me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
 
           }
@@ -583,7 +585,7 @@ class Bot {
       me.gameObject.brain.armC3AInput.blue += (them.gameColor.blue);
       me.gameObject.brain.armC3AInput.green += (them.gameColor.green);
       if(them.gameObject.class != Plant && them.gameObject.class != Meat){
-        me.gameObject.brain.sexytime =+  0.1;
+        me.gameObject.brain.sexytime +=  0.1;
       }
       if(them.gameObject.class == Bot){
         if(me.gameObject.brain.give > 0.0 ){
@@ -591,14 +593,12 @@ class Bot {
         }
           if(me.gameObject.species == them.gameObject.species){
 
-            me.gameObject.brain.sexytime =+  me.gameObject.brain.interestInMating + them.gameObject.brain.sexytime ;
+            me.gameObject.brain.sexytime +=  me.gameObject.brain.interestInMating  ;
               //console.log('sexytime: '+me.gameObject.brain.sexytime);
-            if(me.gameObject.brain.sexytime > 1.0 && me.gameObject.will_mate){
-                me.gameObject.brain.sexytime = -1;
-          me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
-
+            if(me.gameObject.brain.sexytime > 3.0 && me.gameObject.will_mate){
+              me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
+            }
         }
-      }
       }
     };
     this.armC3A = armC3A;
@@ -611,38 +611,40 @@ class Bot {
       bodyB: body,
       pointB: armAOffset,
       bodyA: armA,
-      stiffness: 0.01
+      stiffness: 0.1
     });
+    this.armAConstraint = shitA;
     let shitA2A = Matter.Constraint.create({
       bodyB: body,
       pointB: armA2AOffset,
       bodyA: armA2A,
-      stiffness: 0.01
+      stiffness: 0.1
     });
     let shitA2B = Matter.Constraint.create({
       bodyB: body,
       pointB: armA2BOffset,
       bodyA: armA2B,
-      stiffness: 0.01
+      stiffness: 0.1
     });
 
     let shitB = Matter.Constraint.create({
       bodyB: body,
       pointB: armBOffset,
       bodyA: armB,
-      stiffness: 0.01
+      stiffness: 0.1
     });
+    this.armBConstraint = shitB;
     let shitB2A = Matter.Constraint.create({
       bodyB: body,
       pointB: armB2AOffset,
       bodyA: armB2A,
-      stiffness: 0.01
+      stiffness: 0.1
     });
     let shitB2B = Matter.Constraint.create({
       bodyB: body,
       pointB: armB2BOffset,
       bodyA: armB2B,
-      stiffness: 0.01
+      stiffness: 0.1
     });
 
     let shitC = Matter.Constraint.create({
@@ -724,10 +726,10 @@ class Bot {
 
 
     this.heat = Math.abs( Mathjs.distance([
-      this.body.position.x,
+      this.body.position.y,
       this.body.position.y],
     [ this.centerOfUniverse.x,
-      this.centerOfUniverse.y]))/this.phantomZone;
+      this.centerOfUniverse.y])/(this.phantomZone));
 
     this.brain.heat = this.heat;
     this.brain.life = this.life;
@@ -757,9 +759,9 @@ class Bot {
 
 
       let facing = this.body.angle;
-      let thrustLeftSide = this.brain.farts == true ? this.brain.thrust1*3:this.brain.thrust1;
+      let thrustLeftSide = this.brain.farts == true ? this.brain.thrust1 + 0.75:this.brain.thrust1;
       let turnLeftSide =  (facing - this.brain.turn1 ) ;
-      let thrustRightSide = this.brain.farts == true ? this.brain.thrust2*3:this.brain.thrust2;
+      let thrustRightSide = this.brain.farts == true ? this.brain.thrust2 + 0.75:this.brain.thrust2;
       let turnRightSide =  (facing + this.brain.turn2) ;
 
 
@@ -776,14 +778,11 @@ class Bot {
         Vector.create(thrustRightSide * Math.cos(turnRightSide), thrustRightSide * Math.sin(turnRightSide)));
 
 
-      this.life -= (AGE_DAMAGE * this.brain.age + Math.abs(this.heat * HEAT_DAMAGE ));// +   Math.abs(this.heat)
+      let heatDamage =  (this.heat * this.heat * HEAT_DAMAGE );
+      let ageDamage = AGE_DAMAGE * this.brain.age;
+      this.life -= (heatDamage + ageDamage);
       if(this.isPreggers){
-        this.life -= (AGE_DAMAGE * this.brain.age )/2;
-        this.brain.isPreggers = 1.0;
-          this.gestationTimer--;
-      }else{
-        this.brain.isPreggers = 0;
-        this.gestationTimer++;
+        this.life -= (ageDamage );
       }
 
       if(this.brain.farts){
@@ -801,6 +800,11 @@ class Bot {
       this.armC.render.fillStyle = this.armC2B.render.fillStyle = this.armC2A.render.fillStyle = this.armC3A.render.fillStyle = this.rgbToHex(this.brain.armColorC.red* 255,this.brain.armColorC.green* 255,this.brain.armColorC.blue* 255);
 
       if(this.is_ui_selected){
+         console.log('age damage: '+ ageDamage);
+         console.log('heat damage: '+ heatDamage);
+         console.log('life: '+ this.life);
+        // console.log('speed: '+this.body.speed);
+        console.log('gestation: '+ this.gestationTimer);
         this.body.render.strokeStyle =  this.rgbToHex(150,50,0);
         this.armA.render.strokeStyle =  this.rgbToHex(150,50,0);
         this.armB.render.strokeStyle =  this.rgbToHex(150,50,0);
@@ -820,32 +824,34 @@ class Bot {
       }
 
 
-        if( this.brain.interestInMating > 0 && this.brain.age > SEXUAL_MATURITY ){
+        if( this.brain.interestInMating > 0  && this.brain.age > SEXUAL_MATURITY ){
           this.will_mate = true;
 
         }else{
           this.will_mate = false;
         }
 
-        if(this.gestationTimer < 1 && this.isPreggers){
+        if(this.gestationTimer < 0 && this.isPreggers){
           this.giveBirth();
         }
 
-        if(this.gestationTimer> GESTATION_TIMER *2){
+        if(this.gestationTimer> GESTATION_TIMER *2 ){
+              console.log('self love');
           this.mate(this.brain, this.brain);
-          console.log('self love');
+
         }
 
   }
 
     concieve(channel_A, channel_B){
+      console.log('knocked up: ' + this.species);
       this.gestationTimer = GESTATION_TIMER;
       this.isPreggers = true;
       this.womb.push({ channel_A: channel_A, channel_B:channel_B});
     }
 
     giveBirth(){
-      console.log('birth: ' + this.species + ' litter of:' + this.womb.length);
+      console.log('birth: ' + this.species + ' litter of: ' + this.womb.length);
       while(this.womb.length > 0){
         let genes = this.womb.pop();
         let child = new Bot();
@@ -853,71 +859,83 @@ class Bot {
         child.brain.rebuild(genes.channel_A, genes.channel_B);
         child.create(this.world, Vector.create(this.body.position.x - 300*(Math.random()-0.5), this.body.position.y - 300*(Math.random()-0.5)));
 
-        this.health = this.health *.75;
+        this.health = this.health *.9;
+        child.health = this.health;
       }
-      this.gestationTimer = 1;
+      this.gestationTimer = 0;
       this.isPreggers = false;
     }
 
     mate(p1, p2){
-      this.brain.happy += 1.0
+      this.brain.happy += this.brain.sexytime;
+      this.brain.sexytime = 0;
+      console.log('mating: ' + this.species);
       if(!this.isPreggers){
-        this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
-        if(Math.random() > 0.75){
+        if(Math.random() < 0.75){
           this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
-          if(Math.random() > 0.75){
-              this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
-              if(Math.random() > 0.75){
-                  this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
-              }
+          if(Math.random() < 0.55){
+            this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
+            if(Math.random() < 0.55){
+                this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
+                if(Math.random() < 0.55){
+                    this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
+                }
+            }
           }
         }
       }
-      console.log('mating: ' + this.species);
 
     }
 
   eat(food){
     // will only eat if wants to
-
     if(this.brain.wantEat > 0){
-      // the amount eaten
-      food.life -= 0.1 * this.brain.wantEat;
 
+      let speedMod = Mathjs.abs(1.0 - (this.body.speed)/150);
+      let effectiveGain =   (this.brain.wantEat * (speedMod )*EAT_AMOUNT);
+      food.life -= this.brain.wantEat * EAT_AMOUNT;
 
-      this.brain.happy += 0.1
+      this.brain.happy += effectiveGain;
+
       // if eating food bot still only gains life up to max
-    if(this.life < this.maxLife ){
-      var speedMod = 1.0 - (this.body.speed)/100;
-      this.life += (this.brain.wantEat * speedMod);
+    if(this.life < MAX_LIFE ){
+      this.life += effectiveGain;
+      // if(this.is_ui_selected){
+      //   console.log('Food eaten: '+effectiveGain);
+      //   console.log('Gestation: '+this.gestationTimer);
+      // }
+      if(!this.isPreggers && this.brain.age > SEXUAL_MATURITY){
+        this.gestationTimer+=effectiveGain;
+      }
       if(this.isPreggers){
-          //this.gestationTimer--;
-            this.brain.happy += 0.1;
+          this.gestationTimer -= effectiveGain;
+          this.brain.happy += effectiveGain;
       }
     }else {
 
-      if(this.isPreggers){
-          this.gestationTimer--;
-            this.brain.happy += 0.1;
-      }else{
-        this.life -= OVEREAT_PENALTY * this.brain.wantEat;
-          this.brain.ouchie += 0.1;
-      }
+      // if(this.isPreggers){
+      //   this.gestationTimer -= effectiveGain;
+      //   this.brain.happy += effectiveGain;
+      // }else{
+        this.life -= OVEREAT_PENALTY * effectiveGain;
+        this.brain.ouchie += effectiveGain;
+      // }
     }
 
 
     }
     // sitting on food ruins it
-    food.life -= 0.02;
+    food.life -= 0.01;
     if(food.life <0.0){ food.destroy()}
     //console.log('nom' + food.class);
   }
 
   give(them){
-    if(them.life<them.maxLife ){
+    if(them.life< MAX_LIFE ){
       let toGive = GIVE_AMOUNT * this.brain.give;
-      this.life -=toGive + GIVE_AMOUNT/2;
+      this.life -=toGive + GIVE_AMOUNT*0.9;
       them.life +=toGive;
+      them.brain.happy+= this.brain.give;
     }
 
   }

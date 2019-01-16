@@ -15,60 +15,62 @@ class OtherBrain extends BaseBrain{
   }
     constructor(){
       super();
-     var mutation_rate = 0.55;
-     var mutation_magnitude = 2.0;
+     let mutation_rate = 0.5;
+     let weight_mutation_magnitude = 1.0;
+     let bias_mutation_magnitude = 1.0;
+
       this.inputWeightsA = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  mutation_magnitude*(Math.random()-0.5);
+          value+=  weight_mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
 
       this.inputBiasA = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+= mutation_magnitude*(Math.random()-0.5);
+          value+= bias_mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerWeightsA = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  mutation_magnitude*(Math.random()-0.5);
+          value+=  weight_mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerBiasA = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  mutation_magnitude*(Math.random()-0.5);
+          value+=  bias_mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
 
       this.inputWeightsB = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  mutation_magnitude*(Math.random()-0.5);
+          value+=  weight_mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
 
       this.inputBiasB = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  mutation_magnitude*(Math.random()-0.5);
+          value+=  bias_mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerWeightsB = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  mutation_magnitude*(Math.random()-0.5);
+          value+=  weight_mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
 
       this.hiddenLayerBiasB = Mathjs.zeros([this.inputSize]).map( function(value, index, matrix) {
         if(Math.random() < mutation_rate){
-          value+=  mutation_magnitude*(Math.random()-0.5);
+          value+=  bias_mutation_magnitude*(Math.random()-0.5);
         }
         return value;
       });
@@ -86,30 +88,40 @@ class OtherBrain extends BaseBrain{
 
     doMagic(input_vector){
 
-      let postInputsWeightsVector = Mathjs.multiply(this.combined_input_weights, input_vector);
+      input_vector = input_vector.map(function(value, index, matrix){
+        let result = (1.0/(1.0 + Mathjs.exp(-1 * value )) - 0.5)*2;
+        //(value*value)/(1 + value*value);
+        //let result = Mathjs.cos(value);
+        //1.0/(1.0 + Mathjs.exp(-1 * value));
+        //(value*value)/(1 + value*value)
+        if(isNaN(result)){
+          result = 0.0
+        }
+        return result;
+      });
+      let postInputsWeightsVector = Mathjs.multiply(this.combined_input_weights.map(function(value, index, matrix){
+        return Math.random() > Math.abs(value) ? 1 * Math.sign(value) : 0;
+        }), input_vector);
 
       let postInputsBiasVector = Mathjs.add(postInputsWeightsVector, this.combined_input_bias);
 
       let hiddenLayerInputVector =  postInputsBiasVector.map(function(value, index, matrix){
-        let result = (1.0/(1.0 + Mathjs.exp(-1 * value/2)) - 0.5)*2;
-        //(value*value)/(1 + value*value);
-        //Mathjs.sin(value*value);
-        //1.0/(1.0 + Mathjs.exp(-1 * value));
-        //(value*value)/(1 + value*value)
+        let result = (1.0/(1.0 + Mathjs.exp(-1 * value )) - 0.5)*2;
+
         if(isNaN(result)){
             result = 0.0
         }
         return result;
         });
 
-        let postHiddenLayerWeightsVector = Mathjs.multiply(hiddenLayerInputVector, this.combined_hidden_weights);
+        let postHiddenLayerWeightsVector = Mathjs.multiply(hiddenLayerInputVector.map(function(value, index, matrix){
+            return Math.random() > Math.abs(value) ? 1 * Math.sign(value) : 0;
+          }), this.combined_hidden_weights);
         let postHiddenLayerBaisVector = Mathjs.add(postHiddenLayerWeightsVector, this.combined_hidden_bias);
 
         let outputVector = postHiddenLayerBaisVector.map(function(value, index, matrix){
-          let result = (1.0/(1.0 + Mathjs.exp(-1 * value/2)) - 0.5)*2;
-          //(value*value)/(1 + value*value);
-          //Mathjs.sin(value*value);
-          //1.0/(1.0 + Mathjs.exp(-1 * value));
+          let result = (1.0/(1.0 + Mathjs.exp(-1 * value )) - 0.5)*2;
+
           if(isNaN(result)){
             result = 0.0
           }
@@ -160,10 +172,10 @@ class OtherBrain extends BaseBrain{
 
       childBrain.inputWeightsA = this.mutate_layer(this.inputWeightsA);
 
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.1){
         childBrain.inputWeightsA = Mathjs.transpose(childBrain.inputWeightsA);
       }
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.1){
         childBrain.inputWeightsA = Mathjs.inv(childBrain.inputWeightsA);
       }
 
@@ -175,19 +187,19 @@ class OtherBrain extends BaseBrain{
 
       childBrain.hiddenLayerWeightsA = this.mutate_layer(this.hiddenLayerWeightsA);
 
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.1){
         childBrain.hiddenLayerWeightsA = Mathjs.transpose(childBrain.hiddenLayerWeightsA);
       }
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.1){
         childBrain.hiddenLayerWeightsA = Mathjs.inv(childBrain.hiddenLayerWeightsA);
       }
 
       childBrain.inputWeightsB = this.mutate_layer(this.inputWeightsB);
 
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.1){
         childBrain.inputWeightsB = Mathjs.transpose(childBrain.inputWeightsB);
       }
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.1){
         childBrain.inputWeightsB = Mathjs.inv(childBrain.inputWeightsB);
       }
 
@@ -199,10 +211,10 @@ class OtherBrain extends BaseBrain{
 
       childBrain.hiddenLayerWeightsB = this.mutate_layer(this.hiddenLayerWeightsB);
 
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.1){
         childBrain.hiddenLayerWeightsB = Mathjs.transpose(childBrain.hiddenLayerWeightsB);
       }
-      if(Math.random()< 0.05){
+      if(Math.random()< 0.1){
         childBrain.hiddenLayerWeightsB = Mathjs.inv(childBrain.hiddenLayerWeightsB);
       }
       childBrain.buildLayers();
@@ -211,17 +223,21 @@ class OtherBrain extends BaseBrain{
 
     mutate_layer(layer){
       layer = layer.map(function(value, index, matrix){
+        if(Math.random() < .5){
+          value += 0.01*(Math.random()-0.5)*value + 0.001*(Math.random()-0.5) ;
+        }
         if(Math.random() < 0.1){
-          value += 0.001*(Math.random()-0.5)*value + 0.001*(Math.random()-0.5) ;
+          value += 0.1*(Math.random()-0.5)*value;
+        }
+        if(Math.random() < 0.1){
+          value += 0.1*(Math.random()-0.5) ;
         }
         if(Math.random() < 0.01){
-          value += 0.01*(Math.random()-0.5)*value +0.01*(Math.random()-0.5) ;
+          value += 0.5*(Math.random()-0.5) ;
         }
-        if(Math.random() < 0.001){
-          value += 0.1*(Math.random()-0.5)*value +0.1*(Math.random()-0.5) ;
-        }
-        if(Math.random() < 0.0001){
-          value += (Math.random()-0.5)*value + (Math.random()-0.5)*value ;
+
+        if(Math.random() < 0.01){
+          value += (Math.random()-0.5)*value ;
         }
 
         return value;

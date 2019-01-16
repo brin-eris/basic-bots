@@ -14,11 +14,11 @@ const MIN_BOTS_PER_SPECIES = 3;
 const MAX_BOTS = 20;
 const SPECIES = 2;
 const STARTING_PLANTS = 350;
-const MIN_PLANTS = 350;
-const WALLS = 12;
+const MIN_PLANTS = 250;
+const WALLS = 2;
 
-const WIDTH = 2500;
-const HEIGHT = 2000;
+const WIDTH = 1500;
+const HEIGHT = 1100;
 
 // soak the brains in here to get juicy
 class SimEngine {
@@ -132,7 +132,7 @@ class SimEngine {
           if(someone_needs_to_die){
             console.log('someone_needs_to_die');
           }
-          if(plantCount < MIN_PLANTS && Math.random()>0.99){
+          if(plantCount < MIN_PLANTS && Math.random()>0.85){
 
             new Plant().create(engine.world, {
               x : Mathjs.pickRandom(horizontal_center_points),

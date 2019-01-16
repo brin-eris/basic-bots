@@ -8,11 +8,11 @@ const    Bodies = require('matter-js').Bodies;
 class Plant {
 
   static get_height(){
-    return 50;
+    return 25;
   }
 
   static get_width(){
-    return 50;
+    return 25;
   }
 
   constructor() {
@@ -49,7 +49,7 @@ class Plant {
       }
 
       tick(){
-        this.life+= 0.001;
+        this.life+= 0.002;
         this.body.gameColor = {red: 0.0, blue: 0.0, green: this.life}
         this.body.render.fillStyle = this.rgbToHex(0,this.life * 255,0);
       }

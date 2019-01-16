@@ -2,7 +2,7 @@
 
 const Mathjs = require('mathjs');
 
-const INPUT_SIZE = 43;
+const INPUT_SIZE = 34;
 
 
 class BaseBrain{
@@ -11,9 +11,13 @@ class BaseBrain{
 
     constructor(){
       this.inputSize = INPUT_SIZE;
-
+      this.interestInMating = 0;
+      this.actuator1 =  0;
+      this.actuator2 =  0;
+      this.actuator3 =  0;
+      this.actuator4 =  0;
       this.voiceInput = 0;
-      this.isPreggers = 0;
+
       this.sexytime = 0;
       this.happy = 0;
       this.smellMeat = 0.0;
@@ -80,46 +84,64 @@ class BaseBrain{
         this.right_eye_vision.blue,
         this.right_eye_vision.green,
 
+
+
         this.bodyInput.red,
         this.bodyInput.blue,
         this.bodyInput.green,
 
 
-        this.armAInput.red,
-        this.armAInput.blue,
-        this.armAInput.green,
+        // this.armAInput.red,
+        // this.armAInput.blue,
+        // this.armAInput.green,
+        //
+        // this.armBInput.red,
+        // this.armBInput.blue,
+        // this.armBInput.green,
+        //
+        // this.armCInput.red +   this.armC2AInput.red +   this.armC2BInput.red + this.armC3AInput.red,
+        // this.armCInput.blue + this.armC2AInput.blue + this.armC2BInput.blue +   this.armC3AInput.blue,
+        // this.armCInput.green + this.armC2AInput.green + this.armC2BInput.green +   this.armC3AInput.green,
 
-        this.armBInput.red,
-        this.armBInput.blue,
-        this.armBInput.green,
+        //  this.bodyColor.red,
+        //  this.bodyColor.blue,
+        //  this.bodyColor.green,
 
-        this.armCInput.red +   this.armC2AInput.red +   this.armC2BInput.red + this.armC3AInput.red,
-        this.armCInput.blue + this.armC2AInput.blue + this.armC2BInput.blue +   this.armC3AInput.blue,
-        this.armCInput.green + this.armC2AInput.green + this.armC2BInput.green +   this.armC3AInput.green,
+         (this.soundInput),
+         (this.voiceInput),
 
-         this.bodyColor.red,
-         this.bodyColor.blue,
-         this.bodyColor.green,
+         // this.voice,
+         // this.sting,
+         // this.give,
+         // (this.sexytime),
+         // this.interestInMating,
 
-         this.voiceInput,
-         this.isPreggers,
-         this.sting,
-         this.voice,
-        this.heat,
+        (this.heat),
         this.gestation,
-        this.soundInput,
-        this.ouchie,
-        this.happy,
+        //
+        (this.ouchie),
+        (this.happy),
         this.life,
         this.ccClock,
-         this.give,
-        this.smellMeat,
+
+        (this.smellMeat),
         this.memory1,
         this.memory2,
         this.memory3,
         this.memory4,
-        Math.random()*2 - 1.0,
-        this.sexytime
+
+        this.center_eye_vision.red,
+        this.center_eye_vision.blue,
+        this.center_eye_vision.green,
+
+        this.left_eye_vision.red,
+        this.left_eye_vision.blue,
+        this.left_eye_vision.green,
+
+        this.right_eye_vision.red,
+        this.right_eye_vision.blue,
+        this.right_eye_vision.green
+
         ]);
 
     }
@@ -132,55 +154,63 @@ class BaseBrain{
       this.turn2 = (this.outputVector.subset(Mathjs.index(2)) - threshold);//*Math.PI;
       this.thrust2 = (this.outputVector.subset(Mathjs.index(3)) - threshold)  ;
 
-      this.bodyColor.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(4))) ;
-      this.bodyColor.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(5)));
-      this.bodyColor.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(6))) ;
+      this.bodyColor.red = 0.5 + (this.outputVector.subset(Mathjs.index(4)))/2 ;
+      this.bodyColor.green = 0.5 + (this.outputVector.subset(Mathjs.index(5)))/2+ this.sting/2;
+      this.bodyColor.blue = 0.5 + (this.outputVector.subset(Mathjs.index(6)))/2 + this.give/2;
 
 
-      this.sting = Mathjs.abs(this.outputVector.subset(Mathjs.index(7)));
+      this.sting =  (this.outputVector.subset(Mathjs.index(7)));
 
-      this.give = Mathjs.abs(this.outputVector.subset(Mathjs.index(8)));
+      this.give = (this.outputVector.subset(Mathjs.index(8)));
 
       this.voice = this.outputVector.subset(Mathjs.index(9)) ;//* Mathjs.compare(this.hawk-this.dove,this.dove-this.hawk);
 
       this.farts = (this.outputVector.subset(Mathjs.index(10)) > threshold);
 
 
-      this.armColorA.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(12)));// + this.sting;
-      this.armColorA.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(13)));// + this.give;
-      this.armColorA.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(14)));
+      this.armColorA.red = 0.5 + (this.outputVector.subset(Mathjs.index(4)))/2 ;
+      this.armColorA.blue = 0.5 +(this.outputVector.subset(Mathjs.index(5)))/2;//  + this.sting/2;
+      this.armColorA.green = 0.5 +(this.outputVector.subset(Mathjs.index(6)))/2;//  + this.give/2;
 
-      this.armColorB.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(15)));// + this.sting;
-      this.armColorB.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(16)));// + this.give;
-      this.armColorB.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(17)));
+      this.armColorB.red = 0.5 + (this.outputVector.subset(Mathjs.index(4)))/2;//
+      this.armColorB.blue =0.5 + (this.outputVector.subset(Mathjs.index(5)))/2;//  + this.sting/2;
+      this.armColorB.green =0.5 + (this.outputVector.subset(Mathjs.index(6)))/2;// + this.give/2;
 
-      this.armColorC.red = Mathjs.abs(this.outputVector.subset(Mathjs.index(18)));// + this.sting;
-      this.armColorC.blue = Mathjs.abs(this.outputVector.subset(Mathjs.index(19)));// + this.give;
-      this.armColorC.green = Mathjs.abs(this.outputVector.subset(Mathjs.index(20)));
+      this.armColorC.red = 0.5 + (this.outputVector.subset(Mathjs.index(4)))/2;//
+      this.armColorC.blue = 0.5 +(this.outputVector.subset(Mathjs.index(5)))/2;// + this.sting/2;
+      this.armColorC.green =0.5 + (this.outputVector.subset(Mathjs.index(6)))/2;// + this.give/2;
 
-      this.interestInMating = (this.outputVector.subset(Mathjs.index(21)));
+      this.interestInMating = (this.outputVector.subset(Mathjs.index(11)));
 
-      this.wantEat = (this.outputVector.subset(Mathjs.index(11)));
-      this.memory1 = this.outputVector.subset(Mathjs.index(22));
-      this.memory2 = this.outputVector.subset(Mathjs.index(23));
-      this.memory3 = this.outputVector.subset(Mathjs.index(24));
-      this.memory4 = this.outputVector.subset(Mathjs.index(25));
+      this.wantEat = (this.outputVector.subset(Mathjs.index(16)));
+      // this.memory1 = Mathjs.sin(Math.PI*(this.outputVector.subset(Mathjs.index(22)))) + this.memory1*0.25 ;
+      // this.memory2 = Mathjs.sin(Math.PI*(this.outputVector.subset(Mathjs.index(23))))+ this.memory2*0.25 ;
+      // this.memory3 = Mathjs.sin(Math.PI*(this.outputVector.subset(Mathjs.index(24))))+ this.memory3*0.25;
+      // this.memory4 = Mathjs.sin(Math.PI*(this.outputVector.subset(Mathjs.index(25))))+ this.memory4*0.25 ;
+      this.memory1 = this.outputVector.subset(Mathjs.index(12));// + this.memory1*0.25 ;
+      this.memory2 = this.outputVector.subset(Mathjs.index(13));//+ this.memory2*0.25 ;
+      this.memory3 = this.outputVector.subset(Mathjs.index(14));//+ this.memory3*0.25;
+      this.memory4 = this.outputVector.subset(Mathjs.index(15));//+ this.memory4*0.25 ;
 
-    //  this.pivotEye1 =  this.outputVector.subset(Mathjs.index(26)) * this.outputVector.subset(Mathjs.index(28))/5;
-    //  this.pivotEye2 =  this.outputVector.subset(Mathjs.index(27)) * this.outputVector.subset(Mathjs.index(29))/5;
+    //  this.pivotEye1 =  this.outputVector.subset(Mathjs.index(26)); * this.outputVector.subset(Mathjs.index(28))/5;
+    //  this.pivotEye2 =  this.outputVector.subset(Mathjs.index(27)); * this.outputVector.subset(Mathjs.index(29))/5;
+     // this.actuator1 = (this.outputVector.subset(Mathjs.index(26)));
+     // this.actuator2 =  (this.outputVector.subset(Mathjs.index(27)));
+     // this.actuator3 =  this.outputVector.subset(Mathjs.index(28));
+     // this.actuator4 =  this.outputVector.subset(Mathjs.index(29));
     }
 
     cleanupInputs(){
-      this.sexytime  = 0.5*  this.sexytime;
-      if(this.sexytime <0.01){
+      this.sexytime  = 0.25*  this.sexytime;
+      if(this.sexytime <0.1){
         this.sexytime = 0;
       }
-        this.happy  = 0.5*  this.happy;
-        if(this.happy <0.01){
+        this.happy  = 0.25*  this.happy;
+        if(this.happy <0.1){
           this.happy = 0;
         }
-          this.ouchie = 0.5 * this.ouchie;
-          if(this.ouchie <0.01){
+          this.ouchie = 0.25 * this.ouchie;
+          if(this.ouchie <0.1){
             this.ouchie = 0;
           }
       this.smellMeat  = 0.0;
@@ -207,18 +237,11 @@ class BaseBrain{
       this.cleanupInputs();
     }
 
-    sigmoid(value){
-      let result = 1.0/(1.0 + Mathjs.exp(-1 + value));
-
-      return isNaN(result) ? 1.0 : result;
+    clamps(value){
+      let result = Math.max(Math.min(value,1.0),-1.0);
+      return result;
     }
 
-      // mutate(child){
-      //   child.smell = this.smell + this.smell * (Math.random() - 0.5)*0.1;
-      // }
-      clamp(value){
-        Math.max(Math.min(value,1.0),0);
-      }
 }
 
 

@@ -32,9 +32,7 @@
     "nerdamer": "^0.7.11",
     "p5": "^0.5.16",
     "react": "^16.1.1",
-    "react-dom": "^16.1.1",
-    
-    "utf-8-validate": "^3.0.4"
+    "react-dom": "^16.1.1"
 
   },
   "devDependencies": {

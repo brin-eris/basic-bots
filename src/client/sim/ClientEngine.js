@@ -6,7 +6,7 @@ Matter.use('matter-wrap');
 
 const    MatterAttractors = require('matter-attractors');
 const    Events = require('matter-js').Events;
-const    io = require('socket.io-client')();
+//const    io = require('socket.io-client')();
 
 const  Bot = require('../../common/bot/Bot');
 const SimEngine = require('../../common/SimEngine')
@@ -19,9 +19,9 @@ class ClientEngine extends SimEngine{
     }
 
 static save_current_bot(){
-  if(selection_holder.selected !=null && selection_holder.selected.body !=null){
-     io.emit('save_bot',JSON.stringify( selection_holder.selected.brain));
-  }
+  // if(selection_holder.selected !=null && selection_holder.selected.body !=null){
+  //    io.emit('save_bot',JSON.stringify( selection_holder.selected.brain));
+  // }
 }
 
 static set_selected_bot(value){

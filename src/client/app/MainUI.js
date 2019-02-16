@@ -1,5 +1,5 @@
 'use strict';
-const io = require('socket.io');
+//const io = require('socket.io');
 const React = require('react');
 const BotViewer = require('./BotViewer');
 

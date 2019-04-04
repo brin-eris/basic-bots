@@ -8,11 +8,11 @@ const    Bodies = require('matter-js').Bodies;
 class Plant {
 
   static get_height(){
-    return 25;
+    return 10;
   }
 
   static get_width(){
-    return 25;
+    return 10;
   }
 
   constructor() {
@@ -25,7 +25,7 @@ class Plant {
           label: 'Plant'
         });
 
-          this.body =  Bodies.rectangle(position.x, position.y, Plant.get_width(), Plant.get_height(), {
+          this.body =  Bodies.circle(position.x, position.y, Plant.get_width(),  {
             friction: 0.5,
             frictionStatic: 0.1,
             isStatic: true,
@@ -49,7 +49,9 @@ class Plant {
       }
 
       tick(){
-        this.life+= 0.002;
+        if(this.life <2.0){
+          this.life+= 0.0002;
+        }
         this.body.gameColor = {red: 0.0, blue: 0.0, green: this.life}
         this.body.render.fillStyle = this.rgbToHex(0,this.life * 255,0);
       }

@@ -11,7 +11,7 @@ const Plant = require('../world/Plant');
 const Brain = require('../brains/Brain');
 
 const VIEW_ANGLE =  Math.PI/36;
-const VIEW_DEPTH = 550;
+const VIEW_DEPTH = 650;
 
 class Eye {
 
@@ -60,9 +60,9 @@ class Eye {
             //physical_object_count++;
             var modifier =  this.calc_distance_modifier(startPoint, collision.bodyA.position);///physical_object_count;
               // modifier*=modifier;
-            outputs.red  +=  (collision.bodyA.gameColor.red  * modifier);
-            outputs.blue  +=  (collision.bodyA.gameColor.blue * modifier);
-            outputs.green  +=  (collision.bodyA.gameColor.green * modifier);
+            outputs.red  +=  (collision.bodyA.gameColor.red  * modifier * 1.25);
+            outputs.blue  +=  (collision.bodyA.gameColor.blue * modifier * 1.25);
+            outputs.green  +=  (collision.bodyA.gameColor.green * modifier * 1.25);
         }
 
         collisions = Query.ray(bodies, startPoint, Vector.add(minVec, startPoint));
@@ -89,9 +89,9 @@ class Eye {
           // want a value from 1 to 0, where 0 is max and 1 is min
           // that shrinks exponentially as distance grows linearly
           //(note anything 0<x<1 will be greater than one, is desired)
-        var modifier = -1 * Mathjs.log((distance/VIEW_DEPTH), VIEW_DEPTH);
+        var modifier = -1 * Mathjs.log((distance/VIEW_DEPTH), VIEW_DEPTH/2);
           // divide by number of ray traces
-          return modifier;///3;
+          return modifier;
       }
 }
 

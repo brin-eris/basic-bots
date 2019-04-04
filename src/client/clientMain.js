@@ -3,7 +3,6 @@ const       ReactDOM = require('react-dom');
 const          React = require('react');
 const        Mathjs  = require('mathjs');
 const   ClientEngine = require('./sim/ClientEngine');
-const         MainUI = require('./app/MainUI');
 
 
 

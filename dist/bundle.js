@@ -94543,59 +94543,10 @@ module.exports = E;
 },{}],572:[function(require,module,exports){
 'use strict';
 
-const React = require('react');
-
-class BotViewer extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return React.createElement(
-      'h2',
-      null,
-      this.props.age
-    );
-  }
-
-}
-
-module.exports = BotViewer;
-
-},{"react":562}],573:[function(require,module,exports){
-'use strict';
-//const io = require('socket.io');
-
-const React = require('react');
-const BotViewer = require('./BotViewer');
-
-class MainUI extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-  render() {
-    return React.createElement(BotViewer, null);
-  }
-
-  renderBot(bot) {
-    return React.createElement(BotViewer, { value: bot });
-  }
-
-  handleSelectionChange(e) {
-    this.props.onSelectionChange(e.target.value);
-  }
-}
-
-module.exports = MainUI;
-
-},{"./BotViewer":572,"react":562}],574:[function(require,module,exports){
-'use strict';
-
 const ReactDOM = require('react-dom');
 const React = require('react');
 const Mathjs = require('mathjs');
 const ClientEngine = require('./sim/ClientEngine');
-const MainUI = require('./app/MainUI');
 
 const css = require('./css/app.css');
 
@@ -94623,9 +94574,9 @@ document.addEventListener('DOMContentLoaded', function (e) {
   }, false);
 });
 
-},{"./app/MainUI":573,"./css/app.css":575,"./sim/ClientEngine":576,"mathjs":8,"react":562,"react-dom":559}],575:[function(require,module,exports){
-var css = ".sim{left:0;top:0;width:80%;height:100%;overflow:scroll}.btn{width:100px;height:40px}html{position:relative;min-height:100%}ui{background-color:orange;position:absolute;right:0;top:0;height:100%;width:20%;overflow:hidden}"; (require("browserify-css").createStyle(css, { "href": "src/client/css/app.css" }, { "insertAt": "bottom" })); module.exports = css;
-},{"browserify-css":1}],576:[function(require,module,exports){
+},{"./css/app.css":573,"./sim/ClientEngine":574,"mathjs":8,"react":562,"react-dom":559}],573:[function(require,module,exports){
+var css = ".sim{left:0;top:0;width:80%;height:100%;overflow:scroll}.btn{width:100px;height:40px}html{position:relative;min-height:100%}ui{position:absolute;right:0;top:0;height:10%;width:20%;overflow:hidden}"; (require("browserify-css").createStyle(css, { "href": "src/client/css/app.css" }, { "insertAt": "bottom" })); module.exports = css;
+},{"browserify-css":1}],574:[function(require,module,exports){
 'use-strict';
 
 const Mathjs = require('mathjs');
@@ -94751,7 +94702,7 @@ class ClientEngine extends SimEngine {
 
 module.exports = ClientEngine;
 
-},{"../../common/SimEngine":577,"../../common/bot/Bot":578,"mathjs":8,"matter-attractors":550,"matter-js":551,"matter-wrap":552}],577:[function(require,module,exports){
+},{"../../common/SimEngine":575,"../../common/bot/Bot":576,"mathjs":8,"matter-attractors":550,"matter-js":551,"matter-wrap":552}],575:[function(require,module,exports){
 'use strict';
 
 const Mathjs = require('mathjs');
@@ -94766,16 +94717,15 @@ const Wall = require('./world/Wall');
 
 const STARTING_BOTS = 6;
 const MIN_BOTS_PER_SPECIES = 3;
-const MAX_BOTS = 20;
+const MAX_BOTS = 28;
 const SPECIES = 2;
-const STARTING_PLANTS = 350;
-const MIN_PLANTS = 250;
-const WALLS = 2;
+const STARTING_PLANTS = 250;
+const MIN_PLANTS = 150;
+const WALLS_PER_SECTION = 20;
+const SECTIONS = 3;
+const WIDTH = 2300;
+const HEIGHT = 2100;
 
-const WIDTH = 1500;
-const HEIGHT = 1100;
-
-// soak the brains in here to get juicy
 class SimEngine {
   constructor() {
     this.width = WIDTH;
@@ -94783,6 +94733,7 @@ class SimEngine {
   }
 
   init() {
+    Matter.use(MatterWrap);
     this.physicsEngine = Matter.Engine.create({ constraintIterations: 100 });
     let engine = this.physicsEngine;
     engine.world.bounds.min.x = 0;
@@ -94797,11 +94748,21 @@ class SimEngine {
   start() {
     let engine = this.physicsEngine;
 
-    for (let i = 0; i < WALLS; i++) {
-      new Wall().create(engine.world, {
-        x: Mathjs.round(Math.cos(i * 3.14 / (WALLS / 2)) * 500) + WIDTH / 2,
-        y: Mathjs.round(Math.sin(i * 3.14 / (WALLS / 2)) * 500) + HEIGHT / 2
-      });
+    for (let section = 0; section < SECTIONS; section++) {
+      let section_offset = section * 6.28 / SECTIONS;
+      let half_width = WIDTH / 2;
+      let half_height = HEIGHT / 2;
+      let angle_incriment = 3.14 / (WALLS_PER_SECTION * 2);
+      let radius_incriment = half_width / (WALLS_PER_SECTION * 1.25);
+      for (let i = 0; i < WALLS_PER_SECTION; i++) {
+        let rnd = (Math.random() - 0.5) * 200;
+        let radius = radius_incriment * i + rnd + 175;
+        let angle = i * angle_incriment + section_offset + (Math.random() - 0.5) / 10;
+        new Wall().create(engine.world, {
+          x: Mathjs.round(Math.cos(angle) * radius) + half_width,
+          y: Mathjs.round(Math.sin(angle) * radius) + half_height
+        });
+      }
     }
 
     let spacer = 2;
@@ -94882,7 +94843,7 @@ class SimEngine {
       if (someone_needs_to_die) {
         console.log('someone_needs_to_die');
       }
-      if (plantCount < MIN_PLANTS && Math.random() > 0.85) {
+      if (plantCount < MIN_PLANTS && Math.random() < 0.65) {
 
         new Plant().create(engine.world, {
           x: Mathjs.pickRandom(horizontal_center_points),
@@ -94897,7 +94858,9 @@ class SimEngine {
 
           let child = new Bot();
           child.species = k;
-          child.create(engine.world, { x: WIDTH / 2 + Math.random() * 500, y: HEIGHT / 2 + Math.random() * 500 });
+          child.create(engine.world, {
+            x: WIDTH * 0.5 + (Math.random() - 0.5) * WIDTH,
+            y: HEIGHT * 0.5 + (Math.random() - 0.5) * HEIGHT });
           console.log("Spawned new: " + k);
         }
       }
@@ -94937,7 +94900,7 @@ class SimEngine {
 
 module.exports = SimEngine;
 
-},{"./bot/Bot":578,"./world/Meat":585,"./world/Plant":586,"./world/Wall":587,"mathjs":8,"matter-attractors":550,"matter-js":551,"matter-wrap":552}],578:[function(require,module,exports){
+},{"./bot/Bot":576,"./world/Meat":583,"./world/Plant":584,"./world/Wall":585,"mathjs":8,"matter-attractors":550,"matter-js":551,"matter-wrap":552}],576:[function(require,module,exports){
 'use strict';
 
 const Matter = require('matter-js');
@@ -94963,27 +94926,26 @@ const Composite = require('matter-js').Composite;
 
 const Mathjs = require('mathjs');
 
-const COLLISION_DAMAGE = 0.0003;
-const sting_DAMAGE = 10;
-const AGE_DAMAGE = 0.000015;
-const HEAT_DAMAGE = 0.00015;
-const OVEREAT_PENALTY = 0.15;
-const BOOST_COST = 0.005;
-const GESTATION_TIMER = 2.5;
-const GIVE_AMOUNT = 0.1;
-const SEXUAL_MATURITY = 5;
-const EAT_AMOUNT = 0.15;
-const MAX_LIFE = 1.0;
+const COLLISION_DAMAGE = 0.000125;
+const sting_DAMAGE = 50;
+const AGE_DAMAGE = 0.00001;
+
+const BOOST_COST = 0.0025;
+const BOOST_FACTOR = 1.5;
+const GESTATION_TIMER = 2.0;
+const GIVE_AMOUNT = 0.075;
+//const SEXUAL_MATURITY = 5;
+const EAT_AMOUNT = 0.075;
+const MAX_LIFE = 4.5;
 
 class Bot {
   constructor() {
 
     this.class = Bot;
-    this.brain = Brain.create_new();
+    this.brain = OtherBrain.create_new();
 
-    this.life = MAX_LIFE;
+    this.life = 1.0;
 
-    this.heat = 0.0;
     this.isPreggers = false;
     this.gestationTimer = 0;
     this.center_eye = new Eye();
@@ -94995,15 +94957,12 @@ class Bot {
 
   create(world, position) {
 
-    this.centerOfUniverse = { x: world.bounds.max.x / 2, y: world.bounds.max.y / 2 };
-    this.phantomZone = Math.abs(Mathjs.distance([0, 0], [this.centerOfUniverse.x, this.centerOfUniverse.y]));
-
     let group = Body.nextGroup(true);
 
     let radius = 10;
     this.radius = radius;
     let armRadius = 6;
-    let offsetRadius = radius * 1.6 + armRadius;
+    let offsetRadius = radius * 1.15 + armRadius;
     let offsetLayer2Radius = offsetRadius * 1.6;
 
     let armAOffset = Vector.create(offsetRadius * Math.cos(1.1), offsetRadius * Math.sin(1.1));
@@ -95014,7 +94973,7 @@ class Bot {
     let armB2AOffset = Vector.create(offsetRadius * Math.cos(-2.1), offsetRadius * Math.sin(-2.1));
     let armB2BOffset = Vector.create(offsetRadius * Math.cos(-1.6), offsetRadius * Math.sin(-1.6));
 
-    let armCOffset = Vector.create(offsetRadius * 1.5, 0);
+    let armCOffset = Vector.create(offsetRadius, 0);
     let armC2AOffset = Vector.create(offsetLayer2Radius, offsetLayer2Radius * Math.sin(-0.3));
     let armC2BOffset = Vector.create(offsetLayer2Radius, offsetLayer2Radius * Math.sin(0.3));
     let armC3AOffset = Vector.create(offsetLayer2Radius * 1.3, 0);
@@ -95022,29 +94981,28 @@ class Bot {
     let soundRadius = 200;
 
     let bot = Matter.Composite.create({
-      label: 'Bot',
-      plugin: {
-        wrap: {
-          min: {
-            x: 0,
-            y: 0
-          },
-          max: {
-            x: world.bounds.max.x,
-            y: world.bounds.max.y
-          }
-        }
-      }
+      label: 'Bot'
     });
+
+    bot.plugin.wrap = {
+      min: {
+        x: world.bounds.min.x + soundRadius,
+        y: world.bounds.min.y + soundRadius
+      },
+      max: {
+        x: world.bounds.max.x - soundRadius,
+        y: world.bounds.max.y - soundRadius
+      }
+    };
 
     let body = Bodies.circle(position.x, position.y, radius, {
       collisionFilter: {
         group: group
       },
-      density: 0.09,
-      restitution: 0.1,
+      density: 0.155,
+      restitution: 0.4,
       friction: 0.1,
-      frictionAir: 2.5,
+      frictionAir: 1.75,
       frictionStatic: 0.01
 
     });
@@ -95061,10 +95019,7 @@ class Bot {
 
         if (them.gameObject.class == Bot) {}
         if (them.gameObject.class == Plant) {
-          //          if(me.speed < 100){
           me.gameObject.eat(them.gameObject);
-          //        }
-
         } else if (them.gameObject.class == Wall) {
           let myMomentum = Vector.mult(me.velocity, 1.0);
           let theirMomentum = Vector.mult(them.velocity, 1.0);
@@ -95072,14 +95027,14 @@ class Bot {
 
           let damage = COLLISION_DAMAGE * Math.abs(Vector.magnitude(relativeMomentum)) * 10;
           me.gameObject.life -= damage;
-          me.gameObject.brain.ouchie += damage;
         } else if (them.gameObject.class == Meat) {
           me.gameObject.brain.smellMeat += 1.0;
-          // only the blood thirsty eat meat
-          //  if(me.gameObject.species == 0){
-          me.gameObject.eat(them.gameObject);
-
-          //  }
+          // only the blood thirsty (eat) meat
+          if (me.gameObject.species == 0) {
+            me.gameObject.eat(them.gameObject);
+            me.gameObject.eat(them.gameObject);
+            //  me.gameObject.eat(them.gameObject);
+          }
         }
       }
     };
@@ -95096,9 +95051,9 @@ class Bot {
 
         if (them.gameObject.brain.sting > 0.0) {
           //one of thier body parts stung me
-          let damage_stung = baseDamage * (1 + them.gameObject.brain.sting * them.gameObject.brain.sting * sting_DAMAGE);
+          let damage_stung = baseDamage * (1 + them.gameObject.brain.sting * them.gameObject.brain.sting) * sting_DAMAGE;
           me.gameObject.life -= damage_stung;
-          me.gameObject.brain.ouchie += damage_stung;
+
           //console.log("damage_stung:" + damage_stung + "; baseDamage:" + baseDamage + "; stinger:" + them.gameObject.brain.sting);
           if (me.gameObject.life <= 0.0) {
             // tell my wife i loved her
@@ -95107,19 +95062,16 @@ class Bot {
         } else {
           // they didnt sting me, but i still got hit
           me.gameObject.life -= baseDamage;
-          me.gameObject.brain.ouchie += baseDamage;
         }
       } else if (them.gameObject && them.gameObject.class == Plant) {
-
         me.gameObject.eat(them.gameObject);
       } else if (them.gameObject && them.gameObject.class == Wall) {
         let myMomentum = Vector.mult(me.velocity, 1.0);
         let theirMomentum = Vector.mult(them.velocity, 1.0);
         let relativeMomentum = Vector.sub(myMomentum, theirMomentum);
 
-        let damage = COLLISION_DAMAGE * Math.abs(Vector.magnitude(relativeMomentum)) * 10;
+        let damage = COLLISION_DAMAGE * Math.abs(Vector.magnitude(relativeMomentum)) * sting_DAMAGE * 2;
         me.gameObject.life -= damage;
-        me.gameObject.brain.ouchie += damage;
       }
     };
 
@@ -95145,19 +95097,18 @@ class Bot {
           me.gameObject.brain.soundInput += distance * them.speed / (soundRadius * 100);
           me.gameObject.brain.voiceInput += them.gameObject.voice;
 
-          if (me.gameObject.species == them.gameObject.species) {
-            if (me.gameObject.will_mate && them.gameObject.will_mate) {
-              me.gameObject.brain.sexytime += them.gameObject.brain.interestInMating;
-            }
-          }
-
-          //console.log(them.gameObject.voice);
-          // if(me.gameObject.brain.give > 0.0 ){
-          //   me.gameObject.give(them.gameObject);
+          // if(me.gameObject.species == them.gameObject.species){
+          //   if(me.gameObject.will_mate && them.gameObject.will_mate){
+          //     me.gameObject.brain.sexytime += them.gameObject.brain.interestInMating;
+          //   }
           // }
         } else if (them.gameObject.class == Meat) {
-          let distance = Math.abs(Mathjs.distance([me.gameObject.body.position.x, me.gameObject.body.position.y], [them.gameObject.body.position.x, them.gameObject.body.position.y]));
-          me.gameObject.brain.smellMeat += .1 + 1 / distance;
+          // let distance = Math.abs(( Mathjs.distance([
+          //   me.gameObject.body.position.x,
+          //   me.gameObject.body.position.y],
+          // [ them.gameObject.body.position.x,
+          //   them.gameObject.body.position.y])));
+          me.gameObject.brain.smellMeat += .5; // + 1/distance;
         }
       }
     };
@@ -95173,7 +95124,7 @@ class Bot {
       collisionFilter: {
         group: group
       },
-      restitution: 0.3,
+      restitution: 0.4,
       isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
@@ -95208,7 +95159,7 @@ class Bot {
       collisionFilter: {
         group: group
       },
-      restitution: 0.3,
+      restitution: 0.4,
       isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
@@ -95243,7 +95194,7 @@ class Bot {
       collisionFilter: {
         group: group
       },
-      restitution: 0.3,
+      restitution: 0.4,
       isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
@@ -95279,7 +95230,7 @@ class Bot {
       collisionFilter: {
         group: group
       },
-      restitution: 0.3,
+      restitution: 0.4,
       isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
@@ -95314,7 +95265,7 @@ class Bot {
       collisionFilter: {
         group: group
       },
-      restitution: 0.3,
+      restitution: 0.4,
       isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
@@ -95349,7 +95300,7 @@ class Bot {
       collisionFilter: {
         group: group
       },
-      restitution: 0.3,
+      restitution: 0.4,
       isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
@@ -95384,7 +95335,7 @@ class Bot {
       collisionFilter: {
         group: group
       },
-      restitution: 0.3,
+      restitution: 0.4,
       isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
@@ -95412,12 +95363,13 @@ class Bot {
           me.gameObject.give(them.gameObject);
         }
         if (me.gameObject.species == them.gameObject.species) {
-          me.gameObject.brain.sexytime += me.gameObject.brain.interestInMating;
+          //  me.gameObject.brain.sexytime +=  them.gameObject.brain.interestInMating ;
           //console.log('sexytime: '+me.gameObject.brain.sexytime);
-          if (me.gameObject.brain.sexytime > 3.0 && me.gameObject.will_mate) {
+          //  if( me.gameObject.will_mate){
 
-            me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
-          }
+          me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
+
+          //}
         }
       }
     };
@@ -95427,7 +95379,7 @@ class Bot {
       collisionFilter: {
         group: group
       },
-      restitution: 0.3,
+      restitution: 0.4,
       isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
@@ -95455,12 +95407,13 @@ class Bot {
           me.gameObject.give(them.gameObject);
         }
         if (me.gameObject.species == them.gameObject.species) {
-          me.gameObject.brain.sexytime += me.gameObject.brain.interestInMating;
+          //me.gameObject.brain.sexytime +=  them.gameObject.brain.interestInMating  ;
           //console.log('sexytime: '+me.gameObject.brain.sexytime);
-          if (me.gameObject.brain.sexytime > 3.0 && me.gameObject.will_mate) {
+          // if(me.gameObject.will_mate){
 
-            me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
-          }
+          me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
+
+          //  }
         }
       }
     };
@@ -95470,7 +95423,7 @@ class Bot {
       collisionFilter: {
         group: group
       },
-      restitution: 0.3,
+      restitution: 0.4,
       isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
@@ -95498,12 +95451,13 @@ class Bot {
           me.gameObject.give(them.gameObject);
         }
         if (me.gameObject.species == them.gameObject.species) {
-          me.gameObject.brain.sexytime += me.gameObject.brain.interestInMating;
+          //  me.gameObject.brain.sexytime +=   them.gameObject.brain.interestInMating  ;
           //console.log('sexytime: '+me.gameObject.brain.sexytime);
-          if (me.gameObject.brain.sexytime > 3.0 && me.gameObject.will_mate) {
+          //if(me.gameObject.will_mate){
 
-            me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
-          }
+          me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
+
+          //  }
         }
       }
     };
@@ -95513,7 +95467,7 @@ class Bot {
       collisionFilter: {
         group: group
       },
-      restitution: 0.3,
+      restitution: 0.4,
       isSensor: false,
       render: {
         fillStyle: '#aaaaaa'
@@ -95545,11 +95499,11 @@ class Bot {
         }
         if (me.gameObject.species == them.gameObject.species) {
 
-          me.gameObject.brain.sexytime += me.gameObject.brain.interestInMating;
+          //me.gameObject.brain.sexytime +=  them.gameObject.brain.interestInMating  ;
           //console.log('sexytime: '+me.gameObject.brain.sexytime);
-          if (me.gameObject.brain.sexytime > 3.0 && me.gameObject.will_mate) {
-            me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
-          }
+          //if( me.gameObject.will_mate){
+          me.gameObject.mate(me.gameObject.brain, them.gameObject.brain);
+          //}
         }
       }
     };
@@ -95670,10 +95624,7 @@ class Bot {
 
   tick() {
 
-    this.heat = Math.abs(Mathjs.distance([this.body.position.y, this.body.position.y], [this.centerOfUniverse.x, this.centerOfUniverse.y]) / this.phantomZone);
-
-    this.brain.heat = this.heat;
-    this.brain.life = this.life;
+    this.brain.life = this.life / MAX_LIFE;
     let behindUs = this.body.angle + Math.PI;
 
     let center_eye_position = Vector.create(11 * Math.cos(behindUs) + this.body.position.x, 11 * Math.sin(behindUs) + this.body.position.y);
@@ -95688,7 +95639,7 @@ class Bot {
     this.brain.right_eye_vision = this.right_eye.scan(Composite.allBodies(this.world), right_eye_position, right_eye_angle);
 
     //this.brain.senseSexualAdvance
-    this.brain.gestation = this.gestationTimer / GESTATION_TIMER;
+    //  this.brain.gestation = this.gestationTimer/GESTATION_TIMER;
     // think
     this.brain.tick();
 
@@ -95698,24 +95649,23 @@ class Bot {
     this.farts = this.brain.farts;
 
     let facing = this.body.angle;
-    let thrustLeftSide = this.brain.farts == true ? this.brain.thrust1 + 0.75 : this.brain.thrust1;
+    let thrustLeftSide = this.brain.farts == true ? this.brain.thrust1 * BOOST_FACTOR : this.brain.thrust1;
     let turnLeftSide = facing - this.brain.turn1;
-    let thrustRightSide = this.brain.farts == true ? this.brain.thrust2 + 0.75 : this.brain.thrust2;
+    let thrustRightSide = this.brain.farts == true ? this.brain.thrust2 * BOOST_FACTOR : this.brain.thrust2;
     let turnRightSide = facing + this.brain.turn2;
 
     let position = Vector.clone(this.body.position);
-    let leftButtcheek = Vector.create(1.5 * Math.cos(facing - 0.01) + position.x, 1.5 * Math.sin(facing - 0.01) + position.y);
-    let rightButtcheek = Vector.create(1.5 * Math.cos(facing + 0.01) + position.x, 1.5 * Math.sin(facing + 0.01) + position.y);
+    let leftButtcheek = Vector.create(2.0 * Math.cos(facing - 1.552) + position.x, 2.0 * Math.sin(facing - 1.552) + position.y);
+    let rightButtcheek = Vector.create(2.0 * Math.cos(facing + 1.552) + position.x, 2.0 * Math.sin(facing + 1.552) + position.y);
 
     Matter.Body.applyForce(this.body, leftButtcheek, Vector.create(thrustLeftSide * Math.cos(turnLeftSide), thrustLeftSide * Math.sin(turnLeftSide)));
 
     Matter.Body.applyForce(this.body, rightButtcheek, Vector.create(thrustRightSide * Math.cos(turnRightSide), thrustRightSide * Math.sin(turnRightSide)));
 
-    let heatDamage = this.heat * this.heat * HEAT_DAMAGE;
     let ageDamage = AGE_DAMAGE * this.brain.age;
-    this.life -= heatDamage + ageDamage;
+    this.life -= ageDamage;
     if (this.isPreggers) {
-      this.life -= ageDamage;
+      this.life -= ageDamage * this.womb.length;
     }
 
     if (this.brain.farts) {
@@ -95733,11 +95683,19 @@ class Bot {
     this.armC.render.fillStyle = this.armC2B.render.fillStyle = this.armC2A.render.fillStyle = this.armC3A.render.fillStyle = this.rgbToHex(this.brain.armColorC.red * 255, this.brain.armColorC.green * 255, this.brain.armColorC.blue * 255);
 
     if (this.is_ui_selected) {
-      console.log('age damage: ' + ageDamage);
-      console.log('heat damage: ' + heatDamage);
-      console.log('life: ' + this.life);
+
+      // console.log('red: '+ this.brain.bodyInput.red);
+      // console.log('blue: ' +this.brain.bodyInput.blue );
+      // console.log('green: '+this.brain.bodyInput.green );
+      //console.log('blue'+ this.brain.center_eye_vision.blue);
+      //console.log('green'+ this.brain.center_eye_vision.green);
+      //console.log('sting: '+ this.brain.sting + ', blue: '+ this.brain.bodyColor.blue);
+
+      //  console.log('age damage: '+ ageDamage);
+      //
+      //  console.log('life: '+ this.life);
       // console.log('speed: '+this.body.speed);
-      console.log('gestation: ' + this.gestationTimer);
+      // console.log('gestation: '+ this.gestationTimer);
       this.body.render.strokeStyle = this.rgbToHex(150, 50, 0);
       this.armA.render.strokeStyle = this.rgbToHex(150, 50, 0);
       this.armB.render.strokeStyle = this.rgbToHex(150, 50, 0);
@@ -95756,17 +95714,18 @@ class Bot {
       this.armC.render.lineWidth = 0;
     }
 
-    if (this.brain.interestInMating > 0 && this.brain.age > SEXUAL_MATURITY) {
-      this.will_mate = true;
-    } else {
-      this.will_mate = false;
-    }
+    // if( this.brain.interestInMating > 0   ){
+    //   this.will_mate = true;
+    //
+    // }else{
+    //   this.will_mate = false;
+    // }
 
     if (this.gestationTimer < 0 && this.isPreggers) {
       this.giveBirth();
     }
 
-    if (this.gestationTimer > GESTATION_TIMER * 2) {
+    if (this.gestationTimer > GESTATION_TIMER * 5) {
       console.log('self love');
       this.mate(this.brain, this.brain);
     }
@@ -95796,17 +95755,16 @@ class Bot {
   }
 
   mate(p1, p2) {
-    this.brain.happy += this.brain.sexytime;
-    this.brain.sexytime = 0;
+
     console.log('mating: ' + this.species);
     if (!this.isPreggers) {
-      if (Math.random() < 0.75) {
+      if (Math.random() < 0.25) {
         this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
-        if (Math.random() < 0.55) {
+        if (Math.random() < 0.25) {
           this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
-          if (Math.random() < 0.55) {
+          if (Math.random() < 0.25) {
             this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
-            if (Math.random() < 0.55) {
+            if (Math.random() < 0.25) {
               this.concieve(p1.get_half_chromosomes(), p2.get_half_chromosomes());
             }
           }
@@ -95816,42 +95774,22 @@ class Bot {
   }
 
   eat(food) {
-    // will only eat if wants to
-    if (this.brain.wantEat > 0) {
 
-      let speedMod = Mathjs.abs(1.0 - this.body.speed / 150);
-      let effectiveGain = this.brain.wantEat * speedMod * EAT_AMOUNT;
-      food.life -= this.brain.wantEat * EAT_AMOUNT;
+    let speedMod = Mathjs.abs(1.0 - this.body.speed / 100);
+    let effectiveGain = speedMod * EAT_AMOUNT;
+    food.life -= effectiveGain;
 
-      this.brain.happy += effectiveGain;
-
-      // if eating food bot still only gains life up to max
-      if (this.life < MAX_LIFE) {
-        this.life += effectiveGain;
-        // if(this.is_ui_selected){
-        //   console.log('Food eaten: '+effectiveGain);
-        //   console.log('Gestation: '+this.gestationTimer);
-        // }
-        if (!this.isPreggers && this.brain.age > SEXUAL_MATURITY) {
-          this.gestationTimer += effectiveGain;
-        }
-        if (this.isPreggers) {
-          this.gestationTimer -= effectiveGain;
-          this.brain.happy += effectiveGain;
-        }
-      } else {
-
-        // if(this.isPreggers){
-        //   this.gestationTimer -= effectiveGain;
-        //   this.brain.happy += effectiveGain;
-        // }else{
-        this.life -= OVEREAT_PENALTY * effectiveGain;
-        this.brain.ouchie += effectiveGain;
-        // }
+    if (this.life < MAX_LIFE) {
+      this.life += effectiveGain;
+    } else {
+      if (!this.isPreggers) {
+        this.gestationTimer += effectiveGain;
+      }
+      if (this.isPreggers) {
+        this.gestationTimer -= effectiveGain;
       }
     }
-    // sitting on food ruins it
-    food.life -= 0.01;
+
     if (food.life < 0.0) {
       food.destroy();
     }
@@ -95863,7 +95801,6 @@ class Bot {
       let toGive = GIVE_AMOUNT * this.brain.give;
       this.life -= toGive + GIVE_AMOUNT * 0.9;
       them.life += toGive;
-      them.brain.happy += this.brain.give;
     }
   }
 
@@ -95871,6 +95808,7 @@ class Bot {
     let child = new Bot();
     child.species = this.species;
     child.brain.rebuild(brain.get_half_chromosomes(), brain.get_half_chromosomes());
+
     child.create(this.world, Vector.create(this.body.position.x - 300 * (Math.random() - 0.5), this.body.position.y - 300 * (Math.random() - 0.5)));
   }
 
@@ -95888,7 +95826,7 @@ class Bot {
 
 module.exports = Bot;
 
-},{"../brains/Brain":581,"../brains/DeltaBrain":582,"../brains/Dumber":583,"../brains/OtherBrain":584,"../world/Meat":585,"../world/Plant":586,"../world/Wall":587,"./Eye":579,"mathjs":8,"matter-attractors":550,"matter-js":551,"matter-wrap":552}],579:[function(require,module,exports){
+},{"../brains/Brain":579,"../brains/DeltaBrain":580,"../brains/Dumber":581,"../brains/OtherBrain":582,"../world/Meat":583,"../world/Plant":584,"../world/Wall":585,"./Eye":577,"mathjs":8,"matter-attractors":550,"matter-js":551,"matter-wrap":552}],577:[function(require,module,exports){
 'use strict';
 
 const Mathjs = require('mathjs');
@@ -95903,7 +95841,7 @@ const Plant = require('../world/Plant');
 const Brain = require('../brains/Brain');
 
 const VIEW_ANGLE = Math.PI / 36;
-const VIEW_DEPTH = 550;
+const VIEW_DEPTH = 650;
 
 class Eye {
 
@@ -95953,9 +95891,9 @@ class Eye {
       //physical_object_count++;
       var modifier = this.calc_distance_modifier(startPoint, collision.bodyA.position); ///physical_object_count;
       // modifier*=modifier;
-      outputs.red += collision.bodyA.gameColor.red * modifier;
-      outputs.blue += collision.bodyA.gameColor.blue * modifier;
-      outputs.green += collision.bodyA.gameColor.green * modifier;
+      outputs.red += collision.bodyA.gameColor.red * modifier * 1.25;
+      outputs.blue += collision.bodyA.gameColor.blue * modifier * 1.25;
+      outputs.green += collision.bodyA.gameColor.green * modifier * 1.25;
     }
 
     collisions = Query.ray(bodies, startPoint, Vector.add(minVec, startPoint));
@@ -95983,39 +95921,42 @@ class Eye {
     // want a value from 1 to 0, where 0 is max and 1 is min
     // that shrinks exponentially as distance grows linearly
     //(note anything 0<x<1 will be greater than one, is desired)
-    var modifier = -1 * Mathjs.log(distance / VIEW_DEPTH, VIEW_DEPTH);
+    var modifier = -1 * Mathjs.log(distance / VIEW_DEPTH, VIEW_DEPTH / 2);
     // divide by number of ray traces
-    return modifier; ///3;
+    return modifier;
   }
 }
 
 module.exports = Eye;
 
-},{"../brains/Brain":581,"../world/Plant":586,"./Bot":578,"mathjs":8,"matter-js":551}],580:[function(require,module,exports){
+},{"../brains/Brain":579,"../world/Plant":584,"./Bot":576,"mathjs":8,"matter-js":551}],578:[function(require,module,exports){
 'use strict';
 
 const Mathjs = require('mathjs');
 
-const INPUT_SIZE = 34;
+const INPUT_SIZE = 45;
+const VISION_MOD = 1.5;
+const TOUCH_MOD = 0.9;
 
 class BaseBrain {
 
   constructor() {
     this.inputSize = INPUT_SIZE;
     this.interestInMating = 0;
-    this.actuator1 = 0;
-    this.actuator2 = 0;
-    this.actuator3 = 0;
-    this.actuator4 = 0;
+
     this.voiceInput = 0;
 
     this.sexytime = 0;
-    this.happy = 0;
+
     this.smellMeat = 0.0;
     this.memory1 = 0.0;
     this.memory2 = 0.0;
     this.memory3 = 0.0;
     this.memory4 = 0.0;
+    this.memory5 = 0.0;
+    this.memory6 = 0.0;
+    this.memory7 = 0.0;
+    this.memory8 = 0.0;
     this.ccClock = 0.0;
     this.turn1 = 0.0;
     this.turn2 = 0.0;
@@ -96023,14 +95964,14 @@ class BaseBrain {
     this.thrust2 = 0.0;
     this.sting = 0.0;
     this.voice = 0.0;
-    this.heat = 0.0;
+
     this.turn = 0.0;
     this.thrust = 0.0;
     this.clock = 0;
     this.smell = Math.random();
     this.soundInput = 0.0;
     this.give = 0.0;
-    this.ouchie = 0.0;
+
     this.age = 1;
     this.life = 1.0;
 
@@ -96045,6 +95986,12 @@ class BaseBrain {
     this.armC2AInput = { red: 0, green: 0, blue: 0 };
     this.armC2BInput = { red: 0, green: 0, blue: 0 };
     this.armC3AInput = { red: 0, green: 0, blue: 0 };
+
+    this.base_body_color = {
+      red: 0.5,
+      green: 0.5,
+      blue: 0.5
+    };
 
     this.bodyColor = { red: 0, green: 0, blue: 0 };
     this.armColorA = { red: 0, green: 0, blue: 0 };
@@ -96061,115 +96008,103 @@ class BaseBrain {
     }
     this.ccClock = (this.clock - 30) / 30;
 
-    this.inputVector = Mathjs.matrix([this.center_eye_vision.red, this.center_eye_vision.blue, this.center_eye_vision.green, this.left_eye_vision.red, this.left_eye_vision.blue, this.left_eye_vision.green, this.right_eye_vision.red, this.right_eye_vision.blue, this.right_eye_vision.green, this.bodyInput.red, this.bodyInput.blue, this.bodyInput.green,
-
-    // this.armAInput.red,
-    // this.armAInput.blue,
-    // this.armAInput.green,
-    //
-    // this.armBInput.red,
-    // this.armBInput.blue,
-    // this.armBInput.green,
-    //
-    // this.armCInput.red +   this.armC2AInput.red +   this.armC2BInput.red + this.armC3AInput.red,
-    // this.armCInput.blue + this.armC2AInput.blue + this.armC2BInput.blue +   this.armC3AInput.blue,
-    // this.armCInput.green + this.armC2AInput.green + this.armC2BInput.green +   this.armC3AInput.green,
-
-    //  this.bodyColor.red,
-    //  this.bodyColor.blue,
-    //  this.bodyColor.green,
-
-    this.soundInput, this.voiceInput,
-
-    // this.voice,
-    // this.sting,
-    // this.give,
-    // (this.sexytime),
-    // this.interestInMating,
-
-    this.heat, this.gestation,
-    //
-    this.ouchie, this.happy, this.life, this.ccClock, this.smellMeat, this.memory1, this.memory2, this.memory3, this.memory4, this.center_eye_vision.red, this.center_eye_vision.blue, this.center_eye_vision.green, this.left_eye_vision.red, this.left_eye_vision.blue, this.left_eye_vision.green, this.right_eye_vision.red, this.right_eye_vision.blue, this.right_eye_vision.green]);
+    this.inputVector = Mathjs.matrix([this.center_eye_vision.red * VISION_MOD * 1.25, this.center_eye_vision.blue * VISION_MOD * 1.25, this.center_eye_vision.green * VISION_MOD * 1.25, this.left_eye_vision.red * VISION_MOD, this.left_eye_vision.blue * VISION_MOD, this.left_eye_vision.green * VISION_MOD, this.right_eye_vision.red * VISION_MOD, this.right_eye_vision.blue * VISION_MOD, this.right_eye_vision.green * VISION_MOD, this.bodyInput.red * TOUCH_MOD, this.bodyInput.blue * TOUCH_MOD, this.bodyInput.green * TOUCH_MOD, this.armAInput.red * TOUCH_MOD, this.armAInput.blue * TOUCH_MOD, this.armAInput.green * TOUCH_MOD, this.armBInput.red * TOUCH_MOD, this.armBInput.blue * TOUCH_MOD, this.armBInput.green * TOUCH_MOD, (this.armCInput.red + this.armC2AInput.red + this.armC2BInput.red + this.armC3AInput.red) * TOUCH_MOD, (this.armCInput.blue + this.armC2AInput.blue + this.armC2BInput.blue + this.armC3AInput.blue) * TOUCH_MOD, (this.armCInput.green + this.armC2AInput.green + this.armC2BInput.green + this.armC3AInput.green) * TOUCH_MOD, this.base_body_color.red, this.base_body_color.blue, this.base_body_color.green, this.soundInput, this.voiceInput, this.voice, this.sting, this.give, this.life, this.ccClock, this.smellMeat, this.memory1, this.memory2, this.memory3, this.memory4, this.memory5, this.memory6, this.memory7, this.memory8, Mathjs.e, Mathjs.PI, 1, 0, -1]);
   }
 
   getOutputs() {
     let threshold = 0.0;
-    this.turn1 = this.outputVector.subset(Mathjs.index(0)) - threshold; //*Math.PI;
-    this.thrust1 = this.outputVector.subset(Mathjs.index(1)) - threshold;
-    this.turn2 = this.outputVector.subset(Mathjs.index(2)) - threshold; //*Math.PI;
-    this.thrust2 = this.outputVector.subset(Mathjs.index(3)) - threshold;
-
-    this.bodyColor.red = 0.5 + this.outputVector.subset(Mathjs.index(4)) / 2;
-    this.bodyColor.green = 0.5 + this.outputVector.subset(Mathjs.index(5)) / 2 + this.sting / 2;
-    this.bodyColor.blue = 0.5 + this.outputVector.subset(Mathjs.index(6)) / 2 + this.give / 2;
+    this.turn1 = (this.outputVector.subset(Mathjs.index(0)) + this.outputVector.subset(Mathjs.index(16))) * 0.75; //*Math.PI;
+    this.thrust1 = (this.outputVector.subset(Mathjs.index(1)) + this.outputVector.subset(Mathjs.index(17)) + this.outputVector.subset(Mathjs.index(18))) * 0.75;
+    this.turn2 = (this.outputVector.subset(Mathjs.index(2)) + this.outputVector.subset(Mathjs.index(19))) * 0.75; //*Math.PI;
+    this.thrust2 = (this.outputVector.subset(Mathjs.index(3)) + this.outputVector.subset(Mathjs.index(20)) + this.outputVector.subset(Mathjs.index(21))) * 0.75;
 
     this.sting = this.outputVector.subset(Mathjs.index(7));
 
     this.give = this.outputVector.subset(Mathjs.index(8));
 
-    this.voice = this.outputVector.subset(Mathjs.index(9)); //* Mathjs.compare(this.hawk-this.dove,this.dove-this.hawk);
+    this.voice = this.outputVector.subset(Mathjs.index(9));
 
     this.farts = this.outputVector.subset(Mathjs.index(10)) > threshold;
 
-    this.armColorA.red = 0.5 + this.outputVector.subset(Mathjs.index(4)) / 2;
-    this.armColorA.blue = 0.5 + this.outputVector.subset(Mathjs.index(5)) / 2; //  + this.sting/2;
-    this.armColorA.green = 0.5 + this.outputVector.subset(Mathjs.index(6)) / 2; //  + this.give/2;
+    this.bodyColor.red = 1.0 - this.life;
+    this.bodyColor.blue = this.sting > 0 ? this.sting : 0.0;
+    this.bodyColor.green = this.give > 0 ? this.give : 0.0;
 
-    this.armColorB.red = 0.5 + this.outputVector.subset(Mathjs.index(4)) / 2; //
-    this.armColorB.blue = 0.5 + this.outputVector.subset(Mathjs.index(5)) / 2; //  + this.sting/2;
-    this.armColorB.green = 0.5 + this.outputVector.subset(Mathjs.index(6)) / 2; // + this.give/2;
+    this.armColorA.red = this.base_body_color.red + this.outputVector.subset(Mathjs.index(4)) / 2;
+    this.armColorA.blue = this.base_body_color.blue + this.outputVector.subset(Mathjs.index(5)) / 2; //  + this.sting/2;
+    this.armColorA.green = this.base_body_color.green + this.outputVector.subset(Mathjs.index(6)) / 2; //  + this.give/2;
 
-    this.armColorC.red = 0.5 + this.outputVector.subset(Mathjs.index(4)) / 2; //
-    this.armColorC.blue = 0.5 + this.outputVector.subset(Mathjs.index(5)) / 2; // + this.sting/2;
-    this.armColorC.green = 0.5 + this.outputVector.subset(Mathjs.index(6)) / 2; // + this.give/2;
+    this.armColorB.red = this.base_body_color.red + this.outputVector.subset(Mathjs.index(4)) / 2; //
+    this.armColorB.blue = this.base_body_color.blue + this.outputVector.subset(Mathjs.index(5)) / 2; //  + this.sting/2;
+    this.armColorB.green = this.base_body_color.green + this.outputVector.subset(Mathjs.index(6)) / 2; // + this.give/2;
 
-    this.interestInMating = this.outputVector.subset(Mathjs.index(11));
+    this.armColorC.red = this.base_body_color.red; // + (this.outputVector.subset(Mathjs.index(4)))/2;//
+    this.armColorC.blue = this.base_body_color.blue; // + (this.outputVector.subset(Mathjs.index(5)))/2;// + this.sting/2;
+    this.armColorC.green = this.base_body_color.green; // + (this.outputVector.subset(Mathjs.index(6)))/2;// + this.give/2;
 
-    this.wantEat = this.outputVector.subset(Mathjs.index(16));
-    // this.memory1 = Mathjs.sin(Math.PI*(this.outputVector.subset(Mathjs.index(22)))) + this.memory1*0.25 ;
-    // this.memory2 = Mathjs.sin(Math.PI*(this.outputVector.subset(Mathjs.index(23))))+ this.memory2*0.25 ;
-    // this.memory3 = Mathjs.sin(Math.PI*(this.outputVector.subset(Mathjs.index(24))))+ this.memory3*0.25;
-    // this.memory4 = Mathjs.sin(Math.PI*(this.outputVector.subset(Mathjs.index(25))))+ this.memory4*0.25 ;
-    this.memory1 = this.outputVector.subset(Mathjs.index(12)); // + this.memory1*0.25 ;
-    this.memory2 = this.outputVector.subset(Mathjs.index(13)); //+ this.memory2*0.25 ;
-    this.memory3 = this.outputVector.subset(Mathjs.index(14)); //+ this.memory3*0.25;
-    this.memory4 = this.outputVector.subset(Mathjs.index(15)); //+ this.memory4*0.25 ;
+    //this.interestInMating = (this.outputVector.subset(Mathjs.index(11))+this.outputVector.subset(Mathjs.index(26)));
 
-    //  this.pivotEye1 =  this.outputVector.subset(Mathjs.index(26)); * this.outputVector.subset(Mathjs.index(28))/5;
-    //  this.pivotEye2 =  this.outputVector.subset(Mathjs.index(27)); * this.outputVector.subset(Mathjs.index(29))/5;
-    // this.actuator1 = (this.outputVector.subset(Mathjs.index(26)));
-    // this.actuator2 =  (this.outputVector.subset(Mathjs.index(27)));
-    // this.actuator3 =  this.outputVector.subset(Mathjs.index(28));
-    // this.actuator4 =  this.outputVector.subset(Mathjs.index(29));
+
+    this.memory1 = this.outputVector.subset(Mathjs.index(12)) + this.outputVector.subset(Mathjs.index(22));
+    this.memory2 = this.outputVector.subset(Mathjs.index(13)) + this.outputVector.subset(Mathjs.index(23));
+    this.memory3 = this.outputVector.subset(Mathjs.index(14)) + this.outputVector.subset(Mathjs.index(24));
+    this.memory4 = this.outputVector.subset(Mathjs.index(15)) + this.outputVector.subset(Mathjs.index(25));
+    this.memory5 = this.outputVector.subset(Mathjs.index(16)) + this.outputVector.subset(Mathjs.index(26));
+    this.memory6 = this.outputVector.subset(Mathjs.index(17)) + this.outputVector.subset(Mathjs.index(27));
+    this.memory7 = this.outputVector.subset(Mathjs.index(18)) + this.outputVector.subset(Mathjs.index(28));
+    this.memory8 = this.outputVector.subset(Mathjs.index(19)) + this.outputVector.subset(Mathjs.index(29));
   }
 
   cleanupInputs() {
-    this.sexytime = 0.25 * this.sexytime;
-    if (this.sexytime < 0.1) {
-      this.sexytime = 0;
-    }
-    this.happy = 0.25 * this.happy;
-    if (this.happy < 0.1) {
-      this.happy = 0;
-    }
-    this.ouchie = 0.25 * this.ouchie;
-    if (this.ouchie < 0.1) {
-      this.ouchie = 0;
-    }
-    this.smellMeat = 0.0;
-    this.soundInput = 0.0;
-    this.voiceInput = 0.0;
-    this.heat = 0.0;
-    this.center_eye_vision = { red: 0, green: 0, blue: 0 };
-    this.left_eye_vision = { red: 0, green: 0, blue: 0 };
-    this.right_eye_vision = { red: 0, green: 0, blue: 0 };
-    this.armAInput = { red: 0, green: 0, blue: 0 };
-    this.armBInput = { red: 0, green: 0, blue: 0 };
+    let degridation = 0.0;
+    let vision_degridation = 0.0;
+
+    this.sexytime *= degridation;
+
+    // this.memory1 *= degridation;
+    // this.memory2 *= degridation;
+    // this.memory3 *= degridation;
+    // this.memory4 *= degridation;
+
+
+    this.smellMeat *= degridation;
+    this.soundInput *= degridation;
+    this.voiceInput *= degridation;
+
+    this.center_eye_vision.red *= vision_degridation;
+    this.center_eye_vision.blue *= vision_degridation;
+    this.center_eye_vision.green *= vision_degridation;
+
+    this.left_eye_vision.red *= vision_degridation;
+    this.left_eye_vision.blue *= vision_degridation;
+    this.left_eye_vision.green *= vision_degridation;
+
+    this.right_eye_vision.red *= vision_degridation;
+    this.right_eye_vision.blue *= vision_degridation;
+    this.right_eye_vision.green *= vision_degridation;
+
+    this.bodyInput.red *= degridation;
+    this.bodyInput.blue *= degridation;
+    this.bodyInput.green *= degridation;
+
+    this.armAInput.red *= degridation;
+    this.armAInput.blue *= degridation;
+    this.armAInput.green *= degridation;
+
+    this.armBInput.red *= degridation;
+    this.armBInput.blue *= degridation;
+    this.armBInput.green *= degridation;
+
+    // this.center_eye_vision = { red:0, green: 0, blue:0 };
+    // this.left_eye_vision = { red:0, green: 0, blue:0 };
+    // this.right_eye_vision = { red:0, green: 0, blue:0 };
+    // this.armAInput = { red:0, green: 0, blue:0 };
+    // this.armBInput = { red:0, green: 0, blue:0 };
     this.armCInput = { red: 0, green: 0, blue: 0 };
     this.armC2AInput = { red: 0, green: 0, blue: 0 };
     this.armC2BInput = { red: 0, green: 0, blue: 0 };
     this.armC3AInput = { red: 0, green: 0, blue: 0 };
-    this.bodyInput = { red: 0, green: 0, blue: 0 };
+    //this.bodyInput = { red:0, green: 0, blue:0 };
   }
 
   tick() {
@@ -96188,7 +96123,7 @@ class BaseBrain {
 
 module.exports = BaseBrain;
 
-},{"mathjs":8}],581:[function(require,module,exports){
+},{"mathjs":8}],579:[function(require,module,exports){
 'use strict';
 
 const Mathjs = require('mathjs');
@@ -96204,9 +96139,9 @@ class Brain extends BaseBrain {
   }
   constructor() {
     super();
-    var mutation_rate = 0.5;
-    let weight_mutation_magnitude = 2.0;
-    let bias_mutation_magnitude = 1.0;
+    let mutation_rate = 0.5;
+    let weight_mutation_magnitude = 0.65;
+    let bias_mutation_magnitude = 0.35;
 
     this.inputWeightsA = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map(function (value, index, matrix) {
       if (Math.random() < mutation_rate) {
@@ -96274,17 +96209,17 @@ class Brain extends BaseBrain {
 
   doMagic(input_vector) {
 
-    // input_vector = input_vector.map(function(value, index, matrix){
-    //   let result = (1.0/(1.0 + Mathjs.exp(-1 * value * 2)) - 0.5)*2;
-    //   //(value*value)/(1 + value*value);
-    //   //Mathjs.sin(value*value);
-    //   //1.0/(1.0 + Mathjs.exp(-1 * value));
-    //   //(value*value)/(1 + value*value)
-    //   if(isNaN(result)){
-    //     result = 0.0
-    //   }
-    //   return result;
-    // });
+    input_vector = input_vector.map(function (value, index, matrix) {
+      let result = (1.0 / (1.0 + Mathjs.exp(-1 * value)) - 0.5) * 2;
+      //(value*value)/(1 + value*value);
+      //Mathjs.sin(value*value);
+      //1.0/(1.0 + Mathjs.exp(-1 * value));
+      //(value*value)/(1 + value*value)
+      if (isNaN(result)) {
+        result = 0.0;
+      }
+      return result;
+    });
     let postInputsWeightsVector = Mathjs.multiply(this.combined_input_weights, input_vector);
 
     let postInputsBiasVector = Mathjs.add(postInputsWeightsVector, this.combined_input_bias);
@@ -96305,7 +96240,7 @@ class Brain extends BaseBrain {
     let postHiddenLayerBaisVector = Mathjs.add(postHiddenLayerWeightsVector, this.combined_hidden_bias);
 
     let outputVector = postHiddenLayerBaisVector.map(function (value, index, matrix) {
-      let result = (1.0 / (1.0 + Mathjs.exp(-1 * value * 0.75)) - 0.5) * 2;
+      let result = (1.0 / (1.0 + Mathjs.exp(-1 * value)) - 0.5) * 2;
       //(value*value)/(1 + value*value);
       //Mathjs.sin(value*value);
       //1.0/(1.0 + Mathjs.exp(-1 * value));
@@ -96340,35 +96275,36 @@ class Brain extends BaseBrain {
   }
 
   rebuild(channel_A, channel_B) {
+    let mut_rate = 0.02;
     this.inputWeightsA = this.mutate_layer(channel_A.inputWeights);
-    if (Math.random() < .01) {
+    if (Math.random() < mut_rate) {
       this.inputWeightsA = Mathjs.inv(this.inputWeightsA);
     }
-    if (Math.random() < .01) {
+    if (Math.random() < mut_rate) {
       this.inputWeightsA = Mathjs.transpose(this.inputWeightsA);
     }
     this.inputBiasA = this.mutate_layer(channel_A.inputBias);
     this.hiddenLayerWeightsA = this.mutate_layer(channel_A.hiddenLayerWeights);
-    if (Math.random() < .01) {
+    if (Math.random() < mut_rate) {
       this.hiddenLayerWeightsA = Mathjs.inv(this.hiddenLayerWeightsA);
     }
-    if (Math.random() < .01) {
+    if (Math.random() < mut_rate) {
       this.hiddenLayerWeightsA = Mathjs.transpose(this.hiddenLayerWeightsA);
     }
     this.hiddenLayerBiasA = this.mutate_layer(channel_A.hiddenLayerBias);
     this.inputWeightsB = this.mutate_layer(channel_B.inputWeights);
-    if (Math.random() < .01) {
+    if (Math.random() < mut_rate) {
       this.inputWeightsB = Mathjs.inv(this.inputWeightsB);
     }
-    if (Math.random() < .01) {
+    if (Math.random() < mut_rate) {
       this.inputWeightsB = Mathjs.transpose(this.inputWeightsB);
     }
     this.inputBiasB = this.mutate_layer(channel_B.inputBias);
     this.hiddenLayerWeightsB = this.mutate_layer(channel_B.hiddenLayerWeights);
-    if (Math.random() < .01) {
+    if (Math.random() < mut_rate) {
       this.hiddenLayerWeightsB = Mathjs.inv(this.hiddenLayerWeightsB);
     }
-    if (Math.random() < .01) {
+    if (Math.random() < mut_rate) {
       this.hiddenLayerWeightsB = Mathjs.transpose(this.hiddenLayerWeightsB);
     }
     this.hiddenLayerBiasB = this.mutate_layer(channel_B.hiddenLayerBias);
@@ -96378,27 +96314,19 @@ class Brain extends BaseBrain {
 
   mutate_layer(layer) {
     layer = layer.map(function (value, index, matrix) {
-      // if(Math.random() < .5){
-      //   value += 0.01*(Math.random()-0.5)*value  ;
-      // }
-      // if(Math.random() < .5){
-      //   value += + 0.001*(Math.random()-0.5) ;
-      // }
-      // if(Math.random() < 0.1){
-      //   value += 0.1*(Math.random()-0.5)*value;
-      // }
-      // if(Math.random() < 0.1){
-      //   value += 0.1*(Math.random()-0.5) ;
-      // }
-      if (Math.random() < 0.05) {
-        value += 0.1 * (Math.random() - 0.5) * (Math.random() - 0.5);
+
+      let mut_rate = 0.015;
+      let mut_magnitude = 0.015;
+
+      value += mut_magnitude * mut_rate * (Math.random() - 0.5);
+
+      if (Math.random() < mut_rate) {
+        value += Math.random() < 0.5 ? mut_magnitude : -mut_magnitude;
       }
 
-      if (Math.random() < 0.05) {
-        value += 0.01 * (Math.random() - 0.5) * value;
+      if (Math.random() < mut_rate) {
+        value += Math.random() < 0.5 ? mut_magnitude * value : -mut_magnitude * value;
       }
-
-      value += 0.001 * (Math.random() - 0.5);
 
       return value;
     });
@@ -96423,7 +96351,7 @@ class Brain extends BaseBrain {
 
 module.exports = Brain;
 
-},{"./BaseBrain":580,"mathjs":8}],582:[function(require,module,exports){
+},{"./BaseBrain":578,"mathjs":8}],580:[function(require,module,exports){
 'use strict';
 
 const Mathjs = require('mathjs');
@@ -96543,7 +96471,7 @@ class DeltaBrain extends BaseBrain {
 
 module.exports = DeltaBrain;
 
-},{"../bot/Bot":578,"./BaseBrain":580,"mathjs":8}],583:[function(require,module,exports){
+},{"../bot/Bot":576,"./BaseBrain":578,"mathjs":8}],581:[function(require,module,exports){
 'use strict';
 
 const Mathjs = require('mathjs');
@@ -96559,64 +96487,96 @@ class Dumber extends BaseBrain {
   }
   constructor() {
     super();
-    var mutation_rate = 0.75;
-    var mutation_magnitude = 1.5;
+    var mutation_rate = 0.5;
+    let weight_mutation_magnitude = 0.5;
+    let bias_mutation_magnitude = 0.25;
 
     this.inputWeightsA = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map(function (value, index, matrix) {
       if (Math.random() < mutation_rate) {
-        value += mutation_magnitude * (Math.random() - 0.5);
+        value += weight_mutation_magnitude * (Math.random() - 0.5);
       }
       return value;
     });
 
     this.inputBiasA = Mathjs.zeros([this.inputSize]).map(function (value, index, matrix) {
       if (Math.random() < mutation_rate) {
-        value += mutation_magnitude * (Math.random() - 0.5);
+        value += bias_mutation_magnitude * (Math.random() - 0.5);
       }
       return value;
     });
 
     this.hiddenLayerWeightsA = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map(function (value, index, matrix) {
       if (Math.random() < mutation_rate) {
-        value += mutation_magnitude * (Math.random() - 0.5);
+        value += weight_mutation_magnitude * (Math.random() - 0.5);
       }
       return value;
     });
 
     this.hiddenLayerBiasA = Mathjs.zeros([this.inputSize]).map(function (value, index, matrix) {
       if (Math.random() < mutation_rate) {
-        value += mutation_magnitude * (Math.random() - 0.5);
+        value += bias_mutation_magnitude * (Math.random() - 0.5);
       }
       return value;
     });
 
     this.inputWeightsB = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map(function (value, index, matrix) {
       if (Math.random() < mutation_rate) {
-        value += mutation_magnitude * (Math.random() - 0.5);
+        value += weight_mutation_magnitude * (Math.random() - 0.5);
       }
       return value;
     });
 
     this.inputBiasB = Mathjs.zeros([this.inputSize]).map(function (value, index, matrix) {
       if (Math.random() < mutation_rate) {
-        value += mutation_magnitude * (Math.random() - 0.5);
+        value += bias_mutation_magnitude * (Math.random() - 0.5);
       }
       return value;
     });
 
     this.hiddenLayerWeightsB = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map(function (value, index, matrix) {
       if (Math.random() < mutation_rate) {
-        value += mutation_magnitude * (Math.random() - 0.5);
+        value += weight_mutation_magnitude * (Math.random() - 0.5);
       }
       return value;
     });
 
     this.hiddenLayerBiasB = Mathjs.zeros([this.inputSize]).map(function (value, index, matrix) {
       if (Math.random() < mutation_rate) {
-        value += mutation_magnitude * (Math.random() - 0.5);
+        value += bias_mutation_magnitude * (Math.random() - 0.5);
       }
       return value;
     });
+
+    this.hiddenTwoLayerWeightsA = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map(function (value, index, matrix) {
+      if (Math.random() < mutation_rate) {
+        value += weight_mutation_magnitude * (Math.random() - 0.5);
+      }
+      return value;
+    });
+
+    this.hiddenTwoLayerBiasA = Mathjs.zeros([this.inputSize]).map(function (value, index, matrix) {
+      if (Math.random() < mutation_rate) {
+        value += bias_mutation_magnitude * (Math.random() - 0.5);
+      }
+      return value;
+    });
+
+    this.hiddenTwoLayerWeightsB = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map(function (value, index, matrix) {
+      if (Math.random() < mutation_rate) {
+        value += weight_mutation_magnitude * (Math.random() - 0.5);
+      }
+      return value;
+    });
+
+    this.hiddenTwoLayerBiasB = Mathjs.zeros([this.inputSize]).map(function (value, index, matrix) {
+      if (Math.random() < mutation_rate) {
+        value += bias_mutation_magnitude * (Math.random() - 0.5);
+      }
+      return value;
+    });
+
+    this.base_body_colorA = { red: 0.25, blue: 0.25, green: 0.25 };
+    this.base_body_colorB = { red: 0.25, blue: 0.25, green: 0.25 };
   }
 
   buildLayers() {
@@ -96624,31 +96584,22 @@ class Dumber extends BaseBrain {
     this.combined_input_bias = Mathjs.add(this.inputBiasA, this.inputBiasB);
     this.combined_hidden_weights = Mathjs.add(this.hiddenLayerWeightsA, this.hiddenLayerWeightsB);
     this.combined_hidden_bias = Mathjs.add(this.hiddenLayerBiasA, this.hiddenLayerBiasB);
+    this.combined_hidden_two_weights = Mathjs.add(this.hiddenTwoLayerWeightsA, this.hiddenTwoLayerWeightsB);
+    this.combined_hidden_two_bias = Mathjs.add(this.hiddenTwoLayerBiasA, this.hiddenTwoLayerBiasB);
+
+    this.base_body_color.red = this.base_body_colorA.red + this.base_body_colorB.red;
+    this.base_body_color.blue = this.base_body_colorA.blue + this.base_body_colorB.blue;
+    this.base_body_color.green = this.base_body_colorA.green + this.base_body_colorB.green;
   }
 
   doMagic(input_vector) {
 
-    input_vector = input_vector.map(function (value, index, matrix) {
-      let result = (1.0 / (1.0 + Mathjs.exp(-1 * value)) - 0.5) * 2;
-      //(value*value)/(1 + value*value);
-      //Mathjs.sin(value*value);
-      //1.0/(1.0 + Mathjs.exp(-1 * value));
-      //(value*value)/(1 + value*value)
-      if (isNaN(result)) {
-        result = 0.0;
-      }
-      return result;
-    });
     let postInputsWeightsVector = Mathjs.multiply(this.combined_input_weights, input_vector);
 
     let postInputsBiasVector = Mathjs.add(postInputsWeightsVector, this.combined_input_bias);
 
     let hiddenLayerInputVector = postInputsBiasVector.map(function (value, index, matrix) {
-      let result = (1.0 / (1.0 + Mathjs.exp(-1 * value)) - 0.5) * 2;
-      //(value*value)/(1 + value*value);
-      //Mathjs.sin(value*value);
-      //1.0/(1.0 + Mathjs.exp(-1 * value));
-      //(value*value)/(1 + value*value)
+      let result = Mathjs.sin(value * Mathjs.PI);
       if (isNaN(result)) {
         result = 0.0;
       }
@@ -96658,11 +96609,21 @@ class Dumber extends BaseBrain {
     let postHiddenLayerWeightsVector = Mathjs.multiply(hiddenLayerInputVector, this.combined_hidden_weights);
     let postHiddenLayerBaisVector = Mathjs.add(postHiddenLayerWeightsVector, this.combined_hidden_bias);
 
-    let outputVector = postHiddenLayerBaisVector.map(function (value, index, matrix) {
-      let result = (1.0 / (1.0 + Mathjs.exp(-1 * value)) - 0.5) * 2;
-      //(value*value)/(1 + value*value);
-      //Mathjs.sin(value*value);
-      //1.0/(1.0 + Mathjs.exp(-1 * value));
+    let postFirstHiddenLayer = postHiddenLayerBaisVector.map(function (value, index, matrix) {
+      let result = Mathjs.sin(value);
+
+      if (isNaN(result)) {
+        result = 0.0;
+      }
+      return result;
+    });
+
+    let postHiddenTwoLayerWeightsVector = Mathjs.multiply(postFirstHiddenLayer, this.combined_hidden_two_weights);
+    let postHiddenTwoLayerBaisVector = Mathjs.add(postHiddenTwoLayerWeightsVector, this.combined_hidden_two_bias);
+
+    let outputVector = postHiddenTwoLayerBaisVector.map(function (value, index, matrix) {
+      let result = Mathjs.sin(value);
+
       if (isNaN(result)) {
         result = 0.0;
       }
@@ -96675,105 +96636,152 @@ class Dumber extends BaseBrain {
   get_half_chromosomes() {
     let inputs_result = Math.random();
 
-    let inputWeights = Math.random() < 0.5 ? Mathjs.clone(this.inputWeightsA) : Mathjs.clone(this.inputWeightsB);
+    let inputWeights = inputs_result < 0.5 ? Mathjs.clone(this.inputWeightsA) : Mathjs.clone(this.inputWeightsB);
 
-    let inputBias = Math.random() < 0.5 ? Mathjs.clone(this.inputBiasA) : Mathjs.clone(this.inputBiasB);
+    let inputBias = inputs_result < 0.5 ? Mathjs.clone(this.inputBiasA) : Mathjs.clone(this.inputBiasB);
 
     let hidden_result = Math.random();
-    let hiddenLayerWeights = Math.random() < 0.5 ? Mathjs.clone(this.hiddenLayerWeightsA) : Mathjs.clone(this.hiddenLayerWeightsB);
 
-    let hiddenLayerBias = Math.random() < 0.5 ? Mathjs.clone(this.hiddenLayerBiasA) : Mathjs.clone(this.hiddenLayerBiasB);
+    let hiddenLayerWeights = hidden_result < 0.5 ? Mathjs.clone(this.hiddenLayerWeightsA) : Mathjs.clone(this.hiddenLayerWeightsB);
+
+    let hiddenLayerBias = hidden_result < 0.5 ? Mathjs.clone(this.hiddenLayerBiasA) : Mathjs.clone(this.hiddenLayerBiasB);
+
+    let hidden_two_result = Math.random();
+
+    let hiddenTwoLayerWeights = hidden_two_result < 0.5 ? Mathjs.clone(this.hiddenTwoLayerWeightsA) : Mathjs.clone(this.hiddenTwoLayerWeightsB);
+
+    let hiddenTwoLayerBias = hidden_two_result < 0.5 ? Mathjs.clone(this.hiddenTwoLayerBiasA) : Mathjs.clone(this.hiddenTwoLayerBiasB);
+
+    let body_color_result = Math.random();
+
+    let base_body_color = body_color_result < 0.5 ? this.base_body_colorA : this.base_body_colorB;
+
+    //{red: 0, blue:0, green:0 };
+
 
     return {
       inputWeights: inputWeights,
       inputBias: inputBias,
       hiddenLayerWeights: hiddenLayerWeights,
-      hiddenLayerBias: hiddenLayerBias
+      hiddenLayerBias: hiddenLayerBias,
+      hiddenTwoLayerWeights: hiddenTwoLayerWeights,
+      hiddenTwoLayerBias: hiddenTwoLayerBias,
+      base_body_color: base_body_color
     };
   }
 
   rebuild(channel_A, channel_B) {
+    let mut_rate = 0.03;
     this.inputWeightsA = this.mutate_layer(channel_A.inputWeights);
+    if (Math.random() < mut_rate) {
+      this.inputWeightsA = Mathjs.inv(this.inputWeightsA);
+    }
+    if (Math.random() < mut_rate) {
+      this.inputWeightsA = Mathjs.transpose(this.inputWeightsA);
+    }
     this.inputBiasA = this.mutate_layer(channel_A.inputBias);
+
     this.hiddenLayerWeightsA = this.mutate_layer(channel_A.hiddenLayerWeights);
+    if (Math.random() < mut_rate) {
+      this.hiddenLayerWeightsA = Mathjs.inv(this.hiddenLayerWeightsA);
+    }
+    if (Math.random() < mut_rate) {
+      this.hiddenLayerWeightsA = Mathjs.transpose(this.hiddenLayerWeightsA);
+    }
     this.hiddenLayerBiasA = this.mutate_layer(channel_A.hiddenLayerBias);
+
+    this.hiddenTwoLayerWeightsA = this.mutate_layer(channel_A.hiddenTwoLayerWeights);
+    if (Math.random() < mut_rate) {
+      this.hiddenTwoLayerWeightsA = Mathjs.inv(this.hiddenTwoLayerWeightsA);
+    }
+    if (Math.random() < mut_rate) {
+      this.hiddenTwoLayerWeightsA = Mathjs.transpose(this.hiddenTwoLayerWeightsA);
+    }
+    this.hiddenTwoLayerBiasA = this.mutate_layer(channel_A.hiddenTwoLayerBias);
+
     this.inputWeightsB = this.mutate_layer(channel_B.inputWeights);
+    if (Math.random() < mut_rate) {
+      this.inputWeightsB = Mathjs.inv(this.inputWeightsB);
+    }
+    if (Math.random() < mut_rate) {
+      this.inputWeightsB = Mathjs.transpose(this.inputWeightsB);
+    }
     this.inputBiasB = this.mutate_layer(channel_B.inputBias);
+
     this.hiddenLayerWeightsB = this.mutate_layer(channel_B.hiddenLayerWeights);
+    if (Math.random() < mut_rate) {
+      this.hiddenLayerWeightsB = Mathjs.inv(this.hiddenLayerWeightsB);
+    }
+    if (Math.random() < mut_rate) {
+      this.hiddenLayerWeightsB = Mathjs.transpose(this.hiddenLayerWeightsB);
+    }
     this.hiddenLayerBiasB = this.mutate_layer(channel_B.hiddenLayerBias);
+
+    this.hiddenTwoLayerWeightsB = this.mutate_layer(channel_B.hiddenTwoLayerWeights);
+    if (Math.random() < mut_rate) {
+      this.hiddenTwoLayerWeightsB = Mathjs.inv(this.hiddenTwoLayerWeightsB);
+    }
+    if (Math.random() < mut_rate) {
+      this.hiddenTwoLayerWeightsB = Mathjs.transpose(this.hiddenTwoLayerWeightsB);
+    }
+    this.hiddenTwoLayerBiasB = this.mutate_layer(channel_B.hiddenTwoLayerBias);
+
+    let body_color_mute = 0.25;
+    this.base_body_colorA = channel_A.base_body_color;
+    if (Math.random() < mut_rate * 10) {
+      this.base_body_colorA.red += (Math.random() - 0.5) * body_color_mute;
+    }
+    if (Math.random() < mut_rate * 10) {
+      this.base_body_colorA.blue += (Math.random() - 0.5) * body_color_mute;
+    }
+    if (Math.random() < mut_rate * 10) {
+      this.base_body_colorA.green += (Math.random() - 0.5) * body_color_mute;
+    }
+
+    this.base_body_colorB = channel_B.base_body_color;
+    if (Math.random() < mut_rate * 10) {
+      this.base_body_colorB.red += (Math.random() - 0.5) * body_color_mute;
+    }
+    if (Math.random() < mut_rate * 10) {
+      this.base_body_colorB.blue += (Math.random() - 0.5) * body_color_mute;
+    }
+    if (Math.random() < mut_rate * 10) {
+      this.base_body_colorB.green += (Math.random() - 0.5) * body_color_mute;
+    }
+
     this.buildLayers();
-  }
-
-  mutate() {
-    let childBrain = new Dumber();
-
-    childBrain.inputWeightsA = this.mutate_layer(this.inputWeightsA);
-
-    if (Math.random() < 0.1) {
-      childBrain.inputWeightsA = Mathjs.transpose(childBrain.inputWeightsA);
-    }
-    if (Math.random() < 0.1) {
-      childBrain.inputWeightsA = Mathjs.inv(childBrain.inputWeightsA);
-    }
-
-    childBrain.inputBiasA = this.mutate_layer(this.inputBiasA);
-
-    childBrain.hiddenLayerBiasA = this.mutate_layer(this.hiddenLayerBiasA);
-
-    childBrain.hiddenLayerWeightsA = this.mutate_layer(this.hiddenLayerWeightsA);
-
-    if (Math.random() < 0.1) {
-      childBrain.hiddenLayerWeightsA = Mathjs.transpose(childBrain.hiddenLayerWeightsA);
-    }
-    if (Math.random() < 0.1) {
-      childBrain.hiddenLayerWeightsA = Mathjs.inv(childBrain.hiddenLayerWeightsA);
-    }
-
-    childBrain.inputWeightsB = this.mutate_layer(this.inputWeightsB);
-
-    if (Math.random() < 0.1) {
-      childBrain.inputWeightsB = Mathjs.transpose(childBrain.inputWeightsB);
-    }
-    if (Math.random() < 0.1) {
-      childBrain.inputWeightsB = Mathjs.inv(childBrain.inputWeightsB);
-    }
-
-    childBrain.inputBiasB = this.mutate_layer(this.inputBiasB);
-
-    childBrain.hiddenLayerBiasB = this.mutate_layer(this.hiddenLayerBiasB);
-
-    childBrain.hiddenLayerWeightsB = this.mutate_layer(this.hiddenLayerWeightsB);
-
-    if (Math.random() < 0.1) {
-      childBrain.hiddenLayerWeightsB = Mathjs.transpose(childBrain.hiddenLayerWeightsB);
-    }
-    if (Math.random() < 0.1) {
-      childBrain.hiddenLayerWeightsB = Mathjs.inv(childBrain.hiddenLayerWeightsB);
-    }
-    childBrain.buildLayers();
-    return childBrain;
+    //console.log("combined det: " + Mathjs.det(this.combined_input_weights) );
   }
 
   mutate_layer(layer) {
     layer = layer.map(function (value, index, matrix) {
-      if (Math.random() < .5) {
-        value += 0.01 * (Math.random() - 0.5) * value + 0.001 * (Math.random() - 0.5);
-      }
-      if (Math.random() < 0.1) {
-        value += 0.1 * (Math.random() - 0.5) * value;
-      }
-      if (Math.random() < 0.1) {
-        value += 0.1 * (Math.random() - 0.5);
-      }
-      if (Math.random() < 0.01) {
-        value += Math.random() - 0.5;
+
+      let mutation = 0;
+
+      let mut_rate = 0.025;
+      let mut_magnitude = 0.015;
+
+      // always mutatate a small amount
+      //mutation +=  mut_magnitude*mut_rate*(Math.random()-0.5);
+
+
+      if (Math.random() < mut_rate) {
+        mutation += mut_magnitude * (Math.random() - 0.5);
       }
 
-      if (Math.random() < 0.01) {
-        value += (Math.random() - 0.5) * value;
+      if (Math.random() < mut_rate) {
+        mutation += mut_magnitude * (Math.random() - 0.5) * value;
       }
 
-      return value;
+      if (Math.random() < mut_rate / 10) {
+        mutation += mut_magnitude * (Math.random() - 0.5) * 100;
+      }
+
+      if (Math.random() < mut_rate / 10) {
+        mutation += mut_magnitude * (Math.random() - 0.5) * value * 10;
+      }
+
+      return value + mutation;
     });
     return layer;
   }
@@ -96788,6 +96796,12 @@ class Dumber extends BaseBrain {
     neo.hiddenLayerBiasA = Mathjs.clone(this.hiddenLayerBiasA);
     neo.inputWeightsA = Mathjs.clone(this.inputWeightsA);
     neo.inputBiasA = Mathjs.clone(this.inputBiasA);
+    neo.hiddenTwoLayerWeightsA = Mathjs.clone(this.hiddenTwoLayerWeightsA);
+    neo.hiddenTwoLayerBiasA = Mathjs.clone(this.hiddenTwoLayerBiasA);
+    neo.hiddenTwoLayerWeightsB = Mathjs.clone(this.hiddenTwoLayerWeightsB);
+    neo.hiddenTwoLayerBiasB = Mathjs.clone(this.hiddenTwoLayerBiasB);
+    neo.base_body_colorA = this.base_body_colorA;
+    neo.base_body_colorB = this.base_body_colorB;
 
     neo.buildLayers();
     return neo;
@@ -96796,7 +96810,7 @@ class Dumber extends BaseBrain {
 
 module.exports = Dumber;
 
-},{"./BaseBrain":580,"mathjs":8}],584:[function(require,module,exports){
+},{"./BaseBrain":578,"mathjs":8}],582:[function(require,module,exports){
 'use strict';
 
 const Mathjs = require('mathjs');
@@ -96812,9 +96826,9 @@ class OtherBrain extends BaseBrain {
   }
   constructor() {
     super();
-    let mutation_rate = 0.5;
-    let weight_mutation_magnitude = 1.0;
-    let bias_mutation_magnitude = 1.0;
+    var mutation_rate = 0.25;
+    let weight_mutation_magnitude = 0.5;
+    let bias_mutation_magnitude = 0.15;
 
     this.inputWeightsA = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map(function (value, index, matrix) {
       if (Math.random() < mutation_rate) {
@@ -96871,6 +96885,37 @@ class OtherBrain extends BaseBrain {
       }
       return value;
     });
+
+    this.hiddenTwoLayerWeightsA = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map(function (value, index, matrix) {
+      if (Math.random() < mutation_rate) {
+        value += weight_mutation_magnitude * (Math.random() - 0.5);
+      }
+      return value;
+    });
+
+    this.hiddenTwoLayerBiasA = Mathjs.zeros([this.inputSize]).map(function (value, index, matrix) {
+      if (Math.random() < mutation_rate) {
+        value += bias_mutation_magnitude * (Math.random() - 0.5);
+      }
+      return value;
+    });
+
+    this.hiddenTwoLayerWeightsB = Mathjs.zeros(Mathjs.matrix([this.inputSize, this.inputSize])).map(function (value, index, matrix) {
+      if (Math.random() < mutation_rate) {
+        value += weight_mutation_magnitude * (Math.random() - 0.5);
+      }
+      return value;
+    });
+
+    this.hiddenTwoLayerBiasB = Mathjs.zeros([this.inputSize]).map(function (value, index, matrix) {
+      if (Math.random() < mutation_rate) {
+        value += bias_mutation_magnitude * (Math.random() - 0.5);
+      }
+      return value;
+    });
+
+    this.base_body_colorA = { red: 0.25, blue: 0.25, green: 0.25 };
+    this.base_body_colorB = { red: 0.25, blue: 0.25, green: 0.25 };
   }
 
   buildLayers() {
@@ -96878,29 +96923,38 @@ class OtherBrain extends BaseBrain {
     this.combined_input_bias = Mathjs.add(this.inputBiasA, this.inputBiasB);
     this.combined_hidden_weights = Mathjs.add(this.hiddenLayerWeightsA, this.hiddenLayerWeightsB);
     this.combined_hidden_bias = Mathjs.add(this.hiddenLayerBiasA, this.hiddenLayerBiasB);
+    this.combined_hidden_two_weights = Mathjs.add(this.hiddenTwoLayerWeightsA, this.hiddenTwoLayerWeightsB);
+    this.combined_hidden_two_bias = Mathjs.add(this.hiddenTwoLayerBiasA, this.hiddenTwoLayerBiasB);
+
+    this.base_body_color.red = this.base_body_colorA.red + this.base_body_colorB.red;
+    this.base_body_color.blue = this.base_body_colorA.blue + this.base_body_colorB.blue;
+    this.base_body_color.green = this.base_body_colorA.green + this.base_body_colorB.green;
   }
 
   doMagic(input_vector) {
 
-    input_vector = input_vector.map(function (value, index, matrix) {
-      let result = (1.0 / (1.0 + Mathjs.exp(-1 * value)) - 0.5) * 2;
-      //(value*value)/(1 + value*value);
-      //let result = Mathjs.cos(value);
-      //1.0/(1.0 + Mathjs.exp(-1 * value));
-      //(value*value)/(1 + value*value)
-      if (isNaN(result)) {
-        result = 0.0;
-      }
-      return result;
-    });
-    let postInputsWeightsVector = Mathjs.multiply(this.combined_input_weights.map(function (value, index, matrix) {
-      return Math.random() > Math.abs(value) ? 1 * Math.sign(value) : 0;
-    }), input_vector);
+    let postInputsWeightsVector = Mathjs.multiply(this.combined_input_weights, input_vector);
 
     let postInputsBiasVector = Mathjs.add(postInputsWeightsVector, this.combined_input_bias);
 
     let hiddenLayerInputVector = postInputsBiasVector.map(function (value, index, matrix) {
-      let result = (1.0 / (1.0 + Mathjs.exp(-1 * value)) - 0.5) * 2;
+      //value*=Mathjs.PI;
+      //let result = (1.0/(1.0 + Mathjs.exp(-1 * value )) - 0.5)*Mathjs.e;
+      let result = Mathjs.sin(value) * Mathjs.PI;
+      //Mathjs.sin(value*(index+1))/(index+1);
+      if (isNaN(result)) {
+        result = 0.0;
+      }
+      return result;
+    });
+
+    let postHiddenLayerWeightsVector = Mathjs.multiply(hiddenLayerInputVector, this.combined_hidden_weights);
+    let postHiddenLayerBaisVector = Mathjs.add(postHiddenLayerWeightsVector, this.combined_hidden_bias);
+
+    let postFirstHiddenLayer = postHiddenLayerBaisVector.map(function (value, index, matrix) {
+      //value*=Mathjs.PI/2;
+      let result = Mathjs.sin(value) * Mathjs.PI / 2;
+      //Mathjs.sin(value*(index+1))/(index+1);
 
       if (isNaN(result)) {
         result = 0.0;
@@ -96908,13 +96962,12 @@ class OtherBrain extends BaseBrain {
       return result;
     });
 
-    let postHiddenLayerWeightsVector = Mathjs.multiply(hiddenLayerInputVector.map(function (value, index, matrix) {
-      return Math.random() > Math.abs(value) ? 1 * Math.sign(value) : 0;
-    }), this.combined_hidden_weights);
-    let postHiddenLayerBaisVector = Mathjs.add(postHiddenLayerWeightsVector, this.combined_hidden_bias);
+    let postHiddenTwoLayerWeightsVector = Mathjs.multiply(postFirstHiddenLayer, this.combined_hidden_two_weights);
+    let postHiddenTwoLayerBaisVector = Mathjs.add(postHiddenTwoLayerWeightsVector, this.combined_hidden_two_bias);
 
-    let outputVector = postHiddenLayerBaisVector.map(function (value, index, matrix) {
-      let result = (1.0 / (1.0 + Mathjs.exp(-1 * value)) - 0.5) * 2;
+    let outputVector = postHiddenTwoLayerBaisVector.map(function (value, index, matrix) {
+      //value*=Mathjs.PI;
+      let result = Mathjs.sin(value);
 
       if (isNaN(result)) {
         result = 0.0;
@@ -96928,105 +96981,152 @@ class OtherBrain extends BaseBrain {
   get_half_chromosomes() {
     let inputs_result = Math.random();
 
-    let inputWeights = Math.random() < 0.5 ? Mathjs.clone(this.inputWeightsA) : Mathjs.clone(this.inputWeightsB);
+    let inputWeights = inputs_result < 0.5 ? Mathjs.clone(this.inputWeightsA) : Mathjs.clone(this.inputWeightsB);
 
-    let inputBias = Math.random() < 0.5 ? Mathjs.clone(this.inputBiasA) : Mathjs.clone(this.inputBiasB);
+    let inputBias = inputs_result < 0.5 ? Mathjs.clone(this.inputBiasA) : Mathjs.clone(this.inputBiasB);
 
     let hidden_result = Math.random();
-    let hiddenLayerWeights = Math.random() < 0.5 ? Mathjs.clone(this.hiddenLayerWeightsA) : Mathjs.clone(this.hiddenLayerWeightsB);
 
-    let hiddenLayerBias = Math.random() < 0.5 ? Mathjs.clone(this.hiddenLayerBiasA) : Mathjs.clone(this.hiddenLayerBiasB);
+    let hiddenLayerWeights = hidden_result < 0.5 ? Mathjs.clone(this.hiddenLayerWeightsA) : Mathjs.clone(this.hiddenLayerWeightsB);
+
+    let hiddenLayerBias = hidden_result < 0.5 ? Mathjs.clone(this.hiddenLayerBiasA) : Mathjs.clone(this.hiddenLayerBiasB);
+
+    let hidden_two_result = Math.random();
+
+    let hiddenTwoLayerWeights = hidden_two_result < 0.5 ? Mathjs.clone(this.hiddenTwoLayerWeightsA) : Mathjs.clone(this.hiddenTwoLayerWeightsB);
+
+    let hiddenTwoLayerBias = hidden_two_result < 0.5 ? Mathjs.clone(this.hiddenTwoLayerBiasA) : Mathjs.clone(this.hiddenTwoLayerBiasB);
+
+    let body_color_result = Math.random();
+
+    let base_body_color = body_color_result < 0.5 ? this.base_body_colorA : this.base_body_colorB;
+
+    //{red: 0, blue:0, green:0 };
+
 
     return {
       inputWeights: inputWeights,
       inputBias: inputBias,
       hiddenLayerWeights: hiddenLayerWeights,
-      hiddenLayerBias: hiddenLayerBias
+      hiddenLayerBias: hiddenLayerBias,
+      hiddenTwoLayerWeights: hiddenTwoLayerWeights,
+      hiddenTwoLayerBias: hiddenTwoLayerBias,
+      base_body_color: base_body_color
     };
   }
 
   rebuild(channel_A, channel_B) {
+    let mut_rate = 0.025;
     this.inputWeightsA = this.mutate_layer(channel_A.inputWeights);
+    if (Math.random() < mut_rate) {
+      this.inputWeightsA = Mathjs.inv(this.inputWeightsA);
+    }
+    if (Math.random() < mut_rate) {
+      this.inputWeightsA = Mathjs.transpose(this.inputWeightsA);
+    }
     this.inputBiasA = this.mutate_layer(channel_A.inputBias);
+
     this.hiddenLayerWeightsA = this.mutate_layer(channel_A.hiddenLayerWeights);
+    if (Math.random() < mut_rate) {
+      this.hiddenLayerWeightsA = Mathjs.inv(this.hiddenLayerWeightsA);
+    }
+    if (Math.random() < mut_rate) {
+      this.hiddenLayerWeightsA = Mathjs.transpose(this.hiddenLayerWeightsA);
+    }
     this.hiddenLayerBiasA = this.mutate_layer(channel_A.hiddenLayerBias);
+
+    this.hiddenTwoLayerWeightsA = this.mutate_layer(channel_A.hiddenTwoLayerWeights);
+    if (Math.random() < mut_rate) {
+      this.hiddenTwoLayerWeightsA = Mathjs.inv(this.hiddenTwoLayerWeightsA);
+    }
+    if (Math.random() < mut_rate) {
+      this.hiddenTwoLayerWeightsA = Mathjs.transpose(this.hiddenTwoLayerWeightsA);
+    }
+    this.hiddenTwoLayerBiasA = this.mutate_layer(channel_A.hiddenTwoLayerBias);
+
     this.inputWeightsB = this.mutate_layer(channel_B.inputWeights);
+    if (Math.random() < mut_rate) {
+      this.inputWeightsB = Mathjs.inv(this.inputWeightsB);
+    }
+    if (Math.random() < mut_rate) {
+      this.inputWeightsB = Mathjs.transpose(this.inputWeightsB);
+    }
     this.inputBiasB = this.mutate_layer(channel_B.inputBias);
+
     this.hiddenLayerWeightsB = this.mutate_layer(channel_B.hiddenLayerWeights);
+    if (Math.random() < mut_rate) {
+      this.hiddenLayerWeightsB = Mathjs.inv(this.hiddenLayerWeightsB);
+    }
+    if (Math.random() < mut_rate) {
+      this.hiddenLayerWeightsB = Mathjs.transpose(this.hiddenLayerWeightsB);
+    }
     this.hiddenLayerBiasB = this.mutate_layer(channel_B.hiddenLayerBias);
+
+    this.hiddenTwoLayerWeightsB = this.mutate_layer(channel_B.hiddenTwoLayerWeights);
+    if (Math.random() < mut_rate) {
+      this.hiddenTwoLayerWeightsB = Mathjs.inv(this.hiddenTwoLayerWeightsB);
+    }
+    if (Math.random() < mut_rate) {
+      this.hiddenTwoLayerWeightsB = Mathjs.transpose(this.hiddenTwoLayerWeightsB);
+    }
+    this.hiddenTwoLayerBiasB = this.mutate_layer(channel_B.hiddenTwoLayerBias);
+
+    let body_color_mute = 0.15;
+    this.base_body_colorA = channel_A.base_body_color;
+    if (Math.random() < mut_rate) {
+      this.base_body_colorA.red += (Math.random() - 0.5) * body_color_mute;
+    }
+    if (Math.random() < mut_rate) {
+      this.base_body_colorA.blue += (Math.random() - 0.5) * body_color_mute;
+    }
+    if (Math.random() < mut_rate) {
+      this.base_body_colorA.green += (Math.random() - 0.5) * body_color_mute;
+    }
+
+    this.base_body_colorB = channel_B.base_body_color;
+    if (Math.random() < mut_rate) {
+      this.base_body_colorB.red += (Math.random() - 0.5) * body_color_mute;
+    }
+    if (Math.random() < mut_rate) {
+      this.base_body_colorB.blue += (Math.random() - 0.5) * body_color_mute;
+    }
+    if (Math.random() < mut_rate) {
+      this.base_body_colorB.green += (Math.random() - 0.5) * body_color_mute;
+    }
+
     this.buildLayers();
-  }
-
-  mutate() {
-    let childBrain = new OtherBrain();
-
-    childBrain.inputWeightsA = this.mutate_layer(this.inputWeightsA);
-
-    if (Math.random() < 0.1) {
-      childBrain.inputWeightsA = Mathjs.transpose(childBrain.inputWeightsA);
-    }
-    if (Math.random() < 0.1) {
-      childBrain.inputWeightsA = Mathjs.inv(childBrain.inputWeightsA);
-    }
-
-    childBrain.inputBiasA = this.mutate_layer(this.inputBiasA);
-
-    childBrain.hiddenLayerBiasA = this.mutate_layer(this.hiddenLayerBiasA);
-
-    childBrain.hiddenLayerWeightsA = this.mutate_layer(this.hiddenLayerWeightsA);
-
-    if (Math.random() < 0.1) {
-      childBrain.hiddenLayerWeightsA = Mathjs.transpose(childBrain.hiddenLayerWeightsA);
-    }
-    if (Math.random() < 0.1) {
-      childBrain.hiddenLayerWeightsA = Mathjs.inv(childBrain.hiddenLayerWeightsA);
-    }
-
-    childBrain.inputWeightsB = this.mutate_layer(this.inputWeightsB);
-
-    if (Math.random() < 0.1) {
-      childBrain.inputWeightsB = Mathjs.transpose(childBrain.inputWeightsB);
-    }
-    if (Math.random() < 0.1) {
-      childBrain.inputWeightsB = Mathjs.inv(childBrain.inputWeightsB);
-    }
-
-    childBrain.inputBiasB = this.mutate_layer(this.inputBiasB);
-
-    childBrain.hiddenLayerBiasB = this.mutate_layer(this.hiddenLayerBiasB);
-
-    childBrain.hiddenLayerWeightsB = this.mutate_layer(this.hiddenLayerWeightsB);
-
-    if (Math.random() < 0.1) {
-      childBrain.hiddenLayerWeightsB = Mathjs.transpose(childBrain.hiddenLayerWeightsB);
-    }
-    if (Math.random() < 0.1) {
-      childBrain.hiddenLayerWeightsB = Mathjs.inv(childBrain.hiddenLayerWeightsB);
-    }
-    childBrain.buildLayers();
-    return childBrain;
+    //console.log("combined det: " + Mathjs.det(this.combined_input_weights) );
   }
 
   mutate_layer(layer) {
     layer = layer.map(function (value, index, matrix) {
-      if (Math.random() < .5) {
-        value += 0.01 * (Math.random() - 0.5) * value + 0.001 * (Math.random() - 0.5);
-      }
-      if (Math.random() < 0.1) {
-        value += 0.1 * (Math.random() - 0.5) * value;
-      }
-      if (Math.random() < 0.1) {
-        value += 0.1 * (Math.random() - 0.5);
-      }
-      if (Math.random() < 0.01) {
-        value += 0.5 * (Math.random() - 0.5);
+
+      let mutation = 0;
+
+      let mut_rate = 0.0015;
+      let mut_magnitude = 0.25;
+
+      // always mutatate a small amount
+      //mutation +=  mut_magnitude*mut_rate*(Math.random()-0.5);
+
+
+      if (Math.random() < mut_rate) {
+        mutation += mut_magnitude * (Math.random() - 0.5);
       }
 
-      if (Math.random() < 0.01) {
-        value += (Math.random() - 0.5) * value;
+      if (Math.random() < mut_rate) {
+        mutation += mut_magnitude * (Math.random() - 0.5) * value;
       }
 
-      return value;
+      if (Math.random() < mut_rate / 10) {
+        mutation += mut_magnitude * (Math.random() - 0.5) * 10;
+      }
+
+      if (Math.random() < mut_rate / 10) {
+        mutation += mut_magnitude * (Math.random() - 0.5) * value * 10;
+      }
+
+      return value + mutation;
     });
     return layer;
   }
@@ -97041,6 +97141,12 @@ class OtherBrain extends BaseBrain {
     neo.hiddenLayerBiasA = Mathjs.clone(this.hiddenLayerBiasA);
     neo.inputWeightsA = Mathjs.clone(this.inputWeightsA);
     neo.inputBiasA = Mathjs.clone(this.inputBiasA);
+    neo.hiddenTwoLayerWeightsA = Mathjs.clone(this.hiddenTwoLayerWeightsA);
+    neo.hiddenTwoLayerBiasA = Mathjs.clone(this.hiddenTwoLayerBiasA);
+    neo.hiddenTwoLayerWeightsB = Mathjs.clone(this.hiddenTwoLayerWeightsB);
+    neo.hiddenTwoLayerBiasB = Mathjs.clone(this.hiddenTwoLayerBiasB);
+    neo.base_body_colorA = this.base_body_colorA;
+    neo.base_body_colorB = this.base_body_colorB;
 
     neo.buildLayers();
     return neo;
@@ -97049,7 +97155,7 @@ class OtherBrain extends BaseBrain {
 
 module.exports = OtherBrain;
 
-},{"./BaseBrain":580,"mathjs":8}],585:[function(require,module,exports){
+},{"./BaseBrain":578,"mathjs":8}],583:[function(require,module,exports){
 'use strict';
 
 const Matter = require('matter-js');
@@ -97058,7 +97164,7 @@ const Bodies = require('matter-js').Bodies;
 
 class Meat {
   constructor(quantity) {
-    this.life = quantity * .05;
+    this.life = quantity * .15;
     this.class = Meat;
   }
 
@@ -97090,7 +97196,7 @@ class Meat {
   }
 
   tick() {
-    this.life -= 0.001;
+    this.life -= 0.005;
     if (this.life < 0.0) {
       this.destroy();
       return;
@@ -97117,7 +97223,7 @@ class Meat {
 
 module.exports = Meat;
 
-},{"matter-js":551}],586:[function(require,module,exports){
+},{"matter-js":551}],584:[function(require,module,exports){
 'use strict';
 
 const Matter = require('matter-js');
@@ -97127,11 +97233,11 @@ const Bodies = require('matter-js').Bodies;
 class Plant {
 
   static get_height() {
-    return 25;
+    return 10;
   }
 
   static get_width() {
-    return 25;
+    return 10;
   }
 
   constructor() {
@@ -97144,7 +97250,7 @@ class Plant {
       label: 'Plant'
     });
 
-    this.body = Bodies.rectangle(position.x, position.y, Plant.get_width(), Plant.get_height(), {
+    this.body = Bodies.circle(position.x, position.y, Plant.get_width(), {
       friction: 0.5,
       frictionStatic: 0.1,
       isStatic: true,
@@ -97167,7 +97273,9 @@ class Plant {
   }
 
   tick() {
-    this.life += 0.002;
+    if (this.life < 2.0) {
+      this.life += 0.0002;
+    }
     this.body.gameColor = { red: 0.0, blue: 0.0, green: this.life };
     this.body.render.fillStyle = this.rgbToHex(0, this.life * 255, 0);
   }
@@ -97192,7 +97300,7 @@ class Plant {
 
 module.exports = Plant;
 
-},{"matter-js":551}],587:[function(require,module,exports){
+},{"matter-js":551}],585:[function(require,module,exports){
 'use strict';
 
 const Matter = require('matter-js');
@@ -97205,15 +97313,16 @@ class Wall {
   }
 
   static get_height() {
-    return 20;
+    return 10;
   }
 
   static get_width() {
-    return 20;
+    return 10;
   }
   create(world, position) {
 
-    this.body = Bodies.rectangle(position.x, position.y, Wall.get_height(), Wall.get_width(), {
+    this.body = Bodies.circle(position.x, position.y, Wall.get_width(), {
+      density: 10.0,
       friction: 0.5,
       frictionStatic: 0.1,
       isStatic: true,
@@ -97224,13 +97333,9 @@ class Wall {
       }
     });
 
-    this.body.gameColor = { red: 0.0, blue: 1.0, green: 0.0
+    this.body.gameColor = { red: 0.0, blue: 1.0, green: 0.0 };
 
-      // this.body.onCollideActive = function(me, them){
-      //
-      // }
-
-    };this.body.gameObject = this;
+    this.body.gameObject = this;
     this.world = world;
     World.add(world, this.body);
   }
@@ -97238,4 +97343,4 @@ class Wall {
 
 module.exports = Wall;
 
-},{"matter-js":551}]},{},[574]);
+},{"matter-js":551}]},{},[572]);

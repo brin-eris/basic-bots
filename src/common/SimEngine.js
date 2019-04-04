@@ -11,16 +11,16 @@ const    Wall = require('./world/Wall');
 
 const STARTING_BOTS = 6;
 const MIN_BOTS_PER_SPECIES = 3;
-const MAX_BOTS = 20;
+const MAX_BOTS = 28;
 const SPECIES = 2;
-const STARTING_PLANTS = 350;
-const MIN_PLANTS = 250;
-const WALLS = 2;
+const STARTING_PLANTS = 250;
+const MIN_PLANTS = 150;
+const WALLS_PER_SECTION = 20;
+const SECTIONS = 3;
+const WIDTH = 2300;
+const HEIGHT = 2100;
 
-const WIDTH = 1500;
-const HEIGHT = 1100;
 
-// soak the brains in here to get juicy
 class SimEngine {
   constructor() {
     this.width = WIDTH;
@@ -28,6 +28,7 @@ class SimEngine {
   }
 
   init(){
+    Matter.use(MatterWrap);
     this.physicsEngine = Matter.Engine.create({constraintIterations: 100});
     let engine = this.physicsEngine;
     engine.world.bounds.min.x = 0;
@@ -44,13 +45,22 @@ class SimEngine {
   start(){
     let engine = this.physicsEngine;
 
-      for (let i = 0; i < WALLS; i++){
-            new Wall().create(engine.world, {
-              x : Mathjs.round(Math.cos(i*3.14/(WALLS/2)) * 500 )+WIDTH/2 ,
-              y : Mathjs.round(Math.sin(i*3.14/(WALLS/2))* 500 )+HEIGHT/2
-            });
+      for (let section = 0; section < SECTIONS; section++){
+        let section_offset = (section * 6.28/SECTIONS);
+        let half_width = (WIDTH/2);
+        let half_height = (HEIGHT/2);
+        let angle_incriment = 3.14/(WALLS_PER_SECTION*2);
+        let radius_incriment = (half_width/ (WALLS_PER_SECTION*1.25));
+        for (let i = 0; i < WALLS_PER_SECTION; i++){
+          let rnd = (Math.random()-0.5) * 200;
+          let radius = (radius_incriment * (i ) + rnd + 175);
+          let angle = (i* angle_incriment + section_offset) + (Math.random()-0.5)/10;
+              new Wall().create(engine.world, {
+                x : Mathjs.round(Math.cos(angle) * radius) + half_width ,
+                y : Mathjs.round(Math.sin(angle) * radius) + half_height
+              });
+        }
       }
-
 
 
       let spacer = 2;
@@ -132,7 +142,7 @@ class SimEngine {
           if(someone_needs_to_die){
             console.log('someone_needs_to_die');
           }
-          if(plantCount < MIN_PLANTS && Math.random()>0.85){
+          if(plantCount < MIN_PLANTS && Math.random()<0.65){
 
             new Plant().create(engine.world, {
               x : Mathjs.pickRandom(horizontal_center_points),
@@ -147,7 +157,9 @@ class SimEngine {
 
               let child = new Bot( );
               child.species = k;
-              child.create(engine.world, {x: WIDTH/2 +Math.random()*500, y:HEIGHT/2 +Math.random()*500} );
+              child.create(engine.world, {
+                x: WIDTH * 0.5 + (Math.random()-0.5) * WIDTH,
+                y: HEIGHT * 0.5 + (Math.random()-0.5) * HEIGHT} );
               console.log("Spawned new: " + k);
             }
 

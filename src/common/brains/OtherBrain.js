@@ -103,8 +103,8 @@ class OtherBrain extends BaseBrain{
         return value;
       });
 
-      this.base_body_colorA = { red: 0.25, blue: 0.25, green: 0.25 };
-      this.base_body_colorB = { red: 0.25, blue: 0.25, green: 0.25 };
+      this.base_body_colorA = { red: Math.random()*0.5, blue: Math.random()*0.5, green: Math.random()*0.5 };
+      this.base_body_colorB = { red: Math.random()*0.5, blue: Math.random()*0.5, green: Math.random()*0.5 };
 
     }
 
@@ -270,24 +270,24 @@ class OtherBrain extends BaseBrain{
 
       let body_color_mute = 0.15;
       this.base_body_colorA = channel_A.base_body_color;
-      if(Math.random()<mut_rate){
+      if(Math.random()<mut_rate*10){
         this.base_body_colorA.red += (Math.random() - 0.5) * body_color_mute;
       }
-      if(Math.random()<mut_rate){
+      if(Math.random()<mut_rate*10){
         this.base_body_colorA.blue += (Math.random() - 0.5) * body_color_mute;
       }
-      if(Math.random()<mut_rate){
+      if(Math.random()<mut_rate*10){
         this.base_body_colorA.green += (Math.random() - 0.5) * body_color_mute;
       }
 
       this.base_body_colorB = channel_B.base_body_color;
-      if(Math.random()<mut_rate){
+      if(Math.random()<mut_rate*10){
         this.base_body_colorB.red += (Math.random() - 0.5) * body_color_mute;
       }
-      if(Math.random()<mut_rate){
+      if(Math.random()<mut_rate*10){
         this.base_body_colorB.blue += (Math.random() - 0.5) * body_color_mute;
       }
-      if(Math.random()<mut_rate){
+      if(Math.random()<mut_rate*10){
         this.base_body_colorB.green += (Math.random() - 0.5) * body_color_mute;
       }
 

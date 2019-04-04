@@ -96013,30 +96013,30 @@ class BaseBrain {
 
   getOutputs() {
     let threshold = 0.0;
-    this.turn1 = (this.outputVector.subset(Mathjs.index(0)) + this.outputVector.subset(Mathjs.index(16))) * 0.75; //*Math.PI;
-    this.thrust1 = (this.outputVector.subset(Mathjs.index(1)) + this.outputVector.subset(Mathjs.index(17)) + this.outputVector.subset(Mathjs.index(18))) * 0.75;
-    this.turn2 = (this.outputVector.subset(Mathjs.index(2)) + this.outputVector.subset(Mathjs.index(19))) * 0.75; //*Math.PI;
-    this.thrust2 = (this.outputVector.subset(Mathjs.index(3)) + this.outputVector.subset(Mathjs.index(20)) + this.outputVector.subset(Mathjs.index(21))) * 0.75;
+    this.turn1 = (this.outputVector.subset(Mathjs.index(0)) + this.outputVector.subset(Mathjs.index(1))) * 0.75; //*Math.PI;
+    this.thrust1 = (this.outputVector.subset(Mathjs.index(2)) + this.outputVector.subset(Mathjs.index(3)) + this.outputVector.subset(Mathjs.index(4))) * 0.75;
+    this.turn2 = (this.outputVector.subset(Mathjs.index(5)) + this.outputVector.subset(Mathjs.index(6))) * 0.75; //*Math.PI;
+    this.thrust2 = (this.outputVector.subset(Mathjs.index(7)) + this.outputVector.subset(Mathjs.index(8)) + this.outputVector.subset(Mathjs.index(9))) * 0.75;
 
-    this.sting = this.outputVector.subset(Mathjs.index(7));
+    this.sting = this.outputVector.subset(Mathjs.index(10));
 
-    this.give = this.outputVector.subset(Mathjs.index(8));
+    this.give = this.outputVector.subset(Mathjs.index(11));
 
-    this.voice = this.outputVector.subset(Mathjs.index(9));
+    this.voice = this.outputVector.subset(Mathjs.index(12));
 
-    this.farts = this.outputVector.subset(Mathjs.index(10)) > threshold;
+    this.farts = this.outputVector.subset(Mathjs.index(13)) > threshold;
 
     this.bodyColor.red = 1.0 - this.life;
     this.bodyColor.blue = this.sting > 0 ? this.sting : 0.0;
     this.bodyColor.green = this.give > 0 ? this.give : 0.0;
 
-    this.armColorA.red = this.base_body_color.red + this.outputVector.subset(Mathjs.index(4)) / 2;
-    this.armColorA.blue = this.base_body_color.blue + this.outputVector.subset(Mathjs.index(5)) / 2; //  + this.sting/2;
-    this.armColorA.green = this.base_body_color.green + this.outputVector.subset(Mathjs.index(6)) / 2; //  + this.give/2;
+    this.armColorA.red = this.base_body_color.red; // + (this.outputVector.subset(Mathjs.index(4)) )/2 ;
+    this.armColorA.blue = this.base_body_color.blue; // + (this.outputVector.subset(Mathjs.index(5)))/2;//  + this.sting/2;
+    this.armColorA.green = this.base_body_color.green; // + (this.outputVector.subset(Mathjs.index(6)))/2;//  + this.give/2;
 
-    this.armColorB.red = this.base_body_color.red + this.outputVector.subset(Mathjs.index(4)) / 2; //
-    this.armColorB.blue = this.base_body_color.blue + this.outputVector.subset(Mathjs.index(5)) / 2; //  + this.sting/2;
-    this.armColorB.green = this.base_body_color.green + this.outputVector.subset(Mathjs.index(6)) / 2; // + this.give/2;
+    this.armColorB.red = this.base_body_color.red; // + (this.outputVector.subset(Mathjs.index(4)))/2;//
+    this.armColorB.blue = this.base_body_color.blue; // +  (this.outputVector.subset(Mathjs.index(5)))/2;//  + this.sting/2;
+    this.armColorB.green = this.base_body_color.green; // +  (this.outputVector.subset(Mathjs.index(6)))/2;// + this.give/2;
 
     this.armColorC.red = this.base_body_color.red; // + (this.outputVector.subset(Mathjs.index(4)))/2;//
     this.armColorC.blue = this.base_body_color.blue; // + (this.outputVector.subset(Mathjs.index(5)))/2;// + this.sting/2;
@@ -96045,14 +96045,14 @@ class BaseBrain {
     //this.interestInMating = (this.outputVector.subset(Mathjs.index(11))+this.outputVector.subset(Mathjs.index(26)));
 
 
-    this.memory1 = this.outputVector.subset(Mathjs.index(12)) + this.outputVector.subset(Mathjs.index(22));
-    this.memory2 = this.outputVector.subset(Mathjs.index(13)) + this.outputVector.subset(Mathjs.index(23));
-    this.memory3 = this.outputVector.subset(Mathjs.index(14)) + this.outputVector.subset(Mathjs.index(24));
-    this.memory4 = this.outputVector.subset(Mathjs.index(15)) + this.outputVector.subset(Mathjs.index(25));
-    this.memory5 = this.outputVector.subset(Mathjs.index(16)) + this.outputVector.subset(Mathjs.index(26));
-    this.memory6 = this.outputVector.subset(Mathjs.index(17)) + this.outputVector.subset(Mathjs.index(27));
-    this.memory7 = this.outputVector.subset(Mathjs.index(18)) + this.outputVector.subset(Mathjs.index(28));
-    this.memory8 = this.outputVector.subset(Mathjs.index(19)) + this.outputVector.subset(Mathjs.index(29));
+    this.memory1 = this.outputVector.subset(Mathjs.index(14)) + this.outputVector.subset(Mathjs.index(22));
+    this.memory2 = this.outputVector.subset(Mathjs.index(15)) + this.outputVector.subset(Mathjs.index(23));
+    this.memory3 = this.outputVector.subset(Mathjs.index(16)) + this.outputVector.subset(Mathjs.index(24));
+    this.memory4 = this.outputVector.subset(Mathjs.index(17)) + this.outputVector.subset(Mathjs.index(25));
+    this.memory5 = this.outputVector.subset(Mathjs.index(18)) + this.outputVector.subset(Mathjs.index(26));
+    this.memory6 = this.outputVector.subset(Mathjs.index(19)) + this.outputVector.subset(Mathjs.index(27));
+    this.memory7 = this.outputVector.subset(Mathjs.index(20)) + this.outputVector.subset(Mathjs.index(28));
+    this.memory8 = this.outputVector.subset(Mathjs.index(21)) + this.outputVector.subset(Mathjs.index(29));
   }
 
   cleanupInputs() {
@@ -96914,8 +96914,8 @@ class OtherBrain extends BaseBrain {
       return value;
     });
 
-    this.base_body_colorA = { red: 0.25, blue: 0.25, green: 0.25 };
-    this.base_body_colorB = { red: 0.25, blue: 0.25, green: 0.25 };
+    this.base_body_colorA = { red: Math.random() * 0.5, blue: Math.random() * 0.5, green: Math.random() * 0.5 };
+    this.base_body_colorB = { red: Math.random() * 0.5, blue: Math.random() * 0.5, green: Math.random() * 0.5 };
   }
 
   buildLayers() {
@@ -97073,24 +97073,24 @@ class OtherBrain extends BaseBrain {
 
     let body_color_mute = 0.15;
     this.base_body_colorA = channel_A.base_body_color;
-    if (Math.random() < mut_rate) {
+    if (Math.random() < mut_rate * 10) {
       this.base_body_colorA.red += (Math.random() - 0.5) * body_color_mute;
     }
-    if (Math.random() < mut_rate) {
+    if (Math.random() < mut_rate * 10) {
       this.base_body_colorA.blue += (Math.random() - 0.5) * body_color_mute;
     }
-    if (Math.random() < mut_rate) {
+    if (Math.random() < mut_rate * 10) {
       this.base_body_colorA.green += (Math.random() - 0.5) * body_color_mute;
     }
 
     this.base_body_colorB = channel_B.base_body_color;
-    if (Math.random() < mut_rate) {
+    if (Math.random() < mut_rate * 10) {
       this.base_body_colorB.red += (Math.random() - 0.5) * body_color_mute;
     }
-    if (Math.random() < mut_rate) {
+    if (Math.random() < mut_rate * 10) {
       this.base_body_colorB.blue += (Math.random() - 0.5) * body_color_mute;
     }
-    if (Math.random() < mut_rate) {
+    if (Math.random() < mut_rate * 10) {
       this.base_body_colorB.green += (Math.random() - 0.5) * body_color_mute;
     }
 

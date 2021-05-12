@@ -24,7 +24,7 @@
     "dat.gui": "^0.6.1",
     "express": "^4.16.2",
     "lance-gg": "^1.0.10",
-    "mathjs": "^3.16.5",
+    "mathjs": "^7.5.1",
     "matter-attractors": "^0.1.6",
     "matter-collision-events": "^0.1.7",
     "matter-js": "^0.12.0",

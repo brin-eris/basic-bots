@@ -23,7 +23,7 @@
     "csvtojson": "^1.1.9",
     "dat.gui": "^0.6.1",
     "express": "^4.16.2",
-    "lance-gg": "^1.0.10",
+    "lance-gg": "^4.0.9",
     "mathjs": "^3.16.5",
     "matter-attractors": "^0.1.6",
     "matter-collision-events": "^0.1.7",

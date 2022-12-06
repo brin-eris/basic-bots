@@ -22,7 +22,7 @@
     "bufferutil": "^3.0.4",
     "csvtojson": "^1.1.9",
     "dat.gui": "^0.6.1",
-    "express": "^4.16.2",
+    "express": "^4.18.2",
     "lance-gg": "^1.0.10",
     "mathjs": "^3.16.5",
     "matter-attractors": "^0.1.6",
